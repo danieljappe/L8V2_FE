@@ -192,7 +192,11 @@ const UpcomingEvent: React.FC = () => {
                     variants={itemVariants}
                     whileHover={{ scale: 1.05, y: -5 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedArtist(artist)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedArtist(artist);
+                    }}
                     className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 cursor-pointer group"
                   >
                     <motion.div 

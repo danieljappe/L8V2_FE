@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Image } from 'lucide-react';
+import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Image, Users, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,9 +37,11 @@ const Header: React.FC = () => {
 
   const navItems = [
     { name: 'Begivenheder', path: '/events', icon: Calendar },
+    { name: 'Kunstnere', path: '/artists', icon: Users },
     { name: 'Galleri', path: '/gallery', icon: Image },
     { name: 'Om Os', path: '/about', icon: Info },
-    { name: 'Kontakt', path: '/contact', icon: Phone }
+    { name: 'Kontakt', path: '/contact', icon: Phone },
+    { name: 'Admin', path: '/admin', icon: Settings }
   ];
 
   const socialLinks = [

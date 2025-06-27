@@ -22,16 +22,28 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const baseHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+      let extraHeaders: Record<string, string> = {};
+      if (options.headers && typeof options.headers === 'object' && !(options.headers instanceof Headers)) {
+        extraHeaders = options.headers as Record<string, string>;
+      }
+      if (token) {
+        extraHeaders['Authorization'] = `Bearer ${token}`;
+      }
+      const headers = Object.assign({}, baseHeaders, extraHeaders);
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
         ...options,
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      if (response.status === 204) {
+        // No Content
+        return { data: {} as T };
       }
 
       const data = await response.json();
@@ -177,16 +189,22 @@ export const apiService = {
   getArtists: () => apiClient.get<Artist[]>('/artists'),
   getArtist: (id: string) => apiClient.get<Artist>(`/artists/${id}`),
   createArtist: (artist: Partial<Artist>) => apiClient.post<Artist>('/artists', artist),
+  updateArtist: (id: string, artist: Partial<Artist>) => apiClient.put<Artist>(`/artists/${id}`, artist),
+  deleteArtist: (id: string) => apiClient.delete<null>(`/artists/${id}`),
 
   // Events
   getEvents: () => apiClient.get<Event[]>('/events'),
   getEvent: (id: string) => apiClient.get<Event>(`/events/${id}`),
   createEvent: (event: Partial<Event>) => apiClient.post<Event>('/events', event),
+  updateEvent: (id: string, event: Partial<Event>) => apiClient.put<Event>(`/events/${id}`, event),
+  deleteEvent: (id: string) => apiClient.delete<null>(`/events/${id}`),
 
   // Venues
   getVenues: () => apiClient.get<Venue[]>('/venues'),
   getVenue: (id: number) => apiClient.get<Venue>(`/venues/${id}`),
   createVenue: (venue: Partial<Venue>) => apiClient.post<Venue>('/venues', venue),
+  updateVenue: (id: string | number, venue: Partial<Venue>) => apiClient.put<Venue>(`/venues/${id}`, venue),
+  deleteVenue: (id: string | number) => apiClient.delete<null>(`/venues/${id}`),
 
   // Gallery
   getGalleryImages: () => apiClient.get<GalleryImage[]>('/gallery'),
@@ -205,6 +223,23 @@ export const apiService = {
   // Event Artists
   getEventArtists: () => apiClient.get<EventArtist[]>('/event-artists'),
   createEventArtist: (eventArtist: Partial<EventArtist>) => apiClient.post<EventArtist>('/event-artists', eventArtist),
+
+  // Gallery image upload
+  uploadGalleryImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const response = await fetch(`${API_BASE_URL}/gallery/upload`, {
+      method: 'POST',
+      body: formData,
+      headers,
+    });
+    if (!response.ok) {
+      throw new Error('Image upload failed');
+    }
+    return response.json();
+  },
 };
 
 export default apiService; 
