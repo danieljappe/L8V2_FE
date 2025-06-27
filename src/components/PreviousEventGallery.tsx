@@ -1,14 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Heart, Share2 } from 'lucide-react';
+import LoadingSpinner from './LoadingSpinner';
+import { useGalleryImages, useEvents } from '../hooks/useApi';
+import { GalleryImage, Event } from '../services/api';
 
 const PreviousEventGallery: React.FC = () => {
-  const galleryImages = [
-    { id: 1, src: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'DJ performing' },
-    { id: 2, src: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Crowd dancing' },
-    { id: 3, src: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Stage lights' },
-    { id: 4, src: 'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Concert atmosphere' },
-  ];
+  // Fetch gallery images and events from API
+  const { data: galleryImages, loading: galleryLoading, error: galleryError } = useGalleryImages();
+  const { data: events, loading: eventsLoading, error: eventsError } = useEvents();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -34,6 +34,62 @@ const PreviousEventGallery: React.FC = () => {
     }
   };
 
+  // Get the most recent past event
+  const recentPastEvent = events?.find(event => {
+    const eventDate = new Date(event.date);
+    const today = new Date();
+    return eventDate < today;
+  });
+
+  // Get gallery images for the recent event (or use all if no specific event)
+  const eventGalleryImages = galleryImages?.filter(img => 
+    !recentPastEvent || img.eventId === recentPastEvent.id
+  ) || [];
+
+  // Use fallback images if no gallery images are available
+  const displayImages = eventGalleryImages.length > 0 ? eventGalleryImages : [
+    { id: 1, imageUrl: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'DJ performing' } as GalleryImage,
+    { id: 2, imageUrl: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'Crowd dancing' } as GalleryImage,
+    { id: 3, imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'Stage lights' } as GalleryImage,
+    { id: 4, imageUrl: 'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'Concert atmosphere' } as GalleryImage,
+  ];
+
+  // Show loading state
+  if (galleryLoading || eventsLoading) {
+    return (
+      <section id="gallery" className="min-h-screen flex items-center justify-center p-4 snap-start">
+        <LoadingSpinner size="lg" text="Loading gallery..." />
+      </section>
+    );
+  }
+
+  // Show error state
+  if (galleryError || eventsError) {
+    return (
+      <section id="gallery" className="min-h-screen flex items-center justify-center p-4 snap-start">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Failed to load gallery</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Format event date
+  const formatEventDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
   return (
     <section id="gallery" className="min-h-screen flex items-center justify-center p-4 snap-start">
       <motion.div 
@@ -54,7 +110,10 @@ const PreviousEventGallery: React.FC = () => {
             variants={itemVariants}
             className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4"
           >
-            Relive the magic of "Cosmic Vibes" - our most electrifying event yet with incredible performances and unforgettable moments.
+            {recentPastEvent 
+              ? `Relive the magic of "${recentPastEvent.title}" - our most recent event with incredible performances and unforgettable moments.`
+              : 'Relive the magic of our most electrifying events with incredible performances and unforgettable moments.'
+            }
           </motion.p>
         </motion.div>
 
@@ -72,13 +131,16 @@ const PreviousEventGallery: React.FC = () => {
                 variants={itemVariants}
                 className="text-xl sm:text-2xl font-bold text-white"
               >
-                Cosmic Vibes
+                {recentPastEvent?.title || 'Recent Event'}
               </motion.h3>
               <motion.p 
                 variants={itemVariants}
                 className="text-white/60 text-sm sm:text-base"
               >
-                February 14, 2025 • 2,500 attendees
+                {recentPastEvent 
+                  ? `${formatEventDate(recentPastEvent.date)} • ${recentPastEvent.venue?.name || 'Venue'}`
+                  : 'Recent event highlights'
+                }
               </motion.p>
             </div>
             <div className="flex items-center space-x-2">
@@ -104,7 +166,7 @@ const PreviousEventGallery: React.FC = () => {
             variants={containerVariants}
             className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
           >
-            {galleryImages.map((image, index) => (
+            {displayImages.slice(0, 4).map((image, index) => (
               <motion.div 
                 key={image.id}
                 variants={itemVariants}
@@ -114,8 +176,8 @@ const PreviousEventGallery: React.FC = () => {
               >
                 <div className="aspect-square rounded-2xl overflow-hidden">
                   <motion.img
-                    src={image.src}
-                    alt={image.alt}
+                    src={image.imageUrl}
+                    alt={image.title || `Gallery image ${index + 1}`}
                     className="w-full h-full object-cover"
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.3 }}
@@ -150,8 +212,8 @@ const PreviousEventGallery: React.FC = () => {
             className="grid grid-cols-3 gap-4 mb-4 sm:mb-6"
           >
             {[
-              { value: '2.5K', label: 'Attendees' },
-              { value: '6', label: 'Artists' },
+              { value: recentPastEvent?.venue?.capacity ? `${Math.floor(recentPastEvent.venue.capacity * 0.8)}` : '2.5K', label: 'Attendees' },
+              { value: recentPastEvent?.eventArtists?.length?.toString() || '6', label: 'Artists' },
               { value: '8hrs', label: 'Duration' }
             ].map((stat, index) => (
               <motion.div 

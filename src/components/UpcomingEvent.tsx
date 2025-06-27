@@ -3,22 +3,17 @@ import { motion } from 'framer-motion';
 import { Calendar, MapPin, Clock, Music, Ticket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ArtistModal from './ArtistModal';
-
-interface Artist {
-  name: string;
-  genre: string;
-  image: string;
-  bio: string;
-  social?: {
-    instagram?: string;
-    website?: string;
-    youtube?: string;
-  };
-}
+import LoadingSpinner from './LoadingSpinner';
+import { useEvents, useArtists } from '../hooks/useApi';
+import { Artist, Event } from '../services/api';
 
 const UpcomingEvent: React.FC = () => {
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
   const navigate = useNavigate();
+
+  // Fetch events and artists from API
+  const { data: events, loading: eventsLoading, error: eventsError } = useEvents();
+  const { data: artists, loading: artistsLoading, error: artistsError } = useArtists();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -44,55 +39,70 @@ const UpcomingEvent: React.FC = () => {
     }
   };
 
-  // Artist data
-  const artists: Artist[] = [
-    {
-      name: 'DJ Synthwave',
-      genre: 'Electronic',
-      image: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300',
-      bio: 'Kendt for sine unikke synthwave beats og energiske live shows. Med over 10 års erfaring i den elektroniske musikscene har DJ Synthwave udviklet en særpræget stil, der kombinerer retro synthwave med moderne elektronisk musik.',
-      social: {
-        instagram: 'https://instagram.com/djsynthwave',
-        website: 'https://djsynthwave.com',
-        youtube: 'https://youtube.com/djsynthwave'
-      }
-    },
-    {
-      name: 'Luna Beats',
-      genre: 'House',
-      image: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=300',
-      bio: 'En af de mest innovative house DJs i scenen lige nu. Luna Beats har revolutioneret house-musikken med deres unikke blend af klassisk house og moderne elektroniske elementer.',
-      social: {
-        instagram: 'https://instagram.com/lunabeats',
-        website: 'https://lunabeats.com'
-      }
-    },
-    {
-      name: 'Neon Pulse',
-      genre: 'Techno',
-      image: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=300',
-      bio: 'Specialiseret i hård techno og psykedelisk elektronisk musik. Neon Pulse skaber en intens og hypnotisk oplevelse, der tager lytteren med på en rejse gennem lyd og lys.',
-      social: {
-        instagram: 'https://instagram.com/neonpulse',
-        youtube: 'https://youtube.com/neonpulse'
-      }
-    },
-    {
-      name: 'Echo Dreams',
-      genre: 'Ambient',
-      image: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=300',
-      bio: 'En visionær kunstner, der skaber drømmende ambient lydskulpturer. Echo Dreams kombinerer elektroniske elementer med organiske lyde for at skabe en unik lydoplevelse.',
-      social: {
-        instagram: 'https://instagram.com/echodreams',
-        website: 'https://echodreams.com'
-      }
-    }
-  ];
+  // Get the next upcoming event
+  const upcomingEvent = events?.find(event => {
+    const eventDate = new Date(event.date);
+    const today = new Date();
+    return eventDate >= today;
+  });
+
+  // Get artists for the upcoming event
+  const eventArtists = upcomingEvent?.eventArtists?.map(ea => ea.artist) || [];
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate('/events/1', { replace: true });
+    if (upcomingEvent) {
+      navigate(`/events/${upcomingEvent.id}`, { replace: true });
+    }
+  };
+
+  // Show loading state
+  if (eventsLoading || artistsLoading) {
+    return (
+      <section id="events" className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+        <LoadingSpinner size="lg" text="Loading upcoming events..." />
+      </section>
+    );
+  }
+
+  // Show error state
+  if (eventsError || artistsError) {
+    return (
+      <section id="events" className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Failed to load events</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Show fallback if no upcoming events
+  if (!upcomingEvent) {
+    return (
+      <section id="events" className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">No Upcoming Events</h2>
+          <p className="text-white/70">Check back soon for new events!</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Format event date
+  const formatEventDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('da-DK', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   };
 
   return (
@@ -130,12 +140,12 @@ const UpcomingEvent: React.FC = () => {
               variants={itemVariants}
               className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight"
             >
-              Neon Nætter
+              {upcomingEvent.title}
               <motion.span 
                 variants={itemVariants}
                 className="block text-purple-300 text-lg sm:text-2xl md:text-3xl font-medium mt-2"
               >
-                Multi-Kunstner Oplevelse
+                {upcomingEvent.venue?.name || 'Multi-Kunstner Oplevelse'}
               </motion.span>
             </motion.h1>
 
@@ -145,9 +155,9 @@ const UpcomingEvent: React.FC = () => {
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8"
             >
               {[
-                { icon: Calendar, label: 'Dato', value: '15. marts 2025', color: 'blue' },
-                { icon: Clock, label: 'Tidspunkt', value: '21:00 - 03:00', color: 'green' },
-                { icon: MapPin, label: 'Sted', value: 'Warehouse District', color: 'orange' }
+                { icon: Calendar, label: 'Dato', value: formatEventDate(upcomingEvent.date), color: 'blue' },
+                { icon: Clock, label: 'Tidspunkt', value: upcomingEvent.startTime || '21:00 - 03:00', color: 'green' },
+                { icon: MapPin, label: 'Sted', value: upcomingEvent.venue?.name || 'Warehouse District', color: 'orange' }
               ].map((detail, index) => (
                 <motion.div
                   key={detail.label}
@@ -176,9 +186,9 @@ const UpcomingEvent: React.FC = () => {
                 Fremhævede Kunstnere
               </motion.h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                {artists.map((artist, index) => (
+                {eventArtists.slice(0, 4).map((artist, index) => (
                   <motion.div
-                    key={artist.name}
+                    key={artist.id}
                     variants={itemVariants}
                     whileHover={{ scale: 1.05, y: -5 }}
                     whileTap={{ scale: 0.95 }}
@@ -191,7 +201,7 @@ const UpcomingEvent: React.FC = () => {
                       className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-2 sm:mb-3 mx-auto overflow-hidden"
                     >
                       <img 
-                        src={artist.image} 
+                        src={artist.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300'} 
                         alt={artist.name}
                         className="w-full h-full object-cover"
                       />
@@ -203,17 +213,27 @@ const UpcomingEvent: React.FC = () => {
               </div>
             </motion.div>
 
+            {/* Event Description */}
+            {upcomingEvent.description && (
+              <motion.div variants={itemVariants} className="mb-6 sm:mb-8">
+                <motion.p 
+                  variants={itemVariants}
+                  className="text-white/80 text-sm sm:text-base leading-relaxed"
+                >
+                  {upcomingEvent.description}
+                </motion.p>
+              </motion.div>
+            )}
+
             {/* CTA Button */}
-            <motion.div 
-              variants={itemVariants}
-              className="text-center"
-            >
+            <motion.div variants={itemVariants} className="text-center">
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 mx-auto text-sm sm:text-base"
               >
-                Køb Billetter Nu
+                <Ticket className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Book Billetter</span>
               </motion.button>
             </motion.div>
           </motion.div>
@@ -221,10 +241,12 @@ const UpcomingEvent: React.FC = () => {
       </motion.div>
 
       {/* Artist Modal */}
-      <ArtistModal 
-        artist={selectedArtist} 
-        onClose={() => setSelectedArtist(null)} 
-      />
+      {selectedArtist && (
+        <ArtistModal
+          artist={selectedArtist}
+          onClose={() => setSelectedArtist(null)}
+        />
+      )}
     </section>
   );
 };

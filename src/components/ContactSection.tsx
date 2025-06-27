@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Instagram, Twitter, Facebook } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Instagram, Twitter, Facebook, CheckCircle, AlertCircle } from 'lucide-react';
+import { useCreateContactMessage } from '../hooks/useApi';
+import { ContactMessage } from '../services/api';
 
 const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,11 @@ const ContactSection: React.FC = () => {
     message: ''
   });
 
+  const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState('');
+
+  const { mutate: createContactMessage, loading, error } = useCreateContactMessage();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -17,10 +24,39 @@ const ContactSection: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form:', formData);
-    // Handle form submission
+    
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setFormStatus('error');
+      setStatusMessage('Please fill in all fields');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setFormStatus('error');
+      setStatusMessage('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      const result = await createContactMessage(formData as Partial<ContactMessage>);
+      
+      if (result?.error) {
+        setFormStatus('error');
+        setStatusMessage(result.error);
+      } else {
+        setFormStatus('success');
+        setStatusMessage('Message sent successfully! We\'ll get back to you soon.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      }
+    } catch (err) {
+      setFormStatus('error');
+      setStatusMessage('Failed to send message. Please try again.');
+    }
   };
 
   const contactInfo = [
@@ -111,6 +147,26 @@ const ContactSection: React.FC = () => {
               Send us a Message
             </motion.h3>
             
+            {/* Status Message */}
+            {formStatus !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mb-4 p-3 rounded-lg flex items-center space-x-2 ${
+                  formStatus === 'success' 
+                    ? 'bg-green-500/20 border border-green-300/30 text-green-200' 
+                    : 'bg-red-500/20 border border-red-300/30 text-red-200'
+                }`}
+              >
+                {formStatus === 'success' ? (
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                )}
+                <span className="text-sm">{statusMessage}</span>
+              </motion.div>
+            )}
+            
             <motion.form 
               variants={containerVariants}
               onSubmit={handleSubmit} 
@@ -130,6 +186,7 @@ const ContactSection: React.FC = () => {
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors text-sm sm:text-base"
                     placeholder="Your name"
                     required
+                    disabled={loading}
                   />
                 </motion.div>
                 <motion.div variants={itemVariants}>
@@ -145,6 +202,7 @@ const ContactSection: React.FC = () => {
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors text-sm sm:text-base"
                     placeholder="your@email.com"
                     required
+                    disabled={loading}
                   />
                 </motion.div>
               </div>
@@ -162,6 +220,7 @@ const ContactSection: React.FC = () => {
                   className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors text-sm sm:text-base"
                   placeholder="What's this about?"
                   required
+                  disabled={loading}
                 />
               </motion.div>
 
@@ -178,6 +237,7 @@ const ContactSection: React.FC = () => {
                   className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-400 transition-colors resize-none text-sm sm:text-base"
                   placeholder="Tell us more about your inquiry..."
                   required
+                  disabled={loading}
                 ></motion.textarea>
               </motion.div>
 
@@ -186,10 +246,20 @@ const ContactSection: React.FC = () => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 sm:py-4 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 text-sm sm:text-base"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 sm:py-4 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 text-sm sm:text-base disabled:cursor-not-allowed"
               >
-                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Send Message</span>
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span>Send Message</span>
+                  </>
+                )}
               </motion.button>
             </motion.form>
           </motion.div>
@@ -199,7 +269,6 @@ const ContactSection: React.FC = () => {
             {/* Contact Details */}
             <motion.div 
               variants={itemVariants}
-              whileHover={{ scale: 1.02, y: -5 }}
               className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl"
             >
               <motion.h3 
@@ -211,32 +280,24 @@ const ContactSection: React.FC = () => {
               
               <motion.div 
                 variants={containerVariants}
-                className="space-y-4 sm:space-y-6"
+                className="space-y-4"
               >
                 {contactInfo.map((info, index) => (
-                  <motion.div 
-                    key={index}
+                  <motion.a
+                    key={info.label}
                     variants={itemVariants}
-                    whileHover={{ x: 5 }}
-                    className="flex items-center space-x-4"
+                    href={info.href}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors duration-300"
                   >
-                    <motion.div 
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="p-2 sm:p-3 bg-purple-500/20 rounded-xl flex-shrink-0"
-                    >
-                      <info.icon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
-                    </motion.div>
-                    <div className="min-w-0">
-                      <p className="text-white/60 text-xs sm:text-sm">{info.label}</p>
-                      <motion.a
-                        whileHover={{ scale: 1.05 }}
-                        href={info.href}
-                        className="text-white font-medium hover:text-purple-300 transition-colors text-sm sm:text-base truncate block"
-                      >
-                        {info.value}
-                      </motion.a>
+                    <div className="p-2 sm:p-3 bg-purple-500/20 rounded-xl">
+                      <info.icon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300" />
                     </div>
-                  </motion.div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-white/60">{info.label}</p>
+                      <p className="font-semibold text-sm sm:text-base">{info.value}</p>
+                    </div>
+                  </motion.a>
                 ))}
               </motion.div>
             </motion.div>
@@ -244,7 +305,6 @@ const ContactSection: React.FC = () => {
             {/* Social Media */}
             <motion.div 
               variants={itemVariants}
-              whileHover={{ scale: 1.02, y: -5 }}
               className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl"
             >
               <motion.h3 
@@ -256,29 +316,21 @@ const ContactSection: React.FC = () => {
               
               <motion.div 
                 variants={containerVariants}
-                className="flex space-x-4"
+                className="flex items-center space-x-4"
               >
                 {socialMedia.map((social, index) => (
                   <motion.a
-                    key={index}
+                    key={social.label}
                     variants={itemVariants}
-                    whileHover={{ scale: 1.1, y: -5 }}
-                    whileTap={{ scale: 0.9 }}
                     href={social.href}
-                    className="p-3 sm:p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all duration-300"
-                    aria-label={social.label}
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-3 sm:p-4 bg-white/10 hover:bg-white/20 rounded-xl transition-all duration-300"
                   >
                     <social.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </motion.a>
                 ))}
               </motion.div>
-              
-              <motion.p 
-                variants={itemVariants}
-                className="text-white/70 text-xs sm:text-sm mt-4"
-              >
-                Stay updated with our latest events, artist announcements, and behind-the-scenes content.
-              </motion.p>
             </motion.div>
           </div>
         </div>

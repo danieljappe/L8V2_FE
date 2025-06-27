@@ -1,94 +1,23 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, MapPin, Music, ArrowLeft, Ticket, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, Music, ArrowLeft, Ticket, Users, AlertCircle } from 'lucide-react';
 import Header from '../components/Header';
 import ArtistModal from '../components/ArtistModal';
-
-interface Artist {
-  name: string;
-  genre: string;
-  image: string;
-  bio: string;
-  social?: {
-    instagram?: string;
-    website?: string;
-    youtube?: string;
-  };
-}
+import LoadingSpinner from '../components/LoadingSpinner';
+import { useEvent } from '../hooks/useApi';
+import { Artist } from '../services/api';
 
 const EventDetails: React.FC = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const [selectedArtist, setSelectedArtist] = React.useState<Artist | null>(null);
 
-  // This would normally come from an API or database
-  const event = {
-    id: eventId,
-    title: 'Neon Nætter',
-    date: '2025-03-15',
-    time: '21:00',
-    venue: 'Warehouse District',
-    status: 'upcoming',
-    color: 'purple',
-    image: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    description: 'En aften fyldt med elektronisk musik og lysshow, hvor de bedste DJs i byen tager dig med på en rejse gennem lyd og lys. Forbered dig på en magisk oplevelse med verdensklasse kunstnere, imponerende lysshow og en atmosfære, der vil få dig til at danse hele natten.',
-    artists: [
-      {
-        name: 'DJ Synthwave',
-        genre: 'Electronic',
-        image: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300',
-        bio: 'Kendt for sine unikke synthwave beats og energiske live shows. Med over 10 års erfaring i den elektroniske musikscene har DJ Synthwave udviklet en særpræget stil, der kombinerer retro synthwave med moderne elektronisk musik.',
-        social: {
-          instagram: 'https://instagram.com/djsynthwave',
-          website: 'https://djsynthwave.com',
-          youtube: 'https://youtube.com/djsynthwave'
-        }
-      },
-      {
-        name: 'Luna Beats',
-        genre: 'House',
-        image: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=300',
-        bio: 'En af de mest innovative house DJs i scenen lige nu. Luna Beats har revolutioneret house-musikken med deres unikke blend af klassisk house og moderne elektroniske elementer.',
-        social: {
-          instagram: 'https://instagram.com/lunabeats',
-          website: 'https://lunabeats.com'
-        }
-      },
-      {
-        name: 'Neon Pulse',
-        genre: 'Techno',
-        image: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=300',
-        bio: 'Specialiseret i hård techno og psykedelisk elektronisk musik. Neon Pulse skaber en intens og hypnotisk oplevelse, der tager lytteren med på en rejse gennem lyd og lys.',
-        social: {
-          instagram: 'https://instagram.com/neonpulse',
-          youtube: 'https://youtube.com/neonpulse'
-        }
-      },
-      {
-        name: 'Echo Dreams',
-        genre: 'Ambient',
-        image: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300',
-        bio: 'Skaber drømmeagtige ambient lydlandskaber. Echo Dreams kombinerer ambient musik med eksperimentelle lydelementer for at skabe en unik og meditativ oplevelse.',
-        social: {
-          instagram: 'https://instagram.com/echodreams',
-          website: 'https://echodreams.com'
-        }
-      }
-    ],
-    ticketTypes: [
-      {
-        name: 'Standard',
-        price: '299 DKK',
-        features: ['Adgang til eventet', 'Gratis garderobe', 'Program']
-      },
-      {
-        name: 'VIP',
-        price: '599 DKK',
-        features: ['Adgang til eventet', 'Gratis garderobe', 'Program', 'VIP-område', 'Gratis drinks', 'Møde med kunstnere']
-      }
-    ]
-  };
+  // Validate eventId before making API call
+  const isValidEventId = eventId && typeof eventId === 'string' && eventId.trim() !== '';
+
+  // Fetch event data from API only if eventId is valid
+  const { data: event, loading, error } = useEvent(isValidEventId ? eventId : '');
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -112,6 +41,79 @@ const EventDetails: React.FC = () => {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen overflow-x-hidden">
+        <Header />
+        <div className="flex items-center justify-center h-[60vh]">
+          <LoadingSpinner size="lg" text="Loading event details..." />
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state for invalid event ID
+  if (!isValidEventId) {
+    return (
+      <div className="min-h-screen overflow-x-hidden">
+        <Header />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Invalid Event ID</h2>
+            <p className="text-white/70 mb-4">The event ID in the URL is not valid.</p>
+            <button 
+              onClick={() => navigate('/events')}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
+            >
+              Back to Events
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !event) {
+    return (
+      <div className="min-h-screen overflow-x-hidden">
+        <Header />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Event Not Found</h2>
+            <p className="text-white/70 mb-4">The event you're looking for doesn't exist or has been removed.</p>
+            <button 
+              onClick={() => navigate('/events')}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
+            >
+              Back to Events
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if event is upcoming or past
+  const isUpcoming = new Date(event.date) >= new Date();
+
+  // Generate ticket types based on event data
+  const ticketTypes = [
+    {
+      name: 'Standard',
+      price: '299 DKK',
+      features: ['Adgang til eventet', 'Gratis garderobe', 'Program']
+    },
+    {
+      name: 'VIP',
+      price: '599 DKK',
+      features: ['Adgang til eventet', 'Gratis garderobe', 'Program', 'VIP-område', 'Gratis drinks', 'Møde med kunstnere']
+    }
+  ];
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Header */}
@@ -121,7 +123,7 @@ const EventDetails: React.FC = () => {
       <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src={event.image} 
+            src={event.venue?.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=1920'} 
             alt={event.title}
             className="w-full h-full object-cover"
           />
@@ -153,14 +155,14 @@ const EventDetails: React.FC = () => {
               <Clock className="w-5 h-5 text-purple-300" />
               <div>
                 <p className="text-sm text-white/60">Tidspunkt</p>
-                <p className="font-semibold">{event.time}</p>
+                <p className="font-semibold">{event.startTime || '21:00'}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 text-white/80 bg-white/10 backdrop-blur-sm p-3 rounded-xl">
               <MapPin className="w-5 h-5 text-purple-300" />
               <div>
                 <p className="text-sm text-white/60">Sted</p>
-                <p className="font-semibold">{event.venue}</p>
+                <p className="font-semibold">{event.venue?.name || 'TBA'}</p>
               </div>
             </div>
           </div>
@@ -179,87 +181,135 @@ const EventDetails: React.FC = () => {
             </div>
 
             {/* Artists Section */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
-                <Music className="w-6 h-6 mr-2 text-purple-300" />
-                Kunstnere
-              </h2>
+            {event.eventArtists && event.eventArtists.length > 0 && (
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
+                  <Music className="w-6 h-6 mr-2 text-purple-300" />
+                  Kunstnere
+                </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {event.artists.map((artist, index) => (
-                  <div
-                    key={artist.name}
-                    whileHover={{ 
-                      scale: 1.02, 
-                      y: -5,
-                      transition: { duration: 0.2 }
-                    }}
-                    onClick={() => setSelectedArtist(artist)}
-                    className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 cursor-pointer overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative flex items-start space-x-4">
-                      <div 
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 overflow-hidden"
-                      >
-                        <img 
-                          src={artist.image} 
-                          alt={artist.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors duration-300">
-                          {artist.name}
-                        </h3>
-                        <p className="text-purple-300 text-sm mb-2">{artist.genre}</p>
-                        <p className="text-white/70 text-sm line-clamp-2">{artist.bio}</p>
-                        <div className="mt-3 text-purple-300 text-sm font-medium">
-                          Klik for at læse mere →
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {event.eventArtists.map((eventArtist, index) => (
+                    <motion.div
+                      key={eventArtist.id}
+                      whileHover={{ 
+                        scale: 1.02, 
+                        y: -5,
+                        transition: { duration: 0.2 }
+                      }}
+                      onClick={() => setSelectedArtist(eventArtist.artist)}
+                      className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 cursor-pointer overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative flex items-start space-x-4">
+                        <motion.div 
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 overflow-hidden"
+                        >
+                          <img 
+                            src={eventArtist.artist.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300'} 
+                            alt={eventArtist.artist.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </motion.div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors duration-300">
+                            {eventArtist.artist.name}
+                          </h3>
+                          <p className="text-purple-300 text-sm mb-2">{eventArtist.artist.genre}</p>
+                          <p className="text-white/70 text-sm line-clamp-2">{eventArtist.artist.bio}</p>
+                          <div className="mt-3 text-purple-300 text-sm font-medium">
+                            Klik for at læse mere →
+                          </div>
                         </div>
                       </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Venue Information */}
+            {event.venue && (
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
+                  <MapPin className="w-6 h-6 mr-2 text-purple-300" />
+                  Lokation
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">{event.venue.name}</h3>
+                    <p className="text-white/70 mb-2">{event.venue.address}</p>
+                    <p className="text-white/70 mb-4">{event.venue.city}</p>
+                    {event.venue.description && (
+                      <p className="text-white/80 text-sm leading-relaxed">{event.venue.description}</p>
+                    )}
+                  </div>
+                  <div className="bg-white/5 rounded-2xl p-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Users className="w-5 h-5 text-purple-300" />
+                      <span className="text-white font-semibold">Kapacitet</span>
                     </div>
+                    <p className="text-white/70">{event.venue.capacity.toLocaleString()} personer</p>
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Tickets Section */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
-                <Ticket className="w-6 h-6 mr-2 text-purple-300" />
-                Billetter
-              </h2>
+            {/* Tickets Section - Only show for upcoming events */}
+            {isUpcoming && (
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
+                  <Ticket className="w-6 h-6 mr-2 text-purple-300" />
+                  Billetter
+                </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {event.ticketTypes.map((ticket, index) => (
-                  <div
-                    key={ticket.name}
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
-                  >
-                    <h3 className="text-xl font-semibold text-white mb-2">{ticket.name}</h3>
-                    <p className="text-2xl font-bold text-purple-300 mb-4">{ticket.price}</p>
-                    <ul className="space-y-2 mb-6">
-                      {ticket.features.map((feature, i) => (
-                        <li className="flex items-center text-white/80">
-                          <div className="w-1.5 h-1.5 bg-purple-300 rounded-full mr-2"></div>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {ticketTypes.map((ticket, index) => (
+                    <motion.div
+                      key={ticket.name}
+                      whileHover={{ scale: 1.02, y: -5 }}
+                      className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
                     >
-                      Køb {ticket.name} Billet
-                    </button>
-                  </div>
-                ))}
+                      <h3 className="text-xl font-semibold text-white mb-2">{ticket.name}</h3>
+                      <p className="text-2xl font-bold text-purple-300 mb-4">{ticket.price}</p>
+                      <ul className="space-y-2 mb-6">
+                        {ticket.features.map((feature, i) => (
+                          <li key={i} className="flex items-center text-white/80">
+                            <div className="w-1.5 h-1.5 bg-purple-300 rounded-full mr-2"></div>
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                      >
+                        Køb {ticket.name} Billet
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Past Event Message */}
+            {!isUpcoming && (
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 text-center">
+                <h2 className="text-2xl font-bold text-white mb-4">Event Afsluttet</h2>
+                <p className="text-white/70 mb-6">
+                  Dette event har allerede fundet sted. Tak til alle, der deltog og gjorde det til en fantastisk aften!
+                </p>
+                <button
+                  onClick={() => navigate('/events')}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+                >
+                  Se Andre Events
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>

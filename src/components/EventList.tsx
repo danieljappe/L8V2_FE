@@ -2,72 +2,45 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, MapPin, Music, Ticket, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from './LoadingSpinner';
+import { useEvents } from '../hooks/useApi';
+import { Event } from '../services/api';
 
-interface Event {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  venue: string;
+interface ProcessedEvent extends Event {
   status: 'upcoming' | 'past';
   color: string;
-  description: string;
   artists: string[];
 }
 
 const EventList: React.FC = () => {
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<ProcessedEvent | null>(null);
   const navigate = useNavigate();
 
-  const events: Event[] = [
-    {
-      id: 1,
-      title: 'Neon Nætter',
-      date: '2025-03-15',
-      time: '21:00',
-      venue: 'Warehouse District',
-      status: 'upcoming',
-      color: 'purple',
-      description: 'En aften fyldt med elektronisk musik og lysshow, hvor de bedste DJs i byen tager dig med på en rejse gennem lyd og lys.',
-      artists: ['DJ Synthwave', 'Luna Beats', 'Neon Pulse', 'Echo Dreams']
-    },
-    {
-      id: 2,
-      title: 'Cosmic Vibes',
-      date: '2025-02-14',
-      time: '20:30',
-      venue: 'Main Stage',
-      status: 'past',
-      color: 'blue',
-      description: 'En kosmisk rejse gennem lyd og rum, hvor elektronisk musik møder visuelle effekter i en unik oplevelse.',
-      artists: ['Cosmic DJ', 'Space Beats', 'Galaxy Sound']
-    },
-    {
-      id: 3,
-      title: 'Electric Dreams',
-      date: '2025-04-12',
-      time: '22:00',
-      venue: 'Underground Club',
-      status: 'upcoming',
-      color: 'green',
-      description: 'En nat med elektrisk energi og drømmeagtige beats, hvor musik og kunst smelter sammen i en magisk oplevelse.',
-      artists: ['Electric Soul', 'Dream Weaver', 'Neon Lights']
-    },
-    {
-      id: 4,
-      title: 'Rhythm & Lights',
-      date: '2025-01-18',
-      time: '21:30',
-      venue: 'City Hall',
-      status: 'past',
-      color: 'orange',
-      description: 'En festlig aften med rytmisk musik og imponerende lysshow, der bringer liv til byens hjerte.',
-      artists: ['Rhythm Master', 'Light Show', 'City Beats']
+  // Fetch events from API
+  const { data: events, loading, error } = useEvents();
+
+  // Process events data
+  const processedEvents: ProcessedEvent[] = events?.map(event => ({
+    ...event,
+    status: new Date(event.date) >= new Date() ? 'upcoming' : 'past',
+    color: getEventColor(event.id),
+    artists: event.eventArtists?.map(ea => ea.artist.name) || []
+  })) || [];
+
+  function getEventColor(eventId: string): string {
+    const colors = ['purple', 'blue', 'green', 'orange', 'pink', 'indigo'];
+    // Simple hash function to convert string to number
+    let hash = 0;
+    for (let i = 0; i < eventId.length; i++) {
+      const char = eventId.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
     }
-  ];
+    return colors[Math.abs(hash) % colors.length];
+  }
 
   // Sort events by date (latest first)
-  const sortedEvents = [...events].sort((a, b) => 
+  const sortedEvents = [...processedEvents].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
@@ -76,7 +49,9 @@ const EventList: React.FC = () => {
       purple: 'bg-purple-500/20 border-purple-300/30 text-purple-200',
       blue: 'bg-blue-500/20 border-blue-300/30 text-blue-200',
       green: 'bg-green-500/20 border-green-300/30 text-green-200',
-      orange: 'bg-orange-500/20 border-orange-300/30 text-orange-200'
+      orange: 'bg-orange-500/20 border-orange-300/30 text-orange-200',
+      pink: 'bg-pink-500/20 border-pink-300/30 text-pink-200',
+      indigo: 'bg-indigo-500/20 border-indigo-300/30 text-indigo-200'
     };
     return colors[color as keyof typeof colors] || colors.purple;
   };
@@ -104,6 +79,44 @@ const EventList: React.FC = () => {
       }
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+        <LoadingSpinner size="lg" text="Loading events..." />
+      </section>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Failed to load events</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Show empty state
+  if (!events || events.length === 0) {
+    return (
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">No Events Found</h2>
+          <p className="text-white/70">Check back soon for upcoming events!</p>
+        </div>
+      </section>
+    );
+  }
 
   if (selectedEvent) {
     return (
@@ -153,14 +166,14 @@ const EventList: React.FC = () => {
                 <Clock className="w-5 h-5 text-purple-300" />
                 <div>
                   <p className="text-sm text-white/60">Tidspunkt</p>
-                  <p className="font-semibold">{selectedEvent.time}</p>
+                  <p className="font-semibold">{selectedEvent.startTime || '21:00'}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3 text-white/80 bg-white/5 p-3 rounded-2xl">
                 <MapPin className="w-5 h-5 text-purple-300" />
                 <div>
                   <p className="text-sm text-white/60">Sted</p>
-                  <p className="font-semibold">{selectedEvent.venue}</p>
+                  <p className="font-semibold">{selectedEvent.venue?.name || 'TBA'}</p>
                 </div>
               </div>
             </motion.div>
@@ -171,13 +184,19 @@ const EventList: React.FC = () => {
                 Kunstnere
               </motion.h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {selectedEvent.artists.map((artist, index) => (
+                {selectedEvent.eventArtists?.map((eventArtist, index) => (
                   <motion.div
-                    key={index}
+                    key={eventArtist.id}
                     className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-2 mx-auto"></div>
-                    <p className="text-white font-medium text-center text-sm">{artist}</p>
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-2 mx-auto overflow-hidden">
+                      <img 
+                        src={eventArtist.artist.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300'} 
+                        alt={eventArtist.artist.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <p className="text-white font-medium text-center text-sm">{eventArtist.artist.name}</p>
                   </motion.div>
                 ))}
               </div>
@@ -197,9 +216,11 @@ const EventList: React.FC = () => {
                 <motion.button 
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                  onClick={() => navigate(`/events/${selectedEvent.id}`)}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 mx-auto"
                 >
-                  Køb Billetter
+                  <Ticket className="w-5 h-5" />
+                  <span>Se Detaljer & Køb Billetter</span>
                 </motion.button>
               </motion.div>
             )}
@@ -210,7 +231,7 @@ const EventList: React.FC = () => {
   }
 
   return (
-    <section id="events-list" className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+    <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
       <motion.div 
         variants={containerVariants}
         initial="hidden"
@@ -219,23 +240,23 @@ const EventList: React.FC = () => {
         className="container mx-auto max-w-6xl"
       >
         <motion.div variants={itemVariants} className="text-center mb-8 sm:mb-12">
-          <motion.h2 
+          <motion.h1 
             variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 mt-8"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4"
           >
             Alle Begivenheder
-          </motion.h2>
-          {/* <motion.p 
+          </motion.h1>
+          <motion.p 
             variants={itemVariants}
             className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4"
           >
-            Udforsk vores kommende og tidligere begivenheder. Find din næste uforglemmelige oplevelse.
-          </motion.p> */}
+            Udforsk vores kommende og tidligere begivenheder. Find din næste fantastiske oplevelse eller relive magiske øjeblikke fra fortiden.
+          </motion.p>
         </motion.div>
 
         <motion.div 
           variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           {sortedEvents.map((event) => (
             <motion.div
@@ -243,66 +264,100 @@ const EventList: React.FC = () => {
               variants={itemVariants}
               whileHover={{ scale: 1.02, y: -5 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => {
-                setSelectedEvent(event);
-                navigate(`/events/${event.id}`);
-              }}
-              className={`${getColorClasses(event.color)} backdrop-blur-xl rounded-3xl border p-6 cursor-pointer transition-all duration-300`}
+              onClick={() => navigate(`/events/${event.id}`)}
+              className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl cursor-pointer transition-all duration-300 group"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">{event.title}</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {new Date(event.date).toLocaleDateString('da-DK', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Clock className="w-4 h-4 mr-2" />
-                      {event.time}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {event.venue}
-                    </div>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              {/* Event Status Badge */}
+              <motion.div
+                variants={itemVariants}
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-4 ${
                   event.status === 'upcoming' 
-                    ? 'bg-green-500/20 text-green-300' 
-                    : 'bg-gray-500/20 text-gray-300'
-                }`}>
-                  {event.status === 'upcoming' ? 'Kommende' : 'Afholdt'}
+                    ? 'bg-green-500/20 text-green-200 border border-green-300/30' 
+                    : 'bg-gray-500/20 text-gray-200 border border-gray-300/30'
+                }`}
+              >
+                {event.status === 'upcoming' ? 'Kommende' : 'Afsluttet'}
+              </motion.div>
+
+              {/* Event Title */}
+              <motion.h3 
+                variants={itemVariants}
+                className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover:text-purple-300 transition-colors duration-300"
+              >
+                {event.title}
+              </motion.h3>
+
+              {/* Event Details */}
+              <motion.div
+                variants={itemVariants}
+                className="space-y-3 mb-6"
+              >
+                <div className="flex items-center space-x-3 text-white/80">
+                  <Calendar className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                  <span className="text-sm">
+                    {new Date(event.date).toLocaleDateString('da-DK', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </span>
                 </div>
-              </div>
-              <p className="text-sm opacity-80 line-clamp-2">{event.description}</p>
-              <div className="mt-4 flex items-center justify-between">
-                <div className="flex -space-x-2">
-                  {event.artists.slice(0, 3).map((artist, index) => (
-                    <div
-                      key={index}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-white/20"
-                    />
-                  ))}
-                  {event.artists.length > 3 && (
-                    <div className="w-8 h-8 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center text-xs">
-                      +{event.artists.length - 3}
-                    </div>
-                  )}
+                <div className="flex items-center space-x-3 text-white/80">
+                  <Clock className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                  <span className="text-sm">{event.startTime || '21:00'}</span>
                 </div>
+                <div className="flex items-center space-x-3 text-white/80">
+                  <MapPin className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                  <span className="text-sm truncate">{event.venue?.name || 'TBA'}</span>
+                </div>
+              </motion.div>
+
+              {/* Artists Preview */}
+              {event.eventArtists && event.eventArtists.length > 0 && (
+                <motion.div variants={itemVariants} className="mb-6">
+                  <motion.h4 className="text-sm font-semibold text-white/80 mb-3 flex items-center">
+                    <Music className="w-4 h-4 mr-2 text-purple-300" />
+                    Kunstnere
+                  </motion.h4>
+                  <div className="flex flex-wrap gap-2">
+                    {event.eventArtists.slice(0, 3).map((eventArtist) => (
+                      <span 
+                        key={eventArtist.id}
+                        className="text-xs bg-white/10 px-2 py-1 rounded-full text-white/70"
+                      >
+                        {eventArtist.artist.name}
+                      </span>
+                    ))}
+                    {event.eventArtists.length > 3 && (
+                      <span className="text-xs bg-white/10 px-2 py-1 rounded-full text-white/70">
+                        +{event.eventArtists.length - 3} mere
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Event Description */}
+              <motion.p 
+                variants={itemVariants}
+                className="text-white/70 text-sm leading-relaxed mb-6 line-clamp-3"
+              >
+                {event.description}
+              </motion.p>
+
+              {/* CTA Button - now just for style, not navigation */}
+              <motion.div variants={itemVariants} className="text-center">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-sm font-medium"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 w-full text-sm pointer-events-none"
+                  tabIndex={-1}
                 >
-                  Se Detaljer →
+                  <Ticket className="w-4 h-4" />
+                  <span>{event.status === 'upcoming' ? 'Se Detaljer' : 'Se Opsummering'}</span>
                 </motion.button>
-              </div>
+              </motion.div>
             </motion.div>
           ))}
         </motion.div>
