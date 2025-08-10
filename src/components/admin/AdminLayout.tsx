@@ -7,13 +7,15 @@ interface AdminLayoutProps {
   onSectionChange: (section: AdminSection) => void;
   children: React.ReactNode;
   unreadMessages: number;
+  onLogout: () => void;
 }
 
 export default function AdminLayout({ 
   activeSection, 
   onSectionChange, 
   children, 
-  unreadMessages 
+  unreadMessages,
+  onLogout
 }: AdminLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -25,6 +27,7 @@ export default function AdminLayout({
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         unreadMessages={unreadMessages}
+        onLogout={onLogout}
       />
       <main className="flex-1 overflow-auto">
         <div className="p-6">

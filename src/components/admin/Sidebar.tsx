@@ -8,7 +8,8 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
-  ArrowLeft
+  ArrowLeft,
+  LogOut
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminSection } from '../../types/admin';
@@ -19,6 +20,7 @@ interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   unreadMessages: number;
+  onLogout: () => void;
 }
 
 const menuItems = [
@@ -35,7 +37,8 @@ export default function Sidebar({
   onSectionChange, 
   isCollapsed, 
   onToggleCollapse,
-  unreadMessages 
+  unreadMessages,
+  onLogout
 }: SidebarProps) {
   return (
     <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${
@@ -110,6 +113,17 @@ export default function Sidebar({
           <ArrowLeft className="w-5 h-5 text-gray-500" />
           {!isCollapsed && <span className="font-medium">Back to Site</span>}
         </Link>
+
+        {/* Logout button */}
+        <button
+          onClick={onLogout}
+          className={`flex items-center px-3 py-2 rounded-lg text-red-700 hover:bg-red-50 hover:text-red-900 transition-all duration-200 ${
+            isCollapsed ? 'justify-center' : 'space-x-3'
+          }`}
+        >
+          <LogOut className="w-5 h-5 text-red-500" />
+          {!isCollapsed && <span className="font-medium">Logout</span>}
+        </button>
 
         {/* Admin user info */}
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>

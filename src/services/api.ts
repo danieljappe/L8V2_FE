@@ -37,6 +37,21 @@ class ApiClient {
         ...options,
       });
 
+      // Handle authentication errors
+      if (response.status === 401 || response.status === 403) {
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('token');
+        // Use window.location.href for hard redirect to ensure clean state
+        window.location.href = '/login';
+        throw new Error('Authentication failed. Please login again.');
+      }
+
+      // Handle network errors
+      if (!response.ok && response.status !== 401 && response.status !== 403) {
+        console.error('API Error:', response.status, response.statusText);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

@@ -9,10 +9,21 @@ import Artists from './pages/Artists';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Header from './components/Header';
+import { useAuth } from './hooks/useAuth';
+import { AuthProvider } from './contexts/AuthContext';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  return token ? children : <Navigate to="/login" replace />;
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 const AppContent = () => {
@@ -48,7 +59,9 @@ const AppContent = () => {
 const App = () => {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 };

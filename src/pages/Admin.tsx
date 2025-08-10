@@ -7,6 +7,7 @@ import VenuesList from '../components/admin/VenuesList';
 import GalleryList from '../components/admin/GalleryList';
 import MessagesList from '../components/admin/MessagesList';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAuth } from '../hooks/useAuth';
 import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from '../data/mockData';
 import { AdminSection, Event, Artist, Venue, GalleryItem, Message } from '../types/admin';
 import { apiService, Event as ApiEvent, Artist as ApiArtist, Venue as ApiVenue } from '../services/api';
@@ -100,8 +101,6 @@ function mapApiVenueToAdminVenue(apiVenue: ApiVenue): Venue {
     capacity: apiVenue.capacity || 0,
     description: apiVenue.description || '',
     amenities: [],
-    contactEmail: apiVenue.contactEmail || '',
-    contactPhone: apiVenue.contactPhone || '',
     image: apiVenue.image || '',
     pricePerHour: 0,
     createdAt: apiVenue.createdAt,
@@ -109,6 +108,7 @@ function mapApiVenueToAdminVenue(apiVenue: ApiVenue): Venue {
 }
 
 export default function Admin() {
+  const { logout } = useAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
   // Events: use backend
   const [events, setEvents] = useState<Event[]>([]);
@@ -228,7 +228,8 @@ export default function Admin() {
   };
 
   const handleUpdateVenue = async (updatedVenue: Venue) => {
-    const res = await apiService.updateVenue(updatedVenue.id, { ...updatedVenue, id: updatedVenue.id });
+    const { id, ...venueData } = updatedVenue;
+    const res = await apiService.updateVenue(id, venueData);
     if (res.data) {
       setVenues((prev) => prev.map(venue => venue.id === updatedVenue.id ? mapApiVenueToAdminVenue(res.data as ApiVenue) : venue));
     } else {
@@ -343,6 +344,7 @@ export default function Admin() {
         activeSection={activeSection}
         onSectionChange={setActiveSection}
         unreadMessages={unreadMessages}
+        onLogout={logout}
       >
         {renderContent()}
       </AdminLayout>
