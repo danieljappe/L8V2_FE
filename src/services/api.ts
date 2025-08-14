@@ -22,6 +22,7 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
+      
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const baseHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
       let extraHeaders: Record<string, string> = {};
@@ -32,6 +33,7 @@ class ApiClient {
         extraHeaders['Authorization'] = `Bearer ${token}`;
       }
       const headers = Object.assign({}, baseHeaders, extraHeaders);
+      
       const response = await fetch(url, {
         headers,
         ...options,
@@ -167,7 +169,7 @@ export interface GalleryImage {
   mediumUrl?: string;
   largeUrl?: string;
   caption?: string;
-  event?: Event;
+  eventId?: string;
   photographer?: string;
   tags?: string[];
   category: 'event' | 'venue' | 'artist' | 'other';
@@ -230,9 +232,14 @@ export const apiService = {
   deleteVenue: (id: string | number) => apiClient.delete<null>(`/venues/${id}`),
 
   // Gallery
-  getGalleryImages: () => apiClient.get<GalleryImage[]>('/gallery'),
+  getGalleryImages: () => {
+    const result = apiClient.get<GalleryImage[]>('/gallery');
+    return result;
+  },
   getGalleryImage: (id: string) => apiClient.get<GalleryImage>(`/gallery/${id}`),
   createGalleryImage: (image: Partial<GalleryImage>) => apiClient.post<GalleryImage>('/gallery', image),
+  updateGalleryImage: (id: string, image: Partial<GalleryImage>) => apiClient.put<GalleryImage>(`/gallery/${id}`, image),
+  deleteGalleryImage: (id: string) => apiClient.delete<null>(`/gallery/${id}`),
 
   // Contact
   getContactMessages: () => apiClient.get<ContactMessage[]>('/contact'),

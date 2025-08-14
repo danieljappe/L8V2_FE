@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Image, Tag, User } from 'lucide-react';
 import { GalleryItem } from '../../types/admin';
 import { apiService } from '../../services/api';
@@ -53,7 +53,7 @@ export default function GalleryList({
         return 'bg-green-100 text-green-800';
       case 'venue':
         return 'bg-purple-100 text-purple-800';
-      case 'promotional':
+      case 'other':
         return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -143,21 +143,41 @@ function GalleryForm({ item, onSubmit, onCancel }: {
   onCancel: () => void;
 }) {
   const [formData, setFormData] = useState({
-    filename: '',
-    url: '',
-    thumbnailUrl: '',
-    mediumUrl: '',
-    largeUrl: '',
-    caption: '',
-    event: '',
-    photographer: '',
-    tags: [] as string[],
-    category: 'event' as GalleryItem['category'],
-    orderIndex: 0,
-    isPublished: false,
+    filename: item?.filename || '',
+    url: item?.url || '',
+    thumbnailUrl: item?.thumbnailUrl || '',
+    mediumUrl: item?.mediumUrl || '',
+    largeUrl: item?.largeUrl || '',
+    caption: item?.caption || '',
+    event: item?.event || '',
+    photographer: item?.photographer || '',
+    tags: item?.tags || [],
+    category: item?.category || 'event' as GalleryItem['category'],
+    orderIndex: item?.orderIndex || 0,
+    isPublished: item?.isPublished || false,
   });
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Update form data when item changes
+  useEffect(() => {
+    if (item) {
+      setFormData({
+        filename: item.filename || '',
+        url: item.url || '',
+        thumbnailUrl: item.thumbnailUrl || '',
+        mediumUrl: item.mediumUrl || '',
+        largeUrl: item.largeUrl || '',
+        caption: item.caption || '',
+        event: item.event || '',
+        photographer: item.photographer || '',
+        tags: item.tags || [],
+        category: item.category || 'event',
+        orderIndex: item.orderIndex || 0,
+        isPublished: item.isPublished || false,
+      });
+    }
+  }, [item]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -186,13 +206,42 @@ function GalleryForm({ item, onSubmit, onCancel }: {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
             {item ? 'Edit Gallery Item' : 'Add New Gallery Item'}
           </h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="gallery-filename" className="block text-sm font-medium text-gray-700 mb-1">Filename</label>
+              <input
+                id="gallery-filename"
+                type="text"
+                placeholder="Filename"
+                value={formData.filename}
+                onChange={(e) => setFormData({...formData, filename: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="gallery-category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <select
+                id="gallery-category"
+                value={formData.category}
+                onChange={(e) => setFormData({...formData, category: e.target.value as GalleryItem['category']})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="event">Event</option>
+                <option value="artist">Artist</option>
+                <option value="venue">Venue</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          
           <div>
             <label htmlFor="gallery-caption" className="block text-sm font-medium text-gray-700 mb-1">Caption</label>
             <input
@@ -202,9 +251,9 @@ function GalleryForm({ item, onSubmit, onCancel }: {
               value={formData.caption}
               onChange={(e) => setFormData({...formData, caption: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
             />
           </div>
+          
           <div>
             <label htmlFor="gallery-image" className="block text-sm font-medium text-gray-700 mb-1">Image Upload</label>
             <input
@@ -220,41 +269,56 @@ function GalleryForm({ item, onSubmit, onCancel }: {
               <img src={formData.url} alt="Preview" className="mt-2 w-full h-40 object-cover rounded" />
             )}
           </div>
-          <div>
-            <label htmlFor="gallery-category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select
-              id="gallery-category"
-              value={formData.category}
-              onChange={(e) => setFormData({...formData, category: e.target.value as GalleryItem['category']})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            >
-              <option value="event">Event</option>
-              <option value="artist">Artist</option>
-              <option value="venue">Venue</option>
-              <option value="other">Other</option>
-            </select>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="gallery-orderIndex" className="block text-sm font-medium text-gray-700 mb-1">Order Index</label>
+              <input
+                id="gallery-orderIndex"
+                type="number"
+                placeholder="0"
+                value={formData.orderIndex}
+                onChange={(e) => setFormData({...formData, orderIndex: parseInt(e.target.value) || 0})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label htmlFor="gallery-isPublished" className="flex items-center space-x-2">
+                <input
+                  id="gallery-isPublished"
+                  type="checkbox"
+                  checked={formData.isPublished}
+                  onChange={(e) => setFormData({...formData, isPublished: e.target.checked})}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm font-medium text-gray-700">Published</span>
+              </label>
+            </div>
           </div>
-          <div>
-            <label htmlFor="gallery-tags" className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-            <input
-              id="gallery-tags"
-              type="text"
-              placeholder="Tags (comma separated)"
-              value={formData.tags.join(', ')}
-              onChange={(e) => setFormData({...formData, tags: e.target.value.split(',').map(tag => tag.trim())})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div>
-            <label htmlFor="gallery-photographer" className="block text-sm font-medium text-gray-700 mb-1">Photographer</label>
-            <input
-              id="gallery-photographer"
-              type="text"
-              placeholder="Photographer"
-              value={formData.photographer}
-              onChange={(e) => setFormData({...formData, photographer: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="gallery-tags" className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+              <input
+                id="gallery-tags"
+                type="text"
+                placeholder="Tags (comma separated)"
+                value={formData.tags.join(', ')}
+                onChange={(e) => setFormData({...formData, tags: e.target.value.split(',').map(tag => tag.trim())})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label htmlFor="gallery-photographer" className="block text-sm font-medium text-gray-700 mb-1">Photographer</label>
+              <input
+                id="gallery-photographer"
+                type="text"
+                placeholder="Photographer"
+                value={formData.photographer}
+                onChange={(e) => setFormData({...formData, photographer: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
           </div>
           <div className="flex space-x-2">
             <button

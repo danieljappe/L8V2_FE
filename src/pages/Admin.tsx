@@ -11,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from '../data/mockData';
 import { AdminSection, Event, Artist, Venue, GalleryItem, Message } from '../types/admin';
 import { apiService, Event as ApiEvent, Artist as ApiArtist, Venue as ApiVenue } from '../services/api';
+import { constructFullUrl } from '../utils/imageUtils';
 
 // Map backend event to admin event type
 function mapApiEventToAdminEvent(apiEvent: ApiEvent): Event {
@@ -107,6 +108,26 @@ function mapApiVenueToAdminVenue(apiVenue: ApiVenue): Venue {
   };
 }
 
+function mapApiGalleryToAdminGallery(apiGallery: any): GalleryItem {
+  return {
+    id: apiGallery.id,
+    filename: apiGallery.filename || '',
+    url: constructFullUrl(apiGallery.url),
+    thumbnailUrl: constructFullUrl(apiGallery.thumbnailUrl),
+    mediumUrl: constructFullUrl(apiGallery.mediumUrl),
+    largeUrl: constructFullUrl(apiGallery.largeUrl),
+    caption: apiGallery.caption || '',
+    event: apiGallery.eventId || '',
+    photographer: apiGallery.photographer || '',
+    tags: apiGallery.tags || [],
+    category: apiGallery.category || 'event',
+    orderIndex: apiGallery.orderIndex || 0,
+    isPublished: apiGallery.isPublished || false,
+    createdAt: apiGallery.createdAt,
+    updatedAt: apiGallery.updatedAt || apiGallery.createdAt,
+  };
+}
+
 export default function Admin() {
   const { logout } = useAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
@@ -122,7 +143,9 @@ export default function Admin() {
   const [venuesLoading, setVenuesLoading] = useState(false);
 
   // The rest still use local storage for now
-  const [gallery, setGallery] = useLocalStorage<GalleryItem[]>('admin-gallery', mockGallery);
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
   const [messages, setMessages] = useLocalStorage<Message[]>('admin-messages', mockMessages);
 
   const unreadMessages = messages.filter(m => !m.read).length;
@@ -156,9 +179,21 @@ export default function Admin() {
       }
       setVenuesLoading(false);
     };
+    const fetchGallery = async () => {
+      setGalleryLoading(true);
+      setGalleryError(null);
+      const res = await apiService.getGalleryImages();
+      if (res.data) {
+        setGallery((res.data as any[]).map(mapApiGalleryToAdminGallery));
+      } else {
+        setGalleryError(res.error || 'Failed to fetch gallery images');
+      }
+      setGalleryLoading(false);
+    };
     fetchEvents();
     fetchArtists();
     fetchVenues();
+    fetchGallery();
   }, []);
 
   // Event handlers (backend)
@@ -247,21 +282,42 @@ export default function Admin() {
   };
 
   // Gallery handlers
-  const handleAddGallery = (galleryData: Omit<GalleryItem, 'id' | 'createdAt'>) => {
-    const newItem: GalleryItem = {
+  const handleAddGallery = async (galleryData: Omit<GalleryItem, 'id' | 'createdAt'>) => {
+    // Convert admin GalleryItem to API GalleryImage format
+    const apiGalleryData = {
       ...galleryData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+      eventId: galleryData.event || undefined,
     };
-    setGallery([...gallery, newItem]);
+    const res = await apiService.createGalleryImage(apiGalleryData);
+    if (res.data) {
+      setGallery((prev) => [...prev, mapApiGalleryToAdminGallery(res.data)]);
+    } else {
+      alert(res.error || 'Failed to create gallery image');
+    }
   };
 
-  const handleUpdateGallery = (updatedItem: GalleryItem) => {
-    setGallery(gallery.map(item => item.id === updatedItem.id ? updatedItem : item));
+  const handleUpdateGallery = async (updatedItem: GalleryItem) => {
+    const { id, ...galleryData } = updatedItem;
+    // Convert admin GalleryItem to API GalleryImage format
+    const apiGalleryData = {
+      ...galleryData,
+      eventId: galleryData.event || undefined,
+    };
+    const res = await apiService.updateGalleryImage(id, apiGalleryData);
+    if (res.data) {
+      setGallery((prev) => prev.map(item => item.id === updatedItem.id ? mapApiGalleryToAdminGallery(res.data) : item));
+    } else {
+      alert(res.error || 'Failed to update gallery image');
+    }
   };
 
-  const handleDeleteGallery = (id: string) => {
-    setGallery(gallery.filter(item => item.id !== id));
+  const handleDeleteGallery = async (id: string) => {
+    const res = await apiService.deleteGalleryImage(id);
+    if (!res.error) {
+      setGallery((prev) => prev.filter(item => item.id !== id));
+    } else {
+      alert(res.error || 'Failed to delete gallery image');
+    }
   };
 
   // Message handlers

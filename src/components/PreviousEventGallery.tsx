@@ -4,6 +4,7 @@ import { ArrowRight, Play, Heart, Share2 } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import { useGalleryImages, useEvents } from '../hooks/useApi';
 import { GalleryImage, Event } from '../services/api';
+import { constructFullUrl } from '../utils/imageUtils';
 
 const PreviousEventGallery: React.FC = () => {
   // Fetch gallery images and events from API
@@ -48,10 +49,10 @@ const PreviousEventGallery: React.FC = () => {
 
   // Use fallback images if no gallery images are available
   const displayImages = eventGalleryImages.length > 0 ? eventGalleryImages : [
-    { id: 1, imageUrl: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'DJ performing' } as GalleryImage,
-    { id: 2, imageUrl: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'Crowd dancing' } as GalleryImage,
-    { id: 3, imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'Stage lights' } as GalleryImage,
-    { id: 4, imageUrl: 'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=800', title: 'Concert atmosphere' } as GalleryImage,
+    { id: '1', url: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'DJ performing' } as Partial<GalleryImage>,
+    { id: '2', url: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'Crowd dancing' } as Partial<GalleryImage>,
+    { id: '3', url: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'Stage lights' } as Partial<GalleryImage>,
+    { id: '4', url: 'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'Concert atmosphere' } as Partial<GalleryImage>,
   ];
 
   // Show loading state
@@ -176,8 +177,8 @@ const PreviousEventGallery: React.FC = () => {
               >
                 <div className="aspect-square rounded-2xl overflow-hidden">
                   <motion.img
-                    src={image.imageUrl}
-                    alt={image.title || `Gallery image ${index + 1}`}
+                    src={image.url ? constructFullUrl(image.url) : ''}
+                    alt={image.caption || `Gallery image ${index + 1}`}
                     className="w-full h-full object-cover"
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.3 }}
@@ -197,7 +198,7 @@ const PreviousEventGallery: React.FC = () => {
                         whileHover={{ scale: 1.1 }}
                         className="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-full"
                       >
-                        <Play className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                        <Play className="w-4 h-4 sm:w-6 sm:w-6 text-white" />
                       </motion.div>
                     </motion.div>
                   )}
