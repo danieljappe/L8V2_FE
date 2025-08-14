@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthState {
@@ -14,6 +14,12 @@ export function useAuth() {
     loading: true,
   });
   const navigate = useNavigate();
+  const navigateRef = useRef(navigate);
+  
+  // Update ref when navigate changes
+  useEffect(() => {
+    navigateRef.current = navigate;
+  }, [navigate]);
 
   // Check if token is valid (not expired)
   const isTokenValid = useCallback((token: string): boolean => {
@@ -24,7 +30,7 @@ export function useAuth() {
     } catch (error) {
       return false;
     }
-  }, []);
+  }, []); // No dependencies needed for this function
 
   // Initialize auth state
   useEffect(() => {
@@ -47,7 +53,7 @@ export function useAuth() {
         loading: false,
       });
     }
-  }, [isTokenValid]);
+  }, []); // Remove isTokenValid dependency since it's stable
 
   // Login function
   const login = useCallback((token: string) => {
@@ -59,7 +65,7 @@ export function useAuth() {
     });
   }, []);
 
-  // Logout function
+  // Logout function - use ref to avoid dependency issues
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     setAuthState({
@@ -67,10 +73,10 @@ export function useAuth() {
       token: null,
       loading: false,
     });
-    navigate('/login');
-  }, [navigate]);
+    navigateRef.current('/login');
+  }, []); // No dependencies needed
 
-  // Check authentication on route changes
+  // Check authentication on route changes - use ref to avoid dependency issues
   const checkAuth = useCallback(() => {
     const token = localStorage.getItem('token');
     

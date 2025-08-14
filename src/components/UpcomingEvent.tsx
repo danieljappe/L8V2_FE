@@ -114,9 +114,9 @@ const UpcomingEvent: React.FC = () => {
         viewport={{ once: true, amount: 0.3 }}
         className="container mx-auto max-w-4xl"
       >
-        <motion.button 
+        <motion.div 
           onClick={handleClick}
-          className="w-full text-left"
+          className="w-full text-left cursor-pointer"
           style={{ background: 'none', border: 'none', padding: 0 }}
         >
           <motion.div 
@@ -241,7 +241,7 @@ const UpcomingEvent: React.FC = () => {
               </motion.button>
             </motion.div>
           </motion.div>
-        </motion.button>
+        </motion.div>
       </motion.div>
 
       {/* Artist Modal */}

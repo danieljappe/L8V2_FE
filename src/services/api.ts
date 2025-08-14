@@ -161,10 +161,18 @@ export interface EventArtist {
 
 export interface GalleryImage {
   id: string;
-  title: string;
-  description?: string;
-  imageUrl: string;
-  eventId?: string;
+  filename: string;
+  url: string;
+  thumbnailUrl?: string;
+  mediumUrl?: string;
+  largeUrl?: string;
+  caption?: string;
+  event?: Event;
+  photographer?: string;
+  tags?: string[];
+  category: 'event' | 'venue' | 'artist' | 'other';
+  orderIndex: number;
+  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
 }
