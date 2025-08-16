@@ -2,9 +2,33 @@
 export const constructFullUrl = (relativeUrl: string | null | undefined): string => {
   if (!relativeUrl) return '';
   if (relativeUrl.startsWith('http')) return relativeUrl;
-  // Since we have a proxy configured, we can use the relative URL directly
-  // The proxy will forward the request to the backend
-  return relativeUrl;
+  
+  // Debug logging
+  console.log('constructFullUrl called with:', relativeUrl);
+  console.log('import.meta.env.DEV:', import.meta.env.DEV);
+  console.log('import.meta.env.VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
+  console.log('window.location.origin:', window.location.origin);
+  
+  // Option 1: Use environment variable (recommended)
+  if (import.meta.env.VITE_BACKEND_URL) {
+    const fullUrl = `${import.meta.env.VITE_BACKEND_URL}${relativeUrl}`;
+    console.log('Using VITE_BACKEND_URL, returning:', fullUrl);
+    return fullUrl;
+  }
+  
+  // Option 2: Auto-detect from current domain
+  const currentOrigin = window.location.origin;
+  if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
+    // In development, use relative URL (Vite proxy handles it)
+    console.log('Detected localhost, returning relative URL:', relativeUrl);
+    return relativeUrl;
+  }
+  
+  // Option 3: Hardcoded production URL (fallback)
+  const productionBackend = 'https://l8events.dk'; // Your actual domain
+  const fullUrl = `${productionBackend}${relativeUrl}`;
+  console.log('Using hardcoded production URL, returning:', fullUrl);
+  return fullUrl;
 };
 
 // Utility function to get the best available image URL from a gallery image
