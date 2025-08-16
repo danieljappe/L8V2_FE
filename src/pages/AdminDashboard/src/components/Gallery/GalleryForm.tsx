@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, X, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, Save, X, Plus, Trash2, Upload } from 'lucide-react';
 import { GalleryItem } from '../../types';
+import { constructFullUrl } from '../../../../../utils/imageUtils';
+import ImagePreview from './ImagePreview';
 
 interface GalleryFormProps {
   item?: GalleryItem | null;
@@ -10,31 +12,206 @@ interface GalleryFormProps {
 
 export default function GalleryForm({ item, onSubmit, onCancel }: GalleryFormProps) {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    image: '',
+    caption: '',
+    photographer: '',
+    url: '', // Always keep this as a string
     category: 'event' as GalleryItem['category'],
     tags: [''],
-    uploadedBy: 'Admin'
+    filename: '',
+    orderIndex: 0,
+    isPublished: true,
+    updatedAt: new Date().toISOString()
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const resetForm = useCallback(() => {
+    setSelectedFile(null);
+    setFormData({
+      caption: '',
+      photographer: '',
+      url: '',
+      category: 'event',
+      tags: [''],
+      filename: '',
+      orderIndex: 0,
+      isPublished: true,
+      updatedAt: new Date().toISOString()
+    });
+    // Reset the file input
+    const fileInput = document.getElementById('image') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }, []);
 
   useEffect(() => {
     if (item) {
+      console.log('Setting form data for item:', item);
       setFormData({
-        title: item.title,
-        description: item.description,
-        image: item.image,
+        caption: item.caption || '',
+        photographer: item.photographer || '',
+        url: item.url || '',
         category: item.category,
-        tags: item.tags,
-        uploadedBy: item.uploadedBy
+        tags: item.tags || [''],
+        filename: item.filename || '',
+        orderIndex: item.orderIndex || 0,
+        isPublished: item.isPublished !== undefined ? item.isPublished : true,
+        updatedAt: new Date().toISOString()
       });
+    } else {
+      // Reset form when no item is provided (new item mode)
+      resetForm();
     }
-  }, [item]);
+  }, [item, resetForm]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Cleanup function to revoke object URLs
+  useEffect(() => {
+    return () => {
+      // Clean up any object URLs to prevent memory leaks
+      if (selectedFile) {
+        // The object URL will be automatically cleaned up when the component unmounts
+        // but we can set selectedFile to null to help with cleanup
+        setSelectedFile(null);
+      }
+    };
+  }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      // Don't upload yet, just store the file for later
+      // Also don't update the image field until upload is complete
+    }
+  };
+
+  const clearSelectedFile = () => {
+    setSelectedFile(null);
+    // Reset the file input
+    const fileInput = document.getElementById('image') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filteredTags = formData.tags.filter(tag => tag.trim() !== '');
-    onSubmit({ ...formData, tags: filteredTags });
+    
+    console.log('Form submitted:', { 
+      selectedFile: !!selectedFile, 
+      formDataUrl: !!formData.url, 
+      isUploading, 
+      isSubmitting 
+    });
+    
+    if (isSubmitting || isUploading) {
+      console.log('Form submission blocked - already processing');
+      return; // Prevent multiple submissions
+    }
+    
+    // Validate required fields
+    if (!formData.caption.trim() && !formData.photographer.trim()) {
+      alert('Please provide either a caption or photographer for the image.');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      if (formData.url && !selectedFile) {
+        console.log('Handling form submission without file (editing mode)');
+        // Handle form submission without file (existing behavior for editing)
+        const filteredTags = formData.tags.filter(tag => tag.trim() !== '');
+        const submitData = { 
+          ...formData, 
+          tags: filteredTags,
+          updatedAt: new Date().toISOString()
+        };
+        console.log('Submitting form data:', submitData);
+        onSubmit(submitData);
+      } else if (selectedFile) {
+        console.log('File selected - use upload button instead');
+        alert('Please use the "Upload & Add to Gallery" button to upload your file.');
+      } else {
+        console.log('No file selected and no existing image');
+        // No file selected and no existing image
+        alert('Please select an image file to upload.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return;
+
+    console.log('Starting file upload...');
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('image', selectedFile);
+      formDataToSend.append('title', formData.caption || selectedFile.name);
+      formDataToSend.append('description', formData.photographer);
+      formDataToSend.append('category', formData.category);
+      formDataToSend.append('tags', JSON.stringify(formData.tags.filter(tag => tag.trim() !== '')));
+      formDataToSend.append('uploadedBy', formData.photographer);
+
+      console.log('Uploading to /api/gallery/upload...');
+
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 100);
+
+      const response = await fetch('/api/gallery/upload', {
+        method: 'POST',
+        body: formDataToSend,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          // Note: Don't set Content-Type for FormData - browser will set it automatically with boundary
+        }
+      });
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      console.log('Upload response:', response.status, response.ok);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Upload successful, result:', result);
+        // Upload successful - show success message and close form
+        alert('Image uploaded successfully!');
+        
+        // Reset form state
+        resetForm();
+        
+        console.log('Calling onCancel() to close form...');
+        // Close the form - the upload endpoint already created the gallery item
+        onCancel();
+      } else {
+        const error = await response.json();
+        console.log('Upload failed:', error);
+        alert(`Upload failed: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -80,36 +257,36 @@ export default function GalleryForm({ item, onSubmit, onCancel }: GalleryFormPro
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
+              <label htmlFor="caption" className="block text-sm font-medium text-gray-700 mb-2">
+                Caption
               </label>
               <input
                 type="text"
-                id="title"
-                name="title"
-                value={formData.title}
+                id="caption"
+                name="caption"
+                value={formData.caption}
                 onChange={handleChange}
-                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter image title"
+                placeholder="Enter image caption (optional)"
               />
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
+              <label htmlFor="photographer" className="block text-sm font-medium text-gray-700 mb-2">
+                Photographer
               </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
+              <input
+                type="text"
+                id="photographer"
+                name="photographer"
+                value={formData.photographer}
                 onChange={handleChange}
-                required
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Describe the image or media"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 border-transparent"
+                placeholder="Enter photographer name (optional)"
               />
             </div>
+
+
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -127,23 +304,38 @@ export default function GalleryForm({ item, onSubmit, onCancel }: GalleryFormPro
                   <option value="event">Event</option>
                   <option value="artist">Artist</option>
                   <option value="venue">Venue</option>
-                  <option value="promotional">Promotional</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
               <div>
-                <label htmlFor="uploadedBy" className="block text-sm font-medium text-gray-700 mb-2">
-                  Uploaded By *
+                <label htmlFor="orderIndex" className="block text-sm font-medium text-gray-700 mb-2">
+                  Order Index
                 </label>
                 <input
-                  type="text"
-                  id="uploadedBy"
-                  name="uploadedBy"
-                  value={formData.uploadedBy}
+                  type="number"
+                  id="orderIndex"
+                  name="orderIndex"
+                  value={formData.orderIndex}
                   onChange={handleChange}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Admin"
+                  placeholder="0"
                 />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="isPublished"
+                  name="isPublished"
+                  checked={formData.isPublished}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isPublished" className="ml-2 text-sm text-gray-700">
+                  Published
+                </label>
               </div>
             </div>
 
@@ -189,35 +381,137 @@ export default function GalleryForm({ item, onSubmit, onCancel }: GalleryFormPro
           <div className="space-y-6">
             <div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL *
+                {formData.url ? 'Replace Image (Optional)' : 'Image File *'}
               </label>
-              <input
-                type="url"
-                id="image"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="https://example.com/image.jpg"
-              />
+              <div className="flex space-x-2">
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  required={!formData.url}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {selectedFile && (
+                  <button
+                    type="button"
+                    onClick={clearSelectedFile}
+                    className="px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              {selectedFile && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Selected file: {selectedFile.name}
+                  {isUploading && (
+                    <span className="ml-2 text-blue-600"> ({uploadProgress}%)</span>
+                  )}
+                </div>
+              )}
+              <p className="mt-1 text-xs text-gray-500">
+                {formData.url 
+                  ? 'Select a new image file to replace the current one, or leave empty to keep the current image.'
+                  : 'Select an image file. The file will be uploaded when you submit the form.'
+                }
+              </p>
             </div>
 
-            {formData.image && (
+            {formData.url && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image Preview
+                  Current Image
                 </label>
-                <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-300">
-                  <img
-                    src={formData.image}
-                    alt="Gallery preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+                <div className="flex items-center">
+                  <ImagePreview
+                    src={formData.url}
+                    alt="Current gallery image"
+                    size="medium"
+                    showOverlay={true}
+                    overlayText="Current image"
+                    overlaySubtext="Select new file to replace"
+                    clickable={true}
+                    allImages={[{ src: formData.url, alt: "Current gallery image" }]}
+                    currentImageIndex={0}
+                    onImageChange={() => {}} // No-op for form context
                   />
+                  <div className="flex-1 ml-4">
+                    <p className="text-sm text-gray-600">
+                      <strong>Filename:</strong> {formData.filename || 'Unknown filename'}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      <strong>URL:</strong> {formData.url}
+                    </p>
+                  </div>
                 </div>
+              </div>
+            )}
+
+            {/* Show selected file preview before upload */}
+            {selectedFile && !formData.url && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Selected File Preview
+                </label>
+                <div className="flex items-center">
+                  <div 
+                    className="relative w-32 h-32 cursor-pointer hover:scale-105 transition-transform"
+                    onClick={() => {
+                      const newWindow = window.open();
+                      if (newWindow) {
+                        newWindow.document.write(`
+                          <html>
+                            <head><title>File Preview</title></head>
+                            <body style="margin:0;padding:20px;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;">
+                              <img src="${URL.createObjectURL(selectedFile)}" style="max-width:100%;max-height:100%;object-fit:contain;" />
+                            </body>
+                          </html>
+                        `);
+                      }
+                    }}
+                  >
+                    <img
+                      src={URL.createObjectURL(selectedFile)}
+                      alt="File preview"
+                      className="w-full h-full object-cover rounded-lg border border-gray-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                      <div className="text-white text-center bg-black bg-opacity-50 px-3 py-2 rounded">
+                        <div className="text-sm">File selected</div>
+                        <div className="text-xs">Click to preview</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 ml-4">
+                    <p className="text-sm text-gray-600">
+                      <strong>Filename:</strong> {selectedFile.name}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      <strong>Size:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      <strong>Type:</strong> {selectedFile.type}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isUploading && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center space-x-2 text-blue-700">
+                  <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm font-medium">Uploading image...</span>
+                </div>
+                <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-blue-600 mt-1">{uploadProgress}% complete</div>
               </div>
             )}
 
@@ -242,13 +536,57 @@ export default function GalleryForm({ item, onSubmit, onCancel }: GalleryFormPro
             <X className="w-4 h-4" />
             <span>Cancel</span>
           </button>
-          <button
-            type="submit"
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
-          >
-            <Save className="w-4 h-4" />
-            <span>{item ? 'Update Item' : 'Add to Gallery'}</span>
-          </button>
+          
+          {/* Separate upload button for files */}
+          {selectedFile && (
+            <button
+              type="button"
+              onClick={handleFileUpload}
+              disabled={isUploading || isSubmitting}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                isUploading || isSubmitting
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              {isUploading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Uploading...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  <span>Upload & Add to Gallery</span>
+                </>
+              )}
+            </button>
+          )}
+          
+          {/* Form submit button for non-file submissions */}
+          {!selectedFile && (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                isSubmitting 
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>{item ? 'Update Item' : 'Save Details'}</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
       </form>
     </div>

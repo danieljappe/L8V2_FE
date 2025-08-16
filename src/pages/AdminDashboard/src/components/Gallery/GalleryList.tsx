@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Search, Plus, Edit, Trash2, Filter, Upload } from 'lucide-react';
 import { GalleryItem } from '../../types';
 import GalleryForm from './GalleryForm';
+import { constructFullUrl } from '../../../../../utils/imageUtils';
+import ImagePreview from './ImagePreview';
 
 interface GalleryListProps {
   gallery: GalleryItem[];
@@ -16,17 +18,18 @@ export default function GalleryList({ gallery, onUpdateGallery, onDeleteGallery,
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
 
-  const categories = [...new Set(gallery.map(item => item.category))];
+  const categories = [...new Set((gallery || []).map(item => item.category))];
 
   const filteredGallery = gallery.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = (item.caption?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+                         (item.filename?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+                         (item.tags || []).some(tag => (tag?.toLowerCase() || '').includes(searchTerm.toLowerCase()));
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
   const handleEdit = (item: GalleryItem) => {
+    console.log('Editing gallery item:', item);
     setEditingItem(item);
     setShowForm(true);
   };
@@ -51,7 +54,7 @@ export default function GalleryList({ gallery, onUpdateGallery, onDeleteGallery,
       case 'event': return 'bg-blue-100 text-blue-800';
       case 'artist': return 'bg-green-100 text-green-800';
       case 'venue': return 'bg-purple-100 text-purple-800';
-      case 'promotional': return 'bg-orange-100 text-orange-800';
+      case 'other': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -89,7 +92,7 @@ export default function GalleryList({ gallery, onUpdateGallery, onDeleteGallery,
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by title, description, or tags..."
+              placeholder="Search by caption, filename, or tags..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -115,15 +118,25 @@ export default function GalleryList({ gallery, onUpdateGallery, onDeleteGallery,
 
       {/* Gallery Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredGallery.map((item) => (
+        {(filteredGallery || []).map((item) => {
+          console.log('Gallery item data:', item);
+          return (
           <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group">
             <div className="relative aspect-square overflow-hidden">
-              <img 
-                src={item.image} 
-                alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              <ImagePreview
+                src={item.url || ''}
+                alt={item.caption || item.filename || 'Gallery image'}
+                size="large"
+                className="w-full h-full"
+                clickable={true}
+                allImages={filteredGallery.map(img => ({ 
+                  src: img.url || '', 
+                  alt: img.caption || img.filename || 'Gallery image', 
+                  id: img.id 
+                }))}
+                currentImageIndex={filteredGallery.findIndex(img => img.id === item.id)}
+                onImageChange={() => {}} // No-op for grid context
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
               <div className="absolute top-3 left-3">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(item.category)}`}>
                   {item.category}
@@ -148,10 +161,17 @@ export default function GalleryList({ gallery, onUpdateGallery, onDeleteGallery,
             </div>
             
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{item.title}</h3>
-              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.description}</p>
+              <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
+                {item.caption || item.filename || 'Untitled'}
+              </h3>
               
-              {item.tags.length > 0 && (
+              {item.filename && (
+                <p className="text-gray-600 text-sm mb-2 line-clamp-1">
+                  {item.filename}
+                </p>
+              )}
+              
+              {(item.tags && item.tags.length > 0) && (
                 <div className="flex flex-wrap gap-1 mb-3">
                   {item.tags.slice(0, 3).map((tag) => (
                     <span
@@ -170,15 +190,16 @@ export default function GalleryList({ gallery, onUpdateGallery, onDeleteGallery,
               )}
 
               <div className="flex items-center justify-between text-sm text-gray-500">
-                <span>By {item.uploadedBy}</span>
-                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                <span>By {item.photographer || 'Unknown'}</span>
+                <span>{new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
-      {filteredGallery.length === 0 && (
+      {(!filteredGallery || filteredGallery.length === 0) && (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
           <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500">No gallery items found matching your criteria</p>

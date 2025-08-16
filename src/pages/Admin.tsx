@@ -4,7 +4,7 @@ import DashboardOverview from '../components/admin/DashboardOverview';
 import EventsList from '../components/admin/EventsList';
 import ArtistsList from '../components/admin/ArtistsList';
 import VenuesList from '../components/admin/VenuesList';
-import GalleryList from '../components/admin/GalleryList';
+import GalleryList from './AdminDashboard/src/components/Gallery/GalleryList';
 import MessagesList from '../components/admin/MessagesList';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';

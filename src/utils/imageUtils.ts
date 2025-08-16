@@ -2,7 +2,9 @@
 export const constructFullUrl = (relativeUrl: string | null | undefined): string => {
   if (!relativeUrl) return '';
   if (relativeUrl.startsWith('http')) return relativeUrl;
-  return `http://localhost:3000${relativeUrl}`;
+  // Since we have a proxy configured, we can use the relative URL directly
+  // The proxy will forward the request to the backend
+  return relativeUrl;
 };
 
 // Utility function to get the best available image URL from a gallery image

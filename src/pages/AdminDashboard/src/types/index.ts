@@ -51,13 +51,20 @@ export interface Venue {
 
 export interface GalleryItem {
   id: string;
-  title: string;
-  description: string;
-  image: string;
-  category: 'event' | 'artist' | 'venue' | 'promotional';
-  tags: string[];
-  uploadedBy: string;
+  filename: string;
+  url: string;
+  thumbnailUrl?: string;
+  mediumUrl?: string;
+  largeUrl?: string;
+  caption?: string;
+  eventId?: string;
+  photographer?: string;
+  tags?: string[];
+  category: 'event' | 'artist' | 'venue' | 'other';
+  orderIndex: number;
+  isPublished: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Message {
