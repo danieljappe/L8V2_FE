@@ -18,10 +18,10 @@ export const constructFullUrl = (relativeUrl: string | null | undefined): string
     return relativeUrl;
   }
   
-  // Option 3: Hardcoded production URL (fallback)
-  const productionBackend = 'https://l8events.dk'; // Your actual domain
+  // Option 3: Use production backend URL from environment or fallback
+  const productionBackend = import.meta.env.VITE_PRODUCTION_BACKEND_URL || 'https://l8events.dk';
   const fullUrl = `${productionBackend}${relativeUrl}`;
-  console.log('Using hardcoded production URL, returning:', fullUrl);
+  console.log('Using production URL, returning:', fullUrl);
   return fullUrl;
 };
 

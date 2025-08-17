@@ -1,6 +1,27 @@
 // API Base URL - adjust this based on your backend deployment
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
+// Helper function to construct full image URLs
+const constructImageUrl = (imageUrl: string | null | undefined): string => {
+  if (!imageUrl) return '';
+  if (imageUrl.startsWith('http')) return imageUrl;
+  
+  // Use environment variable for production
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return `${import.meta.env.VITE_BACKEND_URL}${imageUrl}`;
+  }
+  
+  // Auto-detect environment
+  const currentOrigin = window.location.origin;
+  if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
+    return imageUrl; // Relative URL for development
+  }
+  
+  // Production fallback
+  const productionBackend = import.meta.env.VITE_PRODUCTION_BACKEND_URL || 'https://l8events.dk';
+  return `${productionBackend}${imageUrl}`;
+};
+
 // Common API response interface
 interface ApiResponse<T> {
   data?: T;
@@ -64,7 +85,9 @@ class ApiClient {
       }
 
       const data = await response.json();
-      return { data };
+      // Transform the response to fix image URLs
+      const transformedData = transformApiResponse(data);
+      return { data: transformedData };
     } catch (error) {
       console.error('API request failed:', error);
       return { error: error instanceof Error ? error.message : 'Unknown error' };
@@ -100,6 +123,36 @@ class ApiClient {
 
 // Create API client instance
 export const apiClient = new ApiClient(API_BASE_URL);
+
+// Helper function to transform API responses and fix image URLs
+const transformApiResponse = <T>(data: T): T => {
+  if (typeof data === 'object' && data !== null) {
+    // Handle arrays
+    if (Array.isArray(data)) {
+      return data.map(item => transformApiResponse(item)) as T;
+    }
+    
+    // Handle objects
+    const transformed = { ...data } as any;
+    for (const [key, value] of Object.entries(transformed)) {
+      if (key === 'imageUrl' && typeof value === 'string') {
+        transformed[key] = constructImageUrl(value);
+      } else if (key === 'url' && typeof value === 'string') {
+        transformed[key] = constructImageUrl(value);
+      } else if (key === 'thumbnailUrl' && typeof value === 'string') {
+        transformed[key] = constructImageUrl(value);
+      } else if (key === 'mediumUrl' && typeof value === 'string') {
+        transformed[key] = constructImageUrl(value);
+      } else if (key === 'largeUrl' && typeof value === 'string') {
+        transformed[key] = constructImageUrl(value);
+      } else if (typeof value === 'object' && value !== null) {
+        transformed[key] = transformApiResponse(value);
+      }
+    }
+    return transformed;
+  }
+  return data;
+};
 
 // Data interfaces based on backend models
 export interface Artist {
