@@ -18,18 +18,16 @@ export interface Event {
 export interface Artist {
   id: string;
   name: string;
-  bio: string;
-  genre: string;
-  email: string;
-  phone: string;
-  image: string;
-  socialMedia: {
-    instagram?: string;
-    twitter?: string;
-    spotify?: string;
-  };
-  eventsCount: number;
+  bio?: string;
+  imageUrl?: string;
+  website?: string;
+  socialMedia?: Array<{
+    platform: string;
+    url: string;
+  }>;
+  genre?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Venue {

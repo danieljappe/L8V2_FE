@@ -83,13 +83,12 @@ function mapApiArtistToAdminArtist(apiArtist: ApiArtist): Artist {
     id: apiArtist.id,
     name: apiArtist.name,
     bio: apiArtist.bio || '',
+    imageUrl: apiArtist.imageUrl || '',
+    website: apiArtist.website || '',
+    socialMedia: apiArtist.socialMedia || [],
     genre: apiArtist.genre || '',
-    email: '',
-    phone: '',
-    image: apiArtist.image || '',
-    socialMedia: {},
-    eventsCount: 0,
     createdAt: apiArtist.createdAt,
+    updatedAt: apiArtist.updatedAt
   };
 }
 

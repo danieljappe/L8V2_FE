@@ -3,15 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Instagram, Globe, Youtube } from 'lucide-react';
 
 interface Artist {
+  id: string;
   name: string;
-  genre: string;
-  image: string;
-  bio: string;
-  social?: {
-    instagram?: string;
-    website?: string;
-    youtube?: string;
-  };
+  bio?: string;
+  imageUrl?: string;
+  website?: string;
+  socialMedia?: Array<{
+    platform: string;
+    url: string;
+  }>;
+  genre?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface ArtistModalProps {
@@ -52,7 +55,7 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose }) => {
           {/* Artist Image */}
           <div className="relative h-48 sm:h-64 md:h-80">
             <img
-              src={artist.image}
+              src={artist.imageUrl}
               alt={artist.name}
               className="w-full h-full object-cover"
             />
@@ -71,42 +74,32 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose }) => {
               
               {/* Social Links */}
               <div className="flex gap-3">
-                {artist.social?.instagram && (
+                {artist.socialMedia && Array.isArray(artist.socialMedia) && artist.socialMedia.map((media, index) => (
                   <motion.a
-                    href={artist.social.instagram}
+                    key={index}
+                    href={media.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.1, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className="p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-colors"
+                    title={media.platform}
                   >
-                    <Instagram className="w-5 h-5" />
+                    {media.platform.toLowerCase().includes('instagram') && <Instagram className="w-5 h-5" />}
+                    {media.platform.toLowerCase().includes('youtube') && <Youtube className="w-5 h-5" />}
+                    {media.platform.toLowerCase().includes('spotify') && <span className="text-2xl">🎵</span>}
+                    {media.platform.toLowerCase().includes('soundcloud') && <span className="text-2xl">☁️</span>}
+                    {media.platform.toLowerCase().includes('twitter') && <span className="text-2xl">🐦</span>}
+                    {media.platform.toLowerCase().includes('facebook') && <span className="text-2xl">📘</span>}
+                    {!media.platform.toLowerCase().includes('instagram') && 
+                     !media.platform.toLowerCase().includes('youtube') && 
+                     !media.platform.toLowerCase().includes('spotify') && 
+                     !media.platform.toLowerCase().includes('soundcloud') && 
+                     !media.platform.toLowerCase().includes('twitter') && 
+                     !media.platform.toLowerCase().includes('facebook') && 
+                     <Globe className="w-5 h-5" />}
                   </motion.a>
-                )}
-                {artist.social?.website && (
-                  <motion.a
-                    href={artist.social.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-colors"
-                  >
-                    <Globe className="w-5 h-5" />
-                  </motion.a>
-                )}
-                {artist.social?.youtube && (
-                  <motion.a
-                    href={artist.social.youtube}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-colors"
-                  >
-                    <Youtube className="w-5 h-5" />
-                  </motion.a>
-                )}
+                ))}
               </div>
             </div>
 

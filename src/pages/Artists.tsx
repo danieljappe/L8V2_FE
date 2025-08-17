@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Music } from 'lucide-react';
+import { Users, Music, Star, Globe, Instagram } from 'lucide-react';
 import { apiService, Artist } from '../services/api';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -10,6 +10,8 @@ const Artists: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [genreFilter, setGenreFilter] = useState<string>('all');
 
   useEffect(() => {
     const fetchArtists = async () => {
@@ -39,6 +41,18 @@ const Artists: React.FC = () => {
   const handleCloseModal = () => {
     setSelectedArtist(null);
   };
+
+  // Filter artists based on search and genre
+  const filteredArtists = artists.filter(artist => {
+    const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (artist.bio && artist.bio.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         (artist.genre && artist.genre.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesGenre = genreFilter === 'all' || artist.genre === genreFilter;
+    return matchesSearch && matchesGenre;
+  });
+
+  // Get unique genres for filter
+  const genres = ['all', ...Array.from(new Set(artists.map(artist => artist.genre).filter(Boolean)))];
 
   if (loading) {
     return (
@@ -87,19 +101,71 @@ const Artists: React.FC = () => {
         </div>
       </div>
 
+      {/* Search and Filter Section */}
+      {artists.length > 0 && (
+        <div className="container mx-auto px-4 py-8">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto">
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Search Input */}
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Søg efter kunstnere, genre eller beskrivelse..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Genre Filter */}
+              <select
+                value={genreFilter}
+                onChange={(e) => setGenreFilter(e.target.value)}
+                className="px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              >
+                {genres.map(genre => (
+                  <option key={genre} value={genre} className="bg-gray-800 text-white">
+                    {genre === 'all' ? 'Alle Genrer' : genre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Results Count */}
+            <div className="mt-4 text-center text-white/80">
+              <span className="text-sm">
+                {filteredArtists.length} af {artists.length} kunstnere
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Artists Grid */}
       <div className="container mx-auto px-4 py-12">
-        {artists.length === 0 ? (
+        {filteredArtists.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Music className="w-8 h-8 text-white/60" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Ingen Kunstnere Endnu</h3>
-            <p className="text-white/60">Kunstnere vil blive tilføjet snart</p>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              {artists.length === 0 ? 'Ingen Kunstnere Endnu' : 'Ingen Resultater'}
+            </h3>
+            <p className="text-white/60">
+              {artists.length === 0 
+                ? 'Kunstnere vil blive tilføjet snart' 
+                : 'Prøv at ændre dine søgekriterier'
+              }
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-            {artists.map((artist, index) => (
+            {filteredArtists.map((artist, index) => (
               <motion.div
                 key={artist.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -111,36 +177,93 @@ const Artists: React.FC = () => {
                 className="group cursor-pointer"
               >
                 <div className="relative">
-                  {/* Circular Artist Image */}
-                  <div className="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white/10 group-hover:border-purple-500/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl">
-                    <img
-                      src={artist.image}
-                      alt={artist.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
+                  {/* Artist Image Card */}
+                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-4 border-white/10 group-hover:border-purple-500/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200">
+                    {artist.imageUrl ? (
+                      <img
+                        src={artist.imageUrl}
+                        alt={artist.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    
+                    {/* Fallback placeholder */}
+                    <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
+                      <div className="text-center">
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                          <span className="text-white text-3xl font-bold">{artist.name.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <p className="text-gray-500 text-sm font-medium">No Image</p>
+                      </div>
+                    </div>
 
-                  {/* Artist Info Overlay */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="text-center">
-                      <h3 className="text-white font-bold text-lg mb-1">{artist.name}</h3>
-                      <p className="text-purple-300 text-sm">{artist.genre}</p>
+                    {/* Status Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      {artist.genre && (
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-sm text-gray-800 border border-gray-200/50 shadow-sm">
+                          {artist.genre}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Social Media Count Badge */}
+                    {artist.socialMedia && Array.isArray(artist.socialMedia) && artist.socialMedia.length > 0 && (
+                      <div className="absolute top-3 right-3">
+                        <div className="bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1 shadow-sm border border-gray-200/50">
+                          <span className="text-sm font-semibold text-gray-800">
+                            {artist.socialMedia.length} social
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Artist Info Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="text-center">
+                        <h3 className="text-white font-bold text-lg mb-1">{artist.name}</h3>
+                        <p className="text-purple-300 text-sm mb-2">{artist.genre}</p>
+                        {artist.bio && (
+                          <p className="text-white/80 text-xs line-clamp-2">
+                            {artist.bio}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Click Indicator */}
+                    <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-2 h-2 bg-white rounded-full" />
                     </div>
                   </div>
 
-                  {/* Click Indicator */}
-                  <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="w-2 h-2 bg-white rounded-full" />
+                  {/* Artist Info Below Image */}
+                  <div className="mt-4 text-center">
+                    <h3 className="text-white font-bold text-lg mb-1 group-hover:text-purple-300 transition-colors">
+                      {artist.name}
+                    </h3>
+                    <p className="text-white/60 text-sm mb-2">{artist.genre}</p>
+                    
+                    {/* Additional Info */}
+                    <div className="flex items-center justify-center space-x-4 text-xs text-white/60">
+                      {artist.website && (
+                        <div className="flex items-center space-x-1">
+                          <Globe className="w-3 h-3 text-blue-400" />
+                          <span>Website</span>
+                        </div>
+                      )}
+                      {artist.socialMedia && Array.isArray(artist.socialMedia) && (
+                        <div className="flex items-center space-x-1">
+                          <Instagram className="w-3 h-3 text-pink-400" />
+                          <span>{artist.socialMedia.length} platforms</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-
-                {/* Artist Info Below Image */}
-                <div className="mt-4 text-center">
-                  <h3 className="text-white font-bold text-lg mb-1 group-hover:text-purple-300 transition-colors">
-                    {artist.name}
-                  </h3>
-                  <p className="text-white/60 text-sm">{artist.genre}</p>
                 </div>
               </motion.div>
             ))}

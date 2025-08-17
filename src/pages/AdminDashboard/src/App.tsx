@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from './components/Layout/AdminLayout';
 import DashboardOver from './components/Dashboard/DashboardOverview';
 import EventsList from './components/Events/EventsList';
@@ -9,17 +9,50 @@ import MessagesList from './components/Messages/MessagesList';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from './data/mockData';
 import { AdminSection, Event, Artist, Venue, GalleryItem, Message } from './types';
-import { apiService } from '../../../services/api';
+import { adminApiService } from './services/api';
 
 function App() {
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
   const [events, setEvents] = useLocalStorage<Event[]>('admin-events', mockEvents);
-  const [artists, setArtists] = useLocalStorage<Artist[]>('admin-artists', mockArtists);
+  const [artists, setArtists] = useState<Artist[]>([]);
   const [venues, setVenues] = useLocalStorage<Venue[]>('admin-venues', mockVenues);
   const [gallery, setGallery] = useLocalStorage<GalleryItem[]>('admin-gallery', mockGallery);
   const [messages, setMessages] = useLocalStorage<Message[]>('admin-messages', mockMessages);
+  const [artistsLoading, setArtistsLoading] = useState(true);
 
   const unreadMessages = messages.filter(m => !m.read).length;
+
+  // Fetch artists from backend on mount
+  useEffect(() => {
+    const fetchArtists = async () => {
+      try {
+        setArtistsLoading(true);
+        console.log('🔄 AdminDashboard: Fetching artists from API...');
+        const res = await adminApiService.getArtists();
+        console.log('📡 AdminDashboard: API response:', res);
+        if (res.data) {
+          console.log('✅ AdminDashboard: API data received:', res.data);
+          // The API response data should already match our Artist type
+          setArtists(res.data as Artist[]);
+          console.log('💾 AdminDashboard: Artists state set to:', res.data);
+        } else {
+          console.error('❌ AdminDashboard: Failed to fetch artists:', res.error);
+          // Fallback to mock data if API fails
+          console.log('🔄 AdminDashboard: Falling back to mock data');
+          setArtists(mockArtists);
+        }
+      } catch (error) {
+        console.error('❌ AdminDashboard: Error fetching artists:', error);
+        // Fallback to mock data if API fails
+        console.log('🔄 AdminDashboard: Falling back to mock data due to error');
+        setArtists(mockArtists);
+      } finally {
+        setArtistsLoading(false);
+      }
+    };
+
+    fetchArtists();
+  }, []);
 
   // Event handlers
   const handleAddEvent = (eventData: Omit<Event, 'id' | 'createdAt'>) => {
@@ -40,21 +73,74 @@ function App() {
   };
 
   // Artist handlers
-  const handleAddArtist = (artistData: Omit<Artist, 'id' | 'createdAt'>) => {
-    const newArtist: Artist = {
-      ...artistData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    };
-    setArtists([...artists, newArtist]);
+  const handleAddArtist = async (artistData: Omit<Artist, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const res = await adminApiService.createArtist(artistData);
+    if (res.data) {
+      // Transform API data to match AdminDashboard types
+      const newArtist: Artist = {
+        id: res.data.id,
+        name: res.data.name,
+        bio: res.data.bio || '',
+        imageUrl: res.data.imageUrl || '',
+        website: res.data.website || '',
+        socialMedia: res.data.socialMedia || [],
+        genre: res.data.genre || '',
+        createdAt: res.data.createdAt || new Date().toISOString(),
+        updatedAt: res.data.updatedAt || new Date().toISOString()
+      };
+      setArtists((prev) => [...prev, newArtist]);
+    } else {
+      alert(res.error || 'Failed to create artist');
+    }
   };
 
-  const handleUpdateArtist = (updatedArtist: Artist) => {
-    setArtists(artists.map(artist => artist.id === updatedArtist.id ? updatedArtist : artist));
+  const handleUpdateArtist = async (updatedArtist: Artist) => {
+    console.log('🔄 AdminDashboard: Updating artist with data:', updatedArtist);
+    
+    // Prepare the data to send to backend (exclude id, createdAt, updatedAt)
+    const updateData = {
+      name: updatedArtist.name,
+      bio: updatedArtist.bio,
+      imageUrl: updatedArtist.imageUrl,
+      website: updatedArtist.website,
+      socialMedia: updatedArtist.socialMedia,
+      genre: updatedArtist.genre
+    };
+    
+    console.log('📤 AdminDashboard: Sending update data to backend:', updateData);
+    
+    const res = await adminApiService.updateArtist(updatedArtist.id, updateData);
+    if (res.data) {
+      console.log('✅ AdminDashboard: Backend update response:', res.data);
+      
+      // Transform API data to match AdminDashboard types
+      const transformedArtist: Artist = {
+        id: res.data.id,
+        name: res.data.name,
+        bio: res.data.bio || '',
+        imageUrl: res.data.imageUrl || '',
+        website: res.data.website || '',
+        socialMedia: res.data.socialMedia || [],
+        genre: res.data.genre || '',
+        createdAt: res.data.createdAt || updatedArtist.createdAt,
+        updatedAt: res.data.updatedAt || new Date().toISOString()
+      };
+      
+      console.log('🔄 AdminDashboard: Transformed artist data:', transformedArtist);
+      
+      setArtists(prev => prev.map(artist => 
+        artist.id === updatedArtist.id ? transformedArtist : artist
+      ));
+      
+      console.log('💾 AdminDashboard: Artists state updated successfully');
+    } else {
+      console.error('❌ AdminDashboard: Failed to update artist:', res.error);
+      alert(res.error || 'Failed to update artist');
+    }
   };
 
   const handleDeleteArtist = async (id: string) => {
-    const res = await apiService.deleteArtist(id);
+    const res = await adminApiService.deleteArtist(id);
     if (!res.error) {
       setArtists(artists.filter(artist => artist.id !== id));
     } else {
@@ -71,17 +157,16 @@ function App() {
       city: apiVenue.city || '',
       capacity: apiVenue.capacity || 0,
       description: apiVenue.description || '',
-      amenities: apiVenue.amenities || [],
-      contactEmail: apiVenue.contactEmail || '',
-      contactPhone: apiVenue.contactPhone || '',
-      image: apiVenue.image || '',
+      imageUrl: apiVenue.image || '',
       pricePerHour: apiVenue.pricePerHour || 0,
-      createdAt: apiVenue.createdAt || ''
+      isActive: apiVenue.isActive !== undefined ? apiVenue.isActive : true,
+      createdAt: apiVenue.createdAt || '',
+      updatedAt: apiVenue.updatedAt || ''
     };
   };
 
   const handleAddVenue = async (venueData: Omit<Venue, 'id' | 'createdAt'>) => {
-    const res = await apiService.createVenue(venueData);
+    const res = await adminApiService.createVenue(venueData);
     if (res.data) {
       setVenues((prev) => [...prev, mapApiVenueToAdminVenue(res.data)]);
     } else {
@@ -90,7 +175,7 @@ function App() {
   };
 
   const handleUpdateVenue = async (updatedVenue: Venue) => {
-    const res = await apiService.updateVenue(Number(updatedVenue.id), { ...updatedVenue, id: Number(updatedVenue.id) });
+    const res = await adminApiService.updateVenue(updatedVenue.id, updatedVenue);
     if (res.data) {
       setVenues((prev) => prev.map(venue => venue.id === updatedVenue.id ? mapApiVenueToAdminVenue(res.data) : venue));
     } else {
@@ -99,7 +184,7 @@ function App() {
   };
 
   const handleDeleteVenue = async (id: string) => {
-    const res = await apiService.deleteVenue(id);
+    const res = await adminApiService.deleteVenue(id);
     if (!res.error) {
       setVenues(venues.filter(venue => venue.id !== id));
     } else {

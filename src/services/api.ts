@@ -105,14 +105,14 @@ export const apiClient = new ApiClient(API_BASE_URL);
 export interface Artist {
   id: string;
   name: string;
-  genre: string;
-  image: string;
-  bio: string;
-  social?: {
-    instagram?: string;
-    website?: string;
-    youtube?: string;
-  };
+  bio?: string;
+  imageUrl?: string;
+  website?: string;
+  socialMedia?: Array<{
+    platform: string;
+    url: string;
+  }>;
+  genre?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -267,6 +267,23 @@ export const apiService = {
     });
     if (!response.ok) {
       throw new Error('Image upload failed');
+    }
+    return response.json();
+  },
+
+  // Artist image upload
+  uploadArtistImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const response = await fetch(`${API_BASE_URL}/artists/upload-image`, {
+      method: 'POST',
+      body: formData,
+      headers,
+    });
+    if (!response.ok) {
+      throw new Error('Artist image upload failed');
     }
     return response.json();
   },

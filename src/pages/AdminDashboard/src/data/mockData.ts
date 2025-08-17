@@ -50,48 +50,40 @@ export const mockArtists: Artist[] = [
     id: '1',
     name: 'The Midnight Collective',
     bio: 'Indie alternative band known for their ethereal soundscapes and introspective lyrics.',
+    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg',
+    website: 'https://midnightcollective.com',
+    socialMedia: 'Instagram: @midnightcollective, Twitter: @themidnightcol, Spotify: the-midnight-collective',
     genre: 'Indie Alternative',
-    email: 'booking@midnightcollective.com',
-    phone: '+1-555-0123',
-    image: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg',
-    socialMedia: {
-      instagram: '@midnightcollective',
-      twitter: '@themidnightcol',
-      spotify: 'the-midnight-collective'
-    },
-    eventsCount: 12,
-    createdAt: '2023-12-01T10:00:00Z'
+    rating: 4.8,
+    isActive: true,
+    createdAt: '2023-12-01T10:00:00Z',
+    updatedAt: '2023-12-01T10:00:00Z'
   },
   {
     id: '2',
     name: 'Sofia Martinez Trio',
     bio: 'Renowned jazz pianist with over 20 years of experience performing worldwide.',
+    imageUrl: 'https://images.pexels.com/photos/1047442/pexels-photo-1047442.jpeg',
+    website: 'https://sofiamartineztrio.com',
+    socialMedia: 'Instagram: @sofiamartineztrio, Spotify: sofia-martinez-trio',
     genre: 'Jazz',
-    email: 'sofia@martineztrio.com',
-    phone: '+1-555-0456',
-    image: 'https://images.pexels.com/photos/1047442/pexels-photo-1047442.jpeg',
-    socialMedia: {
-      instagram: '@sofiamartineztrio',
-      spotify: 'sofia-martinez-trio'
-    },
-    eventsCount: 28,
-    createdAt: '2023-11-15T16:20:00Z'
+    rating: 4.9,
+    isActive: true,
+    createdAt: '2023-11-15T16:20:00Z',
+    updatedAt: '2023-11-15T16:20:00Z'
   },
   {
     id: '3',
     name: 'Thunderstorm',
     bio: 'Heavy metal band that has been rocking stages for over a decade.',
+    imageUrl: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg',
+    website: 'https://thunderstormband.com',
+    socialMedia: 'Instagram: @thunderstormofficial, Twitter: @thunderstormband, Spotify: thunderstorm-metal',
     genre: 'Heavy Metal',
-    email: 'management@thunderstormband.com',
-    phone: '+1-555-0789',
-    image: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg',
-    socialMedia: {
-      instagram: '@thunderstormofficial',
-      twitter: '@thunderstormband',
-      spotify: 'thunderstorm-metal'
-    },
-    eventsCount: 45,
-    createdAt: '2023-10-20T12:45:00Z'
+    rating: 4.7,
+    isActive: true,
+    createdAt: '2023-10-20T12:45:00Z',
+    updatedAt: '2023-10-20T12:45:00Z'
   }
 ];
 

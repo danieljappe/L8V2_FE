@@ -50,48 +50,45 @@ export const mockArtists: Artist[] = [
     id: '1',
     name: 'Sarah Johnson',
     bio: 'A talented singer-songwriter with a unique voice and compelling lyrics.',
+    imageUrl: '/images/artist1.jpg',
+    website: 'https://sarahjohnson.com',
+    socialMedia: [
+      { platform: 'Instagram', url: 'https://instagram.com/sarahjohnson' },
+      { platform: 'Twitter', url: 'https://twitter.com/sarahjohnson' },
+      { platform: 'Spotify', url: 'https://open.spotify.com/artist/sarahjohnson' }
+    ],
     genre: 'Pop/Folk',
-    email: 'sarah@example.com',
-    phone: '+1-555-0123',
-    image: '/images/artist1.jpg',
-    socialMedia: {
-      instagram: '@sarahjohnson',
-      twitter: '@sarahjohnson',
-      spotify: 'sarahjohnson'
-    },
-    eventsCount: 5,
-    createdAt: '2024-01-01T08:00:00Z'
+    createdAt: '2024-01-01T08:00:00Z',
+    updatedAt: '2024-01-01T08:00:00Z'
   },
   {
     id: '2',
     name: 'The Jazz Trio',
     bio: 'A professional jazz ensemble with over 10 years of experience.',
+    imageUrl: '/images/artist2.jpg',
+    website: 'https://jazztrio.com',
+    socialMedia: [
+      { platform: 'Instagram', url: 'https://instagram.com/jazztrio' },
+      { platform: 'Spotify', url: 'https://open.spotify.com/artist/jazztrio' }
+    ],
     genre: 'Jazz',
-    email: 'jazz@example.com',
-    phone: '+1-555-0124',
-    image: '/images/artist2.jpg',
-    socialMedia: {
-      instagram: '@jazztrio',
-      spotify: 'jazztrio'
-    },
-    eventsCount: 3,
-    createdAt: '2024-01-02T10:30:00Z'
+    createdAt: '2024-01-02T10:30:00Z',
+    updatedAt: '2024-01-02T10:30:00Z'
   },
   {
     id: '3',
     name: 'Rock Band XYZ',
     bio: 'High-energy rock band known for their electrifying performances.',
+    imageUrl: '/images/artist3.jpg',
+    website: 'https://rockbandxyz.com',
+    socialMedia: [
+      { platform: 'Instagram', url: 'https://instagram.com/rockbandxyz' },
+      { platform: 'Twitter', url: 'https://twitter.com/rockbandxyz' },
+      { platform: 'Spotify', url: 'https://open.spotify.com/artist/rockbandxyz' }
+    ],
     genre: 'Rock',
-    email: 'rock@example.com',
-    phone: '+1-555-0125',
-    image: '/images/artist3.jpg',
-    socialMedia: {
-      instagram: '@rockbandxyz',
-      twitter: '@rockbandxyz',
-      spotify: 'rockbandxyz'
-    },
-    eventsCount: 8,
-    createdAt: '2024-01-03T12:45:00Z'
+    createdAt: '2024-01-03T12:45:00Z',
+    updatedAt: '2024-01-03T12:45:00Z'
   }
 ];
 

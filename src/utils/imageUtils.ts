@@ -3,12 +3,6 @@ export const constructFullUrl = (relativeUrl: string | null | undefined): string
   if (!relativeUrl) return '';
   if (relativeUrl.startsWith('http')) return relativeUrl;
   
-  // Debug logging
-  console.log('constructFullUrl called with:', relativeUrl);
-  console.log('import.meta.env.DEV:', import.meta.env.DEV);
-  console.log('import.meta.env.VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
-  console.log('window.location.origin:', window.location.origin);
-  
   // Option 1: Use environment variable (recommended)
   if (import.meta.env.VITE_BACKEND_URL) {
     const fullUrl = `${import.meta.env.VITE_BACKEND_URL}${relativeUrl}`;
