@@ -5,6 +5,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
+  errorData?: any; // Additional error details from backend
 }
 
 // Artist type that matches our backend Artist model exactly
@@ -52,6 +53,19 @@ class AdminApiClient {
         headers,
         ...options,
       });
+
+      // Handle 400 responses specially to extract error details
+      if (response.status === 400) {
+        try {
+          const errorData = await response.json();
+          console.log('400 Response with error details:', errorData);
+          // Return the error details so the frontend can handle them properly
+          return { error: errorData.message || errorData.details || 'Bad Request', errorData };
+        } catch (parseError) {
+          // If we can't parse the response, fall back to generic error
+          return { error: 'Bad Request - Unable to parse error details' };
+        }
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

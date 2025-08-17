@@ -27,6 +27,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
+  errorData?: any; // Additional error details from backend
 }
 
 // Generic API client
@@ -69,10 +70,23 @@ class ApiClient {
         throw new Error('Authentication failed. Please login again.');
       }
 
-      // Handle network errors
-      if (!response.ok && response.status !== 401 && response.status !== 403) {
+      // Handle network errors - but allow 400 responses to be processed for detailed error messages
+      if (!response.ok && response.status !== 401 && response.status !== 403 && response.status !== 400) {
         console.error('API Error:', response.status, response.statusText);
         throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      // For 400 responses, we want to extract the error message from the response body
+      if (response.status === 400) {
+        try {
+          const errorData = await response.json();
+          console.log('400 Response with error details:', errorData);
+          // Return the error details so the frontend can handle them properly
+          return { error: errorData.message || errorData.details || 'Bad Request', errorData };
+        } catch (parseError) {
+          // If we can't parse the response, fall back to generic error
+          return { error: 'Bad Request - Unable to parse error details' };
+        }
       }
 
       if (!response.ok) {
@@ -126,8 +140,6 @@ export const apiClient = new ApiClient(API_BASE_URL);
 
 // Helper function to transform API responses and fix image URLs
 const transformApiResponse = <T>(data: T): T => {
-  console.log('transformApiResponse called with:', data);
-  
   if (typeof data === 'object' && data !== null) {
     // Handle arrays
     if (Array.isArray(data)) {
@@ -138,25 +150,15 @@ const transformApiResponse = <T>(data: T): T => {
     const transformed = { ...data } as any;
     for (const [key, value] of Object.entries(transformed)) {
       if (key === 'imageUrl' && typeof value === 'string') {
-        console.log('Transforming imageUrl:', value);
         transformed[key] = constructImageUrl(value);
-        console.log('Transformed to:', transformed[key]);
       } else if (key === 'url' && typeof value === 'string') {
-        console.log('Transforming url:', value);
         transformed[key] = constructImageUrl(value);
-        console.log('Transformed to:', transformed[key]);
       } else if (key === 'thumbnailUrl' && typeof value === 'string') {
-        console.log('Transforming thumbnailUrl:', value);
         transformed[key] = constructImageUrl(value);
-        console.log('Transformed to:', transformed[key]);
       } else if (key === 'mediumUrl' && typeof value === 'string') {
-        console.log('Transforming mediumUrl:', value);
         transformed[key] = constructImageUrl(value);
-        console.log('Transformed to:', transformed[key]);
       } else if (key === 'largeUrl' && typeof value === 'string') {
-        console.log('Transforming largeUrl:', value);
         transformed[key] = constructImageUrl(value);
-        console.log('Transformed to:', transformed[key]);
       } else if (typeof value === 'object' && value !== null) {
         transformed[key] = transformApiResponse(value);
       }
@@ -210,7 +212,7 @@ export interface Event {
   status: string;
   capacity?: number;
   currentAttendees: number;
-  venue: Venue;
+  venue?: Venue;
   eventArtists: EventArtist[];
   tickets?: Ticket[];
   createdAt: string;
@@ -318,6 +320,7 @@ export const apiService = {
   // Event Artists
   getEventArtists: () => apiClient.get<EventArtist[]>('/event-artists'),
   createEventArtist: (eventArtist: Partial<EventArtist>) => apiClient.post<EventArtist>('/event-artists', eventArtist),
+  removeArtistFromEvent: (eventId: string, artistId: string) => apiClient.delete<{ message: string; removedArtist: string; eventTitle: string }>(`/event-artists/event/${eventId}/artist/${artistId}`),
 
   // Gallery image upload
   uploadGalleryImage: async (file: File) => {

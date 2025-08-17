@@ -22,13 +22,10 @@ const Artists: React.FC = () => {
         if (response.error) {
           setError(response.error);
         } else if (response.data) {
-          console.log('Artists data received:', response.data);
-          console.log('First artist imageUrl:', response.data[0]?.imageUrl);
           setArtists(response.data);
         }
       } catch (err) {
         setError('Failed to fetch artists');
-        console.error('Error fetching artists:', err);
       } finally {
         setLoading(false);
       }
@@ -53,6 +50,21 @@ const Artists: React.FC = () => {
     const matchesGenre = genreFilter === 'all' || artist.genre === genreFilter;
     return matchesSearch && matchesGenre;
   });
+
+  // Helper function to get social media count (handles both string and array formats)
+  const getSocialMediaCount = (artist: Artist): number => {
+    if (!artist.socialMedia) return 0;
+    if (Array.isArray(artist.socialMedia)) return artist.socialMedia.length;
+    if (typeof artist.socialMedia === 'string') {
+      try {
+        const parsed = JSON.parse(artist.socialMedia);
+        return Array.isArray(parsed) ? parsed.length : 0;
+      } catch {
+        return 0;
+      }
+    }
+    return 0;
+  };
 
   // Get unique genres for filter
   const genres = ['all', ...Array.from(new Set(artists.map(artist => artist.genre).filter(Boolean)))];
@@ -84,20 +96,20 @@ const Artists: React.FC = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50" />
-        <div className="relative z-10 container mx-auto px-4 py-16 sm:py-24">
+        <div className="relative z-10 container mx-auto px-4 py-4 sm:py-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Users className="w-10 h-10 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Users className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
               Vores Kunstnere
             </h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            <p className="text-base text-white/80 max-w-2xl mx-auto">
               Udforsk de talentfulde kunstnere, der bringer musikken til live på L8
             </p>
           </motion.div>
@@ -106,8 +118,8 @@ const Artists: React.FC = () => {
 
       {/* Search and Filter Section */}
       {artists.length > 0 && (
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 max-w-4xl mx-auto">
+        <div className="container mx-auto px-4">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-4 max-w-4xl mx-auto">
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Search Input */}
               <div className="flex-1 relative">
@@ -140,7 +152,7 @@ const Artists: React.FC = () => {
             </div>
             
             {/* Results Count */}
-            <div className="mt-4 text-center text-white/80">
+            <div className="mt-3 text-center text-white/80">
               <span className="text-sm">
                 {filteredArtists.length} af {artists.length} kunstnere
               </span>
@@ -214,11 +226,11 @@ const Artists: React.FC = () => {
                     </div>
                     
                     {/* Social Media Count Badge */}
-                    {artist.socialMedia && Array.isArray(artist.socialMedia) && artist.socialMedia.length > 0 && (
+                    {artist.socialMedia && getSocialMediaCount(artist) > 0 && (
                       <div className="absolute top-3 right-3">
                         <div className="bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1 shadow-sm border border-gray-200/50">
                           <span className="text-sm font-semibold text-gray-800">
-                            {artist.socialMedia.length} social
+                            {getSocialMediaCount(artist)} social
                           </span>
                         </div>
                       </div>
@@ -259,10 +271,10 @@ const Artists: React.FC = () => {
                           <span>Website</span>
                         </div>
                       )}
-                      {artist.socialMedia && Array.isArray(artist.socialMedia) && (
+                      {artist.socialMedia && getSocialMediaCount(artist) > 0 && (
                         <div className="flex items-center space-x-1">
-                          <Instagram className="w-3 h-3 text-pink-400" />
-                          <span>{artist.socialMedia.length} platforms</span>
+                          <span className="text-pink-400">📱</span>
+                          <span>{getSocialMediaCount(artist)} platforms</span>
                         </div>
                       )}
                     </div>

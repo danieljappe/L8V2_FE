@@ -12,6 +12,7 @@ import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from '
 import { AdminSection, Event, Artist, Venue, GalleryItem, Message } from '../types/admin';
 import { apiService, Event as ApiEvent, Artist as ApiArtist, Venue as ApiVenue } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
+import ConstraintErrorModal from '../components/admin/ConstraintErrorModal';
 
 // Map backend event to admin event type
 function mapApiEventToAdminEvent(apiEvent: ApiEvent): Event {
@@ -38,7 +39,23 @@ function mapApiEventToAdminEvent(apiEvent: ApiEvent): Event {
     image: apiEvent.imageUrl || '',
     status: apiEvent.status as any,
     createdAt: apiEvent.createdAt,
-  } as Event & { artists: string[] };
+    eventArtists: apiEvent.eventArtists ? apiEvent.eventArtists.map(ea => ({
+      id: ea.id,
+      artist: {
+        id: ea.artist.id,
+        name: ea.artist.name
+      }
+    })) : [],
+    // Backend fields
+    ticketPrice: apiEvent.ticketPrice,
+    totalTickets: apiEvent.totalTickets,
+    soldTickets: apiEvent.soldTickets,
+    isActive: apiEvent.isActive,
+    currentAttendees: apiEvent.currentAttendees,
+    startTime: apiEvent.startTime,
+    imageUrl: apiEvent.imageUrl,
+    updatedAt: apiEvent.updatedAt
+  } as Event;
 }
 
 // Map admin event form data to backend event format
@@ -49,16 +66,12 @@ function mapAdminEventToApiEvent(event: Partial<Event>, venues?: Venue[]): Parti
     date: event.date,
     startTime: event.time,
     endTime: event.endTime,
-    ticketPrice: event.price,
-    capacity: event.capacity,
+    ticketPrice: Number(event.price) || 0,
+    totalTickets: Number(event.capacity) || 0,
     imageUrl: event.image,
     // Only allow valid status values
     status: ['upcoming', 'ongoing', 'completed', 'cancelled'].includes(event.status || '') ? event.status : 'upcoming',
   };
-
-  if (event.capacity) {
-    apiEvent.totalTickets = event.capacity;
-  }
 
   // Find the venue by ID if venues are provided and event.venue is a name
   if (event.venue) {
@@ -146,6 +159,15 @@ export default function Admin() {
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [messages, setMessages] = useLocalStorage<Message[]>('admin-messages', mockMessages);
+
+  // Constraint error modal state
+  const [constraintError, setConstraintError] = useState<{
+    message: string;
+    details?: string;
+    eventNames?: string;
+    eventIds?: string[];
+    relatedEvents?: number;
+  } | null>(null);
 
   const unreadMessages = messages.filter(m => !m.read).length;
 
@@ -245,9 +267,69 @@ export default function Admin() {
   const handleDeleteArtist = async (id: string) => {
     const res = await apiService.deleteArtist(id);
     if (!res.error) {
-      setArtists(artists.filter(artist => artist.id !== id));
+      setArtists((prev) => prev.filter(artist => artist.id !== id));
     } else {
       alert(res.error || 'Failed to delete artist');
+    }
+  };
+
+  // Handle removing artist from event
+  const handleRemoveArtistFromEvent = async (eventId: string, artistId: string) => {
+    try {
+      const res = await apiService.removeArtistFromEvent(eventId, artistId);
+      
+      if (res.data) {
+        // Silently refresh events in background to sync with backend
+        const eventsRes = await apiService.getEvents();
+        if (eventsRes.data) {
+          setEvents(eventsRes.data.map(mapApiEventToAdminEvent));
+        }
+        // No alert needed - UI already updated optimistically
+      } else {
+        console.error('Failed to remove artist from event:', res.error);
+      }
+    } catch (error) {
+      console.error('Error removing artist from event:', error);
+    }
+  };
+
+  // Handle adding artist to event
+  const handleAddArtistToEvent = async (eventId: string, artistId: string) => {
+    try {
+      console.log('Frontend: Adding artist to event:', { eventId, artistId });
+      
+      const eventArtistData = {
+        event: { id: eventId } as any,
+        artist: { id: artistId } as any
+      };
+      
+      const res = await apiService.createEventArtist(eventArtistData);
+      
+      if (res.data) {
+        // Silently refresh events in background to sync with backend
+        const eventsRes = await apiService.getEvents();
+        if (eventsRes.data) {
+          setEvents(eventsRes.data.map(mapApiEventToAdminEvent));
+        }
+        // No alert needed - UI already updated optimistically
+      } else {
+        console.error('Failed to add artist to event:', res.error);
+        // Could show a toast notification here instead of alert
+      }
+    } catch (error) {
+      console.error('Error adding artist to event:', error);
+      // Could show a toast notification here instead of alert
+    }
+  };
+
+  // Test function to add an artist to an event
+  const testAddArtistToEvent = async () => {
+    if (events.length > 0 && artists.length > 0) {
+      const eventId = events[0].id;
+      const artistId = artists[0].id;
+      await handleAddArtistToEvent(eventId, artistId);
+    } else {
+      alert('No events or artists available for testing');
     }
   };
 
@@ -334,13 +416,25 @@ export default function Admin() {
     switch (activeSection) {
       case 'dashboard':
         return (
-          <DashboardOverview
-            events={events}
-            artists={artists}
-            venues={venues}
-            gallery={gallery}
-            messages={messages}
-          />
+          <div>
+            <DashboardOverview
+              events={events}
+              artists={artists}
+              venues={venues}
+              gallery={gallery}
+              messages={messages}
+            />
+            {/* Test button for debugging */}
+            <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">Debug Tools</h3>
+              <button
+                onClick={testAddArtistToEvent}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Test Add Artist to Event
+              </button>
+            </div>
+          </div>
         );
       case 'events':
         return (
@@ -351,6 +445,8 @@ export default function Admin() {
             onDeleteEvent={handleDeleteEvent}
             artists={artists}
             venues={venues}
+            onRemoveArtist={handleRemoveArtistFromEvent}
+            onAddArtistToEvent={handleAddArtistToEvent}
           />
         );
       case 'artists':
@@ -403,6 +499,15 @@ export default function Admin() {
       >
         {renderContent()}
       </AdminLayout>
+      
+      {/* Constraint Error Modal */}
+      {constraintError && (
+        <ConstraintErrorModal
+          isOpen={!!constraintError}
+          onClose={() => setConstraintError(null)}
+          error={constraintError}
+        />
+      )}
     </div>
   );
 } 

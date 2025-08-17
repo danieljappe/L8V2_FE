@@ -10,6 +10,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from './data/mockData';
 import { AdminSection, Event, Artist, Venue, GalleryItem, Message } from './types';
 import { adminApiService } from './services/api';
+import ConstraintErrorModal from '../../../components/admin/ConstraintErrorModal';
 
 function App() {
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
@@ -19,6 +20,15 @@ function App() {
   const [gallery, setGallery] = useLocalStorage<GalleryItem[]>('admin-gallery', mockGallery);
   const [messages, setMessages] = useLocalStorage<Message[]>('admin-messages', mockMessages);
   const [artistsLoading, setArtistsLoading] = useState(true);
+
+  // Constraint error modal state
+  const [constraintError, setConstraintError] = useState<{
+    message: string;
+    details?: string;
+    eventNames?: string;
+    eventIds?: string[];
+    relatedEvents?: number;
+  } | null>(null);
 
   const unreadMessages = messages.filter(m => !m.read).length;
 
@@ -144,7 +154,47 @@ function App() {
     if (!res.error) {
       setArtists(artists.filter(artist => artist.id !== id));
     } else {
-      alert(res.error || 'Failed to delete artist');
+      // Check if it's a foreign key constraint error
+      if (res.error.includes('associated with events') || res.error.includes('foreign key constraint')) {
+        // Use errorData if available for detailed information
+        if (res.errorData) {
+          console.log('Constraint error details:', res.errorData);
+          setConstraintError({
+            message: res.errorData.message || 'Cannot delete artist. This artist is associated with events and must be removed from all events first.',
+            details: res.errorData.details,
+            eventNames: res.errorData.eventNames,
+            eventIds: res.errorData.eventIds,
+            relatedEvents: res.errorData.relatedEvents
+          });
+        } else {
+          // Fallback to parsing the error message
+          try {
+            if (res.error.includes('following events')) {
+              const eventNamesMatch = res.error.match(/following events before deleting: (.+)/);
+              const eventNames = eventNamesMatch ? eventNamesMatch[1] : 'Unknown events';
+              
+              setConstraintError({
+                message: 'Cannot delete artist. This artist is associated with events and must be removed from all events first.',
+                details: res.error,
+                eventNames: eventNames,
+                relatedEvents: 1
+              });
+            } else {
+              setConstraintError({
+                message: 'Cannot delete artist. This artist is associated with events and must be removed from all events first.',
+                details: res.error
+              });
+            }
+          } catch (parseError) {
+            setConstraintError({
+              message: 'Cannot delete artist. This artist is associated with events and must be removed from all events first.',
+              details: res.error
+            });
+          }
+        }
+      } else {
+        alert(res.error || 'Failed to delete artist');
+      }
     }
   };
 
@@ -283,13 +333,24 @@ function App() {
   };
 
   return (
-    <AdminLayout
-      activeSection={activeSection}
-      onSectionChange={setActiveSection}
-      unreadMessages={unreadMessages}
-    >
-      {renderContent()}
-    </AdminLayout>
+    <>
+      <AdminLayout
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        unreadMessages={unreadMessages}
+      >
+        {renderContent()}
+      </AdminLayout>
+      
+      {/* Constraint Error Modal */}
+      {constraintError && (
+        <ConstraintErrorModal
+          isOpen={!!constraintError}
+          onClose={() => setConstraintError(null)}
+          error={constraintError}
+        />
+      )}
+    </>
   );
 }
 

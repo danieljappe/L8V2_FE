@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Calendar, MapPin, Users, DollarSign } from 'lucide-react';
 import { Event } from '../../types/admin';
 import EventForm from './EventForm';
@@ -11,6 +11,8 @@ interface EventsListProps {
   onDeleteEvent: (id: string) => void;
   artists: Artist[];
   venues: Venue[];
+  onRemoveArtist?: (eventId: string, artistId: string) => void;
+  onAddArtistToEvent?: (eventId: string, artistId: string) => void;
 }
 
 export default function EventsList({
@@ -19,10 +21,22 @@ export default function EventsList({
   onUpdateEvent,
   onDeleteEvent,
   artists,
-  venues
+  venues,
+  onRemoveArtist,
+  onAddArtistToEvent
 }: EventsListProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+
+  // Refresh editingEvent when events change (e.g., after adding/removing artists)
+  useEffect(() => {
+    if (editingEvent) {
+      const updatedEvent = events.find(e => e.id === editingEvent.id);
+      if (updatedEvent) {
+        setEditingEvent(updatedEvent);
+      }
+    }
+  }, [events, editingEvent?.id]);
 
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
@@ -88,6 +102,8 @@ export default function EventsList({
           onCancel={handleCancel}
           artists={artists}
           venues={venues}
+          onRemoveArtist={onRemoveArtist}
+          onAddArtistToEvent={onAddArtistToEvent}
         />
       )}
 
@@ -132,6 +148,29 @@ export default function EventsList({
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{event.title}</div>
                           <div className="text-sm text-gray-500">{event.artist}</div>
+                          
+                          {/* Show current artists with remove buttons */}
+                          {event.eventArtists && event.eventArtists.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {event.eventArtists.map((eventArtist) => {
+                                const artist = artists.find(a => a.id === eventArtist.artist.id);
+                                return (
+                                  <div key={eventArtist.id} className="flex items-center justify-between bg-gray-50 px-2 py-1 rounded text-xs">
+                                    <span className="text-gray-600">{artist?.name || 'Unknown Artist'}</span>
+                                    {onRemoveArtist && (
+                                      <button
+                                        onClick={() => onRemoveArtist(event.id, eventArtist.artist.id)}
+                                        className="text-red-500 hover:text-red-700 ml-2"
+                                        title="Remove artist from event"
+                                      >
+                                        ×
+                                      </button>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>

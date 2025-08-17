@@ -13,6 +13,22 @@ export interface Event {
   image: string;
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   createdAt: string;
+  eventArtists?: Array<{
+    id: string;
+    artist: {
+      id: string;
+      name: string;
+    };
+  }>;
+  // Add backend-compatible fields
+  ticketPrice?: number;
+  totalTickets?: number;
+  soldTickets?: number;
+  isActive?: boolean;
+  currentAttendees?: number;
+  startTime?: string;
+  imageUrl?: string;
+  updatedAt?: string;
 }
 
 export interface Artist {
