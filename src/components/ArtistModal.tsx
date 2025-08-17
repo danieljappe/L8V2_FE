@@ -83,11 +83,11 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose }) => {
                       className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30 text-white/80 hover:text-white hover:bg-white/30 transition-all duration-200 flex items-center justify-center"
                       title={media.platform}
                     >
-                      {media.platform.toLowerCase().includes('instagram') && <img src="/src/icons/Instagram_icon.png" alt="Instagram" className="w-5 h-5" />}
-                      {media.platform.toLowerCase().includes('youtube') && <img src="/src/icons/Youtube_icon.png" alt="YouTube" className="w-5 h-5" />}
-                      {media.platform.toLowerCase().includes('spotify') && <img src="/src/icons/Spotify_icon.svg.png" alt="Spotify" className="w-5 h-5" />}
-                      {media.platform.toLowerCase().includes('soundcloud') && <img src="/src/icons/soundcloud_icon.png" alt="SoundCloud" className="w-5 h-5" />}
-                      {media.platform.toLowerCase().includes('x') && <img src="/src/icons/x_icon.png" alt="X" className="w-5 h-5" />}
+                      {media.platform.toLowerCase().includes('instagram') && <img src="/icons/Instagram_icon.png" alt="Instagram" className="w-5 h-5" />}
+                      {media.platform.toLowerCase().includes('youtube') && <img src="/icons/Youtube_icon.png" alt="YouTube" className="w-5 h-5" />}
+                      {media.platform.toLowerCase().includes('spotify') && <img src="/icons/Spotify_icon.svg.png" alt="Spotify" className="w-5 h-5" />}
+                      {media.platform.toLowerCase().includes('soundcloud') && <img src="/icons/soundcloud_icon.png" alt="SoundCloud" className="w-5 h-5" />}
+                      {media.platform.toLowerCase().includes('x') && <img src="/icons/x_icon.png" alt="X" className="w-5 h-5" />}
                       {media.platform.toLowerCase().includes('facebook') && <span className="text-blue-600 text-2xl font-bold">📘</span>}
                       {media.platform.toLowerCase().includes('tiktok') && <span className="text-pink-400 text-2xl font-bold">🎵</span>}
                       {media.platform.toLowerCase().includes('linkedin') && <span className="text-blue-700 text-2xl font-bold">💼</span>}
