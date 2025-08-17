@@ -1,7 +1,16 @@
 // Utility function to construct full URLs from relative paths
 export const constructFullUrl = (relativeUrl: string | null | undefined): string => {
-  if (!relativeUrl) return '';
-  if (relativeUrl.startsWith('http')) return relativeUrl;
+  console.log('constructFullUrl called with:', relativeUrl);
+  
+  if (!relativeUrl) {
+    console.log('No URL provided, returning empty string');
+    return '';
+  }
+  
+  if (relativeUrl.startsWith('http')) {
+    console.log('URL is already absolute, returning as-is:', relativeUrl);
+    return relativeUrl;
+  }
   
   // Option 1: Use environment variable (recommended)
   if (import.meta.env.VITE_BACKEND_URL) {
@@ -12,6 +21,8 @@ export const constructFullUrl = (relativeUrl: string | null | undefined): string
   
   // Option 2: Auto-detect from current domain
   const currentOrigin = window.location.origin;
+  console.log('Current origin:', currentOrigin);
+  
   if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
     // In development, use relative URL (Vite proxy handles it)
     console.log('Detected localhost, returning relative URL:', relativeUrl);

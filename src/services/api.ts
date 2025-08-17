@@ -126,6 +126,8 @@ export const apiClient = new ApiClient(API_BASE_URL);
 
 // Helper function to transform API responses and fix image URLs
 const transformApiResponse = <T>(data: T): T => {
+  console.log('transformApiResponse called with:', data);
+  
   if (typeof data === 'object' && data !== null) {
     // Handle arrays
     if (Array.isArray(data)) {
@@ -136,15 +138,25 @@ const transformApiResponse = <T>(data: T): T => {
     const transformed = { ...data } as any;
     for (const [key, value] of Object.entries(transformed)) {
       if (key === 'imageUrl' && typeof value === 'string') {
+        console.log('Transforming imageUrl:', value);
         transformed[key] = constructImageUrl(value);
+        console.log('Transformed to:', transformed[key]);
       } else if (key === 'url' && typeof value === 'string') {
+        console.log('Transforming url:', value);
         transformed[key] = constructImageUrl(value);
+        console.log('Transformed to:', transformed[key]);
       } else if (key === 'thumbnailUrl' && typeof value === 'string') {
+        console.log('Transforming thumbnailUrl:', value);
         transformed[key] = constructImageUrl(value);
+        console.log('Transformed to:', transformed[key]);
       } else if (key === 'mediumUrl' && typeof value === 'string') {
+        console.log('Transforming mediumUrl:', value);
         transformed[key] = constructImageUrl(value);
+        console.log('Transformed to:', transformed[key]);
       } else if (key === 'largeUrl' && typeof value === 'string') {
+        console.log('Transforming largeUrl:', value);
         transformed[key] = constructImageUrl(value);
+        console.log('Transformed to:', transformed[key]);
       } else if (typeof value === 'object' && value !== null) {
         transformed[key] = transformApiResponse(value);
       }

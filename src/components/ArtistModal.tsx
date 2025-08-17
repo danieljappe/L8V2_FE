@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Instagram, Globe, Youtube } from 'lucide-react';
+import { constructFullUrl } from '../utils/imageUtils';
 
 interface Artist {
   id: string;
@@ -55,7 +56,7 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose }) => {
           {/* Artist Image */}
           <div className="relative h-48 sm:h-64 md:h-80">
             <img
-              src={artist.imageUrl}
+              src={constructFullUrl(artist.imageUrl)}
               alt={artist.name}
               className="w-full h-full object-cover"
             />

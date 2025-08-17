@@ -4,6 +4,7 @@ import { Users, Music, Star, Globe, Instagram } from 'lucide-react';
 import { apiService, Artist } from '../services/api';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { constructFullUrl } from '../utils/imageUtils';
 
 const Artists: React.FC = () => {
   const [artists, setArtists] = useState<Artist[]>([]);
@@ -21,6 +22,8 @@ const Artists: React.FC = () => {
         if (response.error) {
           setError(response.error);
         } else if (response.data) {
+          console.log('Artists data received:', response.data);
+          console.log('First artist imageUrl:', response.data[0]?.imageUrl);
           setArtists(response.data);
         }
       } catch (err) {
@@ -181,7 +184,7 @@ const Artists: React.FC = () => {
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-4 border-white/10 group-hover:border-purple-500/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200">
                     {artist.imageUrl ? (
                       <img
-                        src={artist.imageUrl}
+                        src={constructFullUrl(artist.imageUrl)}
                         alt={artist.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         onError={(e) => {
