@@ -5,7 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:events": "cross-env VITE_PLATFORM=events vite --port 3000",
+    "dev:booking": "cross-env VITE_PLATFORM=booking vite --port 3001",
+    "dev:platforms": "node scripts/dev-platforms.js",
     "build": "vite build",
+    "build:events": "cross-env VITE_PLATFORM=events vite build",
+    "build:booking": "cross-env VITE_PLATFORM=booking vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -23,6 +28,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.18",
+    "cross-env": "^7.0.3",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",

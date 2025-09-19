@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Image, Users, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import Breadcrumbs from './Breadcrumbs';
+import Breadcrumbs from '../Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Header: React.FC = () => {
+interface SharedHeaderProps {
+  platform?: 'events' | 'booking';
+}
+
+const SharedHeader: React.FC<SharedHeaderProps> = ({ platform = 'events' }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -35,14 +39,30 @@ const Header: React.FC = () => {
     };
   }, [isMobileMenuOpen]);
 
-  const navItems = [
-    { name: 'Begivenheder', path: '/events', icon: Calendar },
-    { name: 'Kunstnere', path: '/artists', icon: Users },
-    { name: 'Galleri', path: '/gallery', icon: Image },
-    { name: 'Om Os', path: '/about', icon: Info },
-    { name: 'Kontakt', path: '/contact', icon: Phone },
-    { name: 'Admin', path: '/admin', icon: Settings }
-  ];
+  const getNavItems = () => {
+    const baseItems = [
+      { name: 'Begivenheder', path: '/events', icon: Calendar },
+      { name: 'Kunstnere', path: '/artists', icon: Users },
+      { name: 'Galleri', path: '/gallery', icon: Image },
+      { name: 'Om Os', path: '/about', icon: Info },
+      { name: 'Kontakt', path: '/contact', icon: Phone },
+      { name: 'Admin', path: '/admin', icon: Settings }
+    ];
+
+    if (platform === 'booking') {
+      return [
+        { name: 'Booking', path: '/booking', icon: Users },
+        { name: 'Kunstnere', path: '/artists', icon: Music },
+        { name: 'Om Os', path: '/about', icon: Info },
+        { name: 'Kontakt', path: '/contact', icon: Phone },
+        { name: 'Admin', path: '/admin', icon: Settings }
+      ];
+    }
+
+    return baseItems;
+  };
+
+  const navItems = getNavItems();
 
   // Cross-reference navigation based on current platform
   const getCrossReferenceLink = () => {
@@ -78,6 +98,11 @@ const Header: React.FC = () => {
                 <Music className="w-6 h-6 text-white" />
               </div>
               <span className="text-white font-bold text-xl">L8</span>
+              {platform && (
+                <span className="text-white/60 text-sm font-medium">
+                  {platform === 'booking' ? 'Booking' : 'Events'}
+                </span>
+              )}
             </div>
           </Link>
 
@@ -161,6 +186,11 @@ const Header: React.FC = () => {
                         <Music className="w-5 h-5 text-white" />
                       </div>
                       <span className="text-white font-bold text-lg">L8</span>
+                      {platform && (
+                        <span className="text-white/60 text-xs">
+                          {platform === 'booking' ? 'Booking' : 'Events'}
+                        </span>
+                      )}
                     </div>
                     <button
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -249,4 +279,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default SharedHeader;
