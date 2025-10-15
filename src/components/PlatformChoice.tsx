@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Music, ArrowRight } from 'lucide-react';
+import { Calendar, Users, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Scene from './3DScene';
+import { getRedirectUrl } from '../utils/subdomainUtils';
 
 const PlatformChoice: React.FC = () => {
   const navigate = useNavigate();
@@ -10,9 +11,11 @@ const PlatformChoice: React.FC = () => {
   const handlePlatformChoice = (platform: string) => {
     localStorage.setItem('l8-platform-choice', platform);
     if (platform === 'events') {
-      navigate('/events');
+      const redirectUrl = getRedirectUrl('events');
+      window.location.href = redirectUrl;
     } else if (platform === 'booking') {
-      navigate('/booking');
+      const redirectUrl = getRedirectUrl('booking');
+      window.location.href = redirectUrl;
     }
   };
 
