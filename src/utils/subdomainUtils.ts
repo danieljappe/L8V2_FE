@@ -17,6 +17,8 @@ export const getSubdomain = (): string | null => {
   const parts = hostname.split('.');
   if (parts.length >= 3) {
     const subdomain = parts[0];
+    // Skip www subdomain - treat it as main domain
+    if (subdomain === 'www') return null;
     if (subdomain === 'events' || subdomain === 'booking') {
       return subdomain;
     }
@@ -51,14 +53,10 @@ export const getRedirectUrl = (platform: 'events' | 'booking'): string => {
 
 export const shouldShowPlatformChoice = (): boolean => {
   const subdomain = getSubdomain();
-  const platformChoice = localStorage.getItem('l8-platform-choice');
   
   // If we're on a subdomain, don't show platform choice
   if (subdomain) return false;
   
-  // If user has made a choice, don't show platform choice
-  if (platformChoice) return false;
-  
-  // Show platform choice on main domain
-  return true;
+  // Only show platform choice on the root path of main domain (www.l8events.dk)
+  return window.location.pathname === '/';
 };

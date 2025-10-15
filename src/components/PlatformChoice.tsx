@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Users, Music, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Scene from './3DScene';
 
 const PlatformChoice: React.FC = () => {
   const navigate = useNavigate();
@@ -17,34 +18,39 @@ const PlatformChoice: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Split Background */}
-      <div className="absolute inset-0 flex">
+      {/* 3D Background */}
+      <div className="absolute inset-0 z-0">
+        <Scene />
+      </div>
+      
+      {/* Split Background Overlay */}
+      <div className="absolute inset-0 flex z-10">
         {/* Left Side - Events */}
         <motion.div 
-          className="flex-1 bg-gradient-to-br from-purple-900 to-purple-700 relative"
+          className="flex-1 bg-gradient-to-br from-purple-900/50 to-purple-700/50 relative backdrop-blur-sm"
           initial={{ x: '-100%' }}
           animate={{ x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/10" />
         </motion.div>
         
         {/* Right Side - Booking */}
         <motion.div 
-          className="flex-1 bg-gradient-to-br from-blue-900 to-blue-700 relative"
+          className="flex-1 bg-gradient-to-br from-blue-900/50 to-blue-700/50 relative backdrop-blur-sm"
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         >
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/10" />
         </motion.div>
       </div>
 
       {/* Center Divider */}
-      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20 transform -translate-x-1/2 z-10" />
+      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20 transform -translate-x-1/2 z-20" />
 
       {/* Content */}
-      <div className="relative z-20 h-screen flex">
+      <div className="relative z-30 h-screen flex">
         {/* Left Side - Events */}
         <motion.div 
           className="flex-1 flex items-center justify-center relative group cursor-pointer"
@@ -141,19 +147,6 @@ const PlatformChoice: React.FC = () => {
           </div>
         </motion.div>
       </div>
-
-      {/* Bottom Brand */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
-      >
-        <div className="flex items-center space-x-2 text-white/40">
-          <Music className="w-4 h-4" />
-          <span className="text-sm font-light">L8 Platform</span>
-        </div>
-      </motion.div>
     </div>
   );
 };
