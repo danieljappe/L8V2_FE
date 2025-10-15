@@ -207,9 +207,9 @@ const AboutSection: React.FC = () => {
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
             >
               {[
-                { name: 'Alex Chen', role: 'Founder & Creative Director' },
-                { name: 'Sarah Rodriguez', role: 'Event Producer' },
-                { name: 'Mike Thompson', role: 'Artist Relations' }
+                { name: 'Mikkel Danø Mourier', role: 'Founder & Creative Director' },
+                { name: 'Joachim Engelhartt Illigen', role: 'Event Producer' },
+                { name: 'Jacob Kruse', role: 'Artist Relations' }
               ].map((member, index) => (
                 <motion.div 
                   key={index}
