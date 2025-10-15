@@ -36,7 +36,14 @@ const PlatformRouter: React.FC<PlatformRouterProps> = ({ children }) => {
         
         if (platform === 'booking' && !currentPath.startsWith('/booking') && currentPath !== '/') {
           const redirectUrl = getRedirectUrl('booking');
-          window.location.href = `${redirectUrl}${currentPath}`;
+          window.location.href = `${redirectUrl}/booking${currentPath}`;
+          return;
+        }
+        
+        // If on booking subdomain and on root path, redirect to /booking
+        if (platform === 'booking' && currentPath === '/') {
+          const redirectUrl = getRedirectUrl('booking');
+          window.location.href = `${redirectUrl}/booking`;
           return;
         }
       }

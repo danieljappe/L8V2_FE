@@ -3,6 +3,7 @@ import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Im
 import { Link, useLocation } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getRedirectUrl } from '../utils/subdomainUtils';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -104,12 +105,19 @@ const Header: React.FC = () => {
             {/* Cross-reference Link */}
             {crossReferenceLink && (
               <div className="border-l border-white/20 pl-4">
-                <Link to={crossReferenceLink.path}>
+                <div 
+                  onClick={() => {
+                    const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
+                    const redirectUrl = getRedirectUrl(platform);
+                    window.location.href = redirectUrl;
+                  }}
+                  className="cursor-pointer"
+                >
                   <div className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors text-white/60 hover:text-white hover:bg-white/5">
                     <crossReferenceLink.icon className="w-5 h-5" />
                     <span>{crossReferenceLink.name}</span>
                   </div>
-                </Link>
+                </div>
               </div>
             )}
           </nav>
@@ -201,10 +209,14 @@ const Header: React.FC = () => {
                     {/* Cross-reference Link */}
                     {crossReferenceLink && (
                       <div className="border-t border-white/20 pt-4">
-                        <Link
-                          to={crossReferenceLink.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block"
+                        <div
+                          onClick={() => {
+                            const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
+                            const redirectUrl = getRedirectUrl(platform);
+                            setIsMobileMenuOpen(false);
+                            window.location.href = redirectUrl;
+                          }}
+                          className="block cursor-pointer"
                         >
                           <motion.div
                             whileHover={{ x: 5 }}
@@ -213,7 +225,7 @@ const Header: React.FC = () => {
                             <crossReferenceLink.icon className="w-5 h-5" />
                             <span className="text-base">{crossReferenceLink.name}</span>
                           </motion.div>
-                        </Link>
+                        </div>
                       </div>
                     )}
                   </div>

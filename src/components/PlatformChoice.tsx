@@ -26,31 +26,59 @@ const PlatformChoice: React.FC = () => {
         <Scene />
       </div>
       
-      {/* Split Background Overlay */}
+      {/* Split Background Overlay with Circular Cutout */}
       <div className="absolute inset-0 flex z-10">
         {/* Left Side - Events */}
         <motion.div 
-          className="flex-1 bg-gradient-to-br from-purple-900/50 to-purple-700/50 relative backdrop-blur-sm"
+          className="flex-1 relative"
           initial={{ x: '-100%' }}
           animate={{ x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <div className="absolute inset-0 bg-black/10" />
+          <div 
+            className="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-purple-700/50 backdrop-blur-sm"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
+              maskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)',
+              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)'
+            }}
+          />
+          <div 
+            className="absolute inset-0 bg-black/10"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
+              maskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)',
+              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)'
+            }}
+          />
         </motion.div>
         
         {/* Right Side - Booking */}
         <motion.div 
-          className="flex-1 bg-gradient-to-br from-blue-900/50 to-blue-700/50 relative backdrop-blur-sm"
+          className="flex-1 relative"
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         >
-          <div className="absolute inset-0 bg-black/10" />
+          <div 
+            className="absolute inset-0 bg-gradient-to-br from-blue-900/50 to-blue-700/50 backdrop-blur-sm"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
+              maskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)',
+              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)'
+            }}
+          />
+          <div 
+            className="absolute inset-0 bg-black/10"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
+              maskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)',
+              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)'
+            }}
+          />
         </motion.div>
       </div>
 
-      {/* Center Divider */}
-      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20 transform -translate-x-1/2 z-20" />
 
       {/* Content */}
       <div className="relative z-30 h-screen flex">
@@ -61,7 +89,12 @@ const PlatformChoice: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="text-center px-8">
+          {/* Left Side Hover Effects */}
+          <div className="absolute left-1/4 top-1/4 w-32 h-32 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute left-1/4 bottom-1/4 w-32 h-32 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute left-1/3 top-1/3 w-24 h-24 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute left-1/3 bottom-1/3 w-24 h-24 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="text-center px-8 max-w-md">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -97,8 +130,6 @@ const PlatformChoice: React.FC = () => {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
             </motion.div>
 
-            {/* Hover Overlay */}
-            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         </motion.div>
 
@@ -109,7 +140,12 @@ const PlatformChoice: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="text-center px-8">
+          {/* Right Side Hover Effects */}
+          <div className="absolute right-1/4 top-1/4 w-32 h-32 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute right-1/4 bottom-1/4 w-32 h-32 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute right-1/3 top-1/3 w-24 h-24 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute right-1/3 bottom-1/3 w-24 h-24 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="text-center px-8 max-w-md">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -145,8 +181,6 @@ const PlatformChoice: React.FC = () => {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
             </motion.div>
 
-            {/* Hover Overlay */}
-            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         </motion.div>
       </div>

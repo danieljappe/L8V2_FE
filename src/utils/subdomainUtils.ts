@@ -57,6 +57,11 @@ export const shouldShowPlatformChoice = (): boolean => {
   // If we're on a subdomain, don't show platform choice
   if (subdomain) return false;
   
+  // In development, show platform choice on localhost without port (main domain)
+  if (window.location.hostname === 'localhost' && !window.location.port) {
+    return true;
+  }
+  
   // Only show platform choice on the root path of main domain (www.l8events.dk)
   return window.location.pathname === '/';
 };
