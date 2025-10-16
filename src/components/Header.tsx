@@ -48,6 +48,16 @@ const Header: React.FC = () => {
   // Cross-reference navigation based on current platform
   const getCrossReferenceLink = () => {
     const currentPath = location.pathname;
+    const hostname = window.location.hostname;
+    
+    // Check if we're on a subdomain
+    if (hostname.includes('booking.l8events.dk')) {
+      return { name: 'L8 Events', path: '/events', icon: Calendar };
+    } else if (hostname.includes('events.l8events.dk')) {
+      return { name: 'L8 Booking', path: '/booking', icon: Users };
+    }
+    
+    // Fallback to path-based detection for localhost
     if (currentPath.startsWith('/booking')) {
       return { name: 'L8 Events', path: '/events', icon: Calendar };
     } else if (currentPath.startsWith('/events') || currentPath === '/') {
