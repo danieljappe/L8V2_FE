@@ -134,7 +134,7 @@ const Header: React.FC = () => {
                     console.log('Determined platform:', platform);
                     console.log('Current hostname:', window.location.hostname);
                     
-                    if (window.location.hostname.includes('localhost')) {
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                       // Check if we're testing subdomain behavior
                       const urlParams = new URLSearchParams(window.location.search);
                       const testSubdomain = urlParams.get('test-subdomain');
@@ -259,7 +259,7 @@ const Header: React.FC = () => {
                           onClick={() => {
                             const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
                             setIsMobileMenuOpen(false);
-                            if (window.location.hostname.includes('localhost')) {
+                            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                               // Check if we're testing subdomain behavior
                               const urlParams = new URLSearchParams(window.location.search);
                               const testSubdomain = urlParams.get('test-subdomain');
