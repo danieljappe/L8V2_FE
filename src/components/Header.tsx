@@ -129,8 +129,10 @@ const Header: React.FC = () => {
                         navigate(platform === 'booking' ? '/booking' : '/events');
                       }
                     } else {
-                      const redirectUrl = getRedirectUrl(platform);
-                      window.location.href = redirectUrl;
+                      // Direct subdomain redirect for production
+                      const subdomain = platform === 'booking' ? 'booking' : 'events';
+                      const path = platform === 'booking' ? '/booking' : '/events';
+                      window.location.href = `https://${subdomain}.l8events.dk${path}`;
                     }
                   }}
                   className="cursor-pointer"
@@ -246,8 +248,10 @@ const Header: React.FC = () => {
                                 navigate(platform === 'booking' ? '/booking' : '/events');
                               }
                             } else {
-                              const redirectUrl = getRedirectUrl(platform);
-                              window.location.href = redirectUrl;
+                              // Direct subdomain redirect for production
+                              const subdomain = platform === 'booking' ? 'booking' : 'events';
+                              const path = platform === 'booking' ? '/booking' : '/events';
+                              window.location.href = `https://${subdomain}.l8events.dk${path}`;
                             }
                           }}
                           className="block cursor-pointer"
