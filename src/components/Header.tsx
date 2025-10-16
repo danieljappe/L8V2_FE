@@ -150,10 +150,16 @@ const Header: React.FC = () => {
                       
                       if (platform === 'events') {
                         console.log('Redirecting to events subdomain');
-                        window.location.href = 'https://events.l8events.dk';
+                        // Preserve current path, but ensure it starts with /events
+                        const currentPath = location.pathname;
+                        const targetPath = currentPath.startsWith('/events') ? currentPath : '/events';
+                        window.location.href = `https://events.l8events.dk${targetPath}`;
                       } else if (platform === 'booking') {
                         console.log('Redirecting to booking subdomain');
-                        window.location.href = 'https://booking.l8events.dk/booking';
+                        // Preserve current path, but ensure it starts with /booking
+                        const currentPath = location.pathname;
+                        const targetPath = currentPath.startsWith('/booking') ? currentPath : '/booking';
+                        window.location.href = `https://booking.l8events.dk${targetPath}`;
                       }
                     }
                   }}
@@ -276,10 +282,16 @@ const Header: React.FC = () => {
                               
                               if (platform === 'events') {
                                 console.log('Mobile - Redirecting to events subdomain');
-                                window.location.href = 'https://events.l8events.dk';
+                                // Preserve current path, but ensure it starts with /events
+                                const currentPath = location.pathname;
+                                const targetPath = currentPath.startsWith('/events') ? currentPath : '/events';
+                                window.location.href = `https://events.l8events.dk${targetPath}`;
                               } else if (platform === 'booking') {
                                 console.log('Mobile - Redirecting to booking subdomain');
-                                window.location.href = 'https://booking.l8events.dk/booking';
+                                // Preserve current path, but ensure it starts with /booking
+                                const currentPath = location.pathname;
+                                const targetPath = currentPath.startsWith('/booking') ? currentPath : '/booking';
+                                window.location.href = `https://booking.l8events.dk${targetPath}`;
                               }
                             }
                           }}
