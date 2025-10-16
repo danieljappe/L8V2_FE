@@ -130,9 +130,16 @@ const Header: React.FC = () => {
                       }
                     } else {
                       // Direct subdomain redirect for production
-                      const subdomain = platform === 'booking' ? 'booking' : 'events';
-                      const path = platform === 'booking' ? '/booking' : '/events';
-                      window.location.href = `https://${subdomain}.l8events.dk${path}`;
+                      console.log('Cross-reference click - platform:', platform);
+                      console.log('Current hostname:', window.location.hostname);
+                      
+                      if (platform === 'events') {
+                        console.log('Redirecting to events subdomain');
+                        window.location.href = 'https://events.l8events.dk/events';
+                      } else if (platform === 'booking') {
+                        console.log('Redirecting to booking subdomain');
+                        window.location.href = 'https://booking.l8events.dk/booking';
+                      }
                     }
                   }}
                   className="cursor-pointer"
