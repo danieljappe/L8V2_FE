@@ -23,6 +23,16 @@ const PlatformRouter: React.FC<PlatformRouterProps> = ({ children }) => {
         return;
       }
       
+      // Skip platform logic if manual cross-platform navigation is happening
+      if ((window as any).isManualCrossPlatformNavigation) {
+        // Clear the flag after a short delay to allow navigation to complete
+        setTimeout(() => {
+          (window as any).isManualCrossPlatformNavigation = false;
+        }, 100);
+        setIsChecking(false);
+        return;
+      }
+      
       // Only handle subdomain logic in production (not localhost)
       if (platform !== 'main' && !window.location.hostname.includes('localhost')) {
         const currentPath = location.pathname;
