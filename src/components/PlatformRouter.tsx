@@ -23,8 +23,8 @@ const PlatformRouter: React.FC<PlatformRouterProps> = ({ children }) => {
         return;
       }
       
-      // If we're on a subdomain, check if we're on the right platform
-      if (platform !== 'main') {
+      // Only handle subdomain logic in production (not localhost)
+      if (platform !== 'main' && !window.location.hostname.includes('localhost')) {
         const currentPath = location.pathname;
         
         // Redirect to appropriate platform if needed

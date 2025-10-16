@@ -36,8 +36,12 @@ const Home: React.FC = () => {
                 transition={{ delay: 0.2 }}
                 className="group cursor-pointer"
                 onClick={() => {
-                  const redirectUrl = getRedirectUrl('events');
-                  window.location.href = redirectUrl;
+                  if (window.location.hostname.includes('localhost')) {
+                    navigate('/events');
+                  } else {
+                    const redirectUrl = getRedirectUrl('events');
+                    window.location.href = redirectUrl;
+                  }
                 }}
               >
                 <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl hover:bg-white/15 transition-all duration-300 hover:scale-105">
@@ -62,8 +66,12 @@ const Home: React.FC = () => {
                 transition={{ delay: 0.4 }}
                 className="group cursor-pointer"
                 onClick={() => {
-                  const redirectUrl = getRedirectUrl('booking');
-                  window.location.href = redirectUrl;
+                  if (window.location.hostname.includes('localhost')) {
+                    navigate('/booking');
+                  } else {
+                    const redirectUrl = getRedirectUrl('booking');
+                    window.location.href = redirectUrl;
+                  }
                 }}
               >
                 <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl hover:bg-white/15 transition-all duration-300 hover:scale-105">

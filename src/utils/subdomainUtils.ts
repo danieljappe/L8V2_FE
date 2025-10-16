@@ -5,11 +5,14 @@ export const getSubdomain = (): string | null => {
   
   const hostname = window.location.hostname;
   
-  // Handle localhost development
+  // Handle localhost development - check for test subdomains
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    const port = window.location.port;
-    if (port === '3000') return 'events'; // Default to events for localhost:3000
-    if (port === '3001') return 'booking'; // Booking platform on localhost:3001
+    // Check for test subdomain parameters (for testing production behavior locally)
+    const urlParams = new URLSearchParams(window.location.search);
+    const testSubdomain = urlParams.get('test-subdomain');
+    if (testSubdomain === 'events' || testSubdomain === 'booking') {
+      return testSubdomain;
+    }
     return null;
   }
   
@@ -39,10 +42,20 @@ export const getRedirectUrl = (platform: 'events' | 'booking'): string => {
   const currentHost = window.location.host;
   const protocol = window.location.protocol;
   
+  // For development on localhost, check if we're testing subdomain behavior
   if (currentHost.includes('localhost')) {
-    // Development environment
-    const port = platform === 'booking' ? '3001' : '3000';
-    return `${protocol}//localhost:${port}`;
+    const urlParams = new URLSearchParams(window.location.search);
+    const testSubdomain = urlParams.get('test-subdomain');
+    
+    // If testing subdomain behavior, simulate production redirects
+    if (testSubdomain) {
+      const subdomain = platform === 'booking' ? 'booking' : 'events';
+      return `${protocol}//${subdomain}.l8events.dk`;
+    }
+    
+    // Normal localhost behavior - just navigate to path
+    const path = platform === 'booking' ? '/booking' : '/events';
+    return `${protocol}//${currentHost}${path}`;
   }
   
   // Production environment
@@ -56,11 +69,6 @@ export const shouldShowPlatformChoice = (): boolean => {
   
   // If we're on a subdomain, don't show platform choice
   if (subdomain) return false;
-  
-  // In development, show platform choice on localhost without port (main domain)
-  if (window.location.hostname === 'localhost' && !window.location.port) {
-    return true;
-  }
   
   // Only show platform choice on the root path of main domain (www.l8events.dk)
   return window.location.pathname === '/';

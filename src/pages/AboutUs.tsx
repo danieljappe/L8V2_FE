@@ -82,7 +82,7 @@ const AboutUs = () => {
       image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
     },
     {
-      name: "Joachim Engelhartt Illigen",
+      name: "Joachim Engelhart Illigen",
       role: "Creative Director",
       image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
     },
@@ -96,28 +96,28 @@ const AboutUs = () => {
   const stats = [
     { 
       icon: Users, 
-      value: 100, 
+      value: 4, 
       label: "Team Members", 
-      suffix: "+",
+      suffix: "",
       duration: 1.5 + Math.random() * 1.5 // Random duration between 1.5 and 3 seconds
     },
     { 
       icon: Heart, 
-      value: 500, 
-      label: "Happy Clients", 
+      value: 1000, 
+      label: "Glade gæster", 
       suffix: "+",
       duration: 1.5 + Math.random() * 1.5
     },
     { 
       icon: Rocket, 
-      value: 50, 
-      label: "Projects", 
+      value: 11, 
+      label: "Events", 
       suffix: "+",
       duration: 1.5 + Math.random() * 1.5
     },
     { 
       icon: Star, 
-      value: 10, 
+      value: 2, 
       label: "Years Experience", 
       suffix: "+",
       duration: 1.5 + Math.random() * 1.5

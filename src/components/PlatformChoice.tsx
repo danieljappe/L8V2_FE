@@ -12,10 +12,32 @@ const PlatformChoice: React.FC = () => {
     localStorage.setItem('l8-platform-choice', platform);
     if (platform === 'events') {
       const redirectUrl = getRedirectUrl('events');
-      window.location.href = redirectUrl;
+      if (window.location.hostname.includes('localhost')) {
+        // Check if we're testing subdomain behavior
+        const urlParams = new URLSearchParams(window.location.search);
+        const testSubdomain = urlParams.get('test-subdomain');
+        if (testSubdomain) {
+          window.location.href = redirectUrl;
+        } else {
+          navigate('/events');
+        }
+      } else {
+        window.location.href = redirectUrl;
+      }
     } else if (platform === 'booking') {
       const redirectUrl = getRedirectUrl('booking');
-      window.location.href = redirectUrl;
+      if (window.location.hostname.includes('localhost')) {
+        // Check if we're testing subdomain behavior
+        const urlParams = new URLSearchParams(window.location.search);
+        const testSubdomain = urlParams.get('test-subdomain');
+        if (testSubdomain) {
+          window.location.href = redirectUrl;
+        } else {
+          navigate('/booking');
+        }
+      } else {
+        window.location.href = redirectUrl;
+      }
     }
   };
 

@@ -170,19 +170,19 @@ const EventDetails: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10">
+      <main className="relative z-10 bg-gradient-to-b from-purple-900/80 via-black/50 to-purple-900/80 min-h-screen">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
             {/* Description */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
-              <p className="text-white/80 leading-relaxed text-lg">
+            <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
+              <p className="text-white leading-relaxed text-lg">
                 {event.description}
               </p>
             </div>
 
             {/* Artists Section */}
             {event.eventArtists && event.eventArtists.length > 0 && (
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
+              <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
                   <Music className="w-6 h-6 mr-2 text-purple-300" />
                   Kunstnere
@@ -198,7 +198,7 @@ const EventDetails: React.FC = () => {
                         transition: { duration: 0.2 }
                       }}
                       onClick={() => setSelectedArtist(eventArtist.artist)}
-                      className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 cursor-pointer overflow-hidden"
+                      className="group relative bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20 cursor-pointer overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative flex items-start space-x-4">
@@ -217,7 +217,7 @@ const EventDetails: React.FC = () => {
                             {eventArtist.artist.name}
                           </h3>
                           <p className="text-purple-300 text-sm mb-2">{eventArtist.artist.genre}</p>
-                          <p className="text-white/70 text-sm line-clamp-2">{eventArtist.artist.bio}</p>
+                          <p className="text-white/90 text-sm line-clamp-2">{eventArtist.artist.bio}</p>
                           <div className="mt-3 text-purple-300 text-sm font-medium">
                             Klik for at læse mere →
                           </div>
@@ -231,7 +231,7 @@ const EventDetails: React.FC = () => {
 
             {/* Venue Information */}
             {event.venue && (
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
+              <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
                   <MapPin className="w-6 h-6 mr-2 text-purple-300" />
                   Lokation
@@ -246,7 +246,7 @@ const EventDetails: React.FC = () => {
                       <p className="text-white/80 text-sm leading-relaxed">{event.venue.description}</p>
                     )}
                   </div>
-                  <div className="bg-white/5 rounded-2xl p-4">
+                  <div className="bg-black/20 rounded-2xl p-4">
                     <div className="flex items-center space-x-2 mb-2">
                       <Users className="w-5 h-5 text-purple-300" />
                       <span className="text-white font-semibold">Kapacitet</span>
@@ -259,7 +259,7 @@ const EventDetails: React.FC = () => {
 
             {/* Tickets Section - Only show for upcoming events */}
             {isUpcoming && (
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8">
+              <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
                   <Ticket className="w-6 h-6 mr-2 text-purple-300" />
                   Billetter
@@ -270,7 +270,7 @@ const EventDetails: React.FC = () => {
                     <motion.div
                       key={ticket.name}
                       whileHover={{ scale: 1.02, y: -5 }}
-                      className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+                      className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
                     >
                       <h3 className="text-xl font-semibold text-white mb-2">{ticket.name}</h3>
                       <p className="text-2xl font-bold text-purple-300 mb-4">{ticket.price}</p>
@@ -297,7 +297,7 @@ const EventDetails: React.FC = () => {
 
             {/* Past Event Message */}
             {!isUpcoming && (
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 text-center">
+              <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 text-center">
                 <h2 className="text-2xl font-bold text-white mb-4">Event Afsluttet</h2>
                 <p className="text-white/70 mb-6">
                   Dette event har allerede fundet sted. Tak til alle, der deltog og gjorde det til en fantastisk aften!

@@ -108,8 +108,20 @@ const Header: React.FC = () => {
                 <div 
                   onClick={() => {
                     const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
-                    const redirectUrl = getRedirectUrl(platform);
-                    window.location.href = redirectUrl;
+                    if (window.location.hostname.includes('localhost')) {
+                      // Check if we're testing subdomain behavior
+                      const urlParams = new URLSearchParams(window.location.search);
+                      const testSubdomain = urlParams.get('test-subdomain');
+                      if (testSubdomain) {
+                        const redirectUrl = getRedirectUrl(platform);
+                        window.location.href = redirectUrl;
+                      } else {
+                        navigate(platform === 'booking' ? '/booking' : '/events');
+                      }
+                    } else {
+                      const redirectUrl = getRedirectUrl(platform);
+                      window.location.href = redirectUrl;
+                    }
                   }}
                   className="cursor-pointer"
                 >
@@ -212,9 +224,21 @@ const Header: React.FC = () => {
                         <div
                           onClick={() => {
                             const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
-                            const redirectUrl = getRedirectUrl(platform);
                             setIsMobileMenuOpen(false);
-                            window.location.href = redirectUrl;
+                            if (window.location.hostname.includes('localhost')) {
+                              // Check if we're testing subdomain behavior
+                              const urlParams = new URLSearchParams(window.location.search);
+                              const testSubdomain = urlParams.get('test-subdomain');
+                              if (testSubdomain) {
+                                const redirectUrl = getRedirectUrl(platform);
+                                window.location.href = redirectUrl;
+                              } else {
+                                navigate(platform === 'booking' ? '/booking' : '/events');
+                              }
+                            } else {
+                              const redirectUrl = getRedirectUrl(platform);
+                              window.location.href = redirectUrl;
+                            }
                           }}
                           className="block cursor-pointer"
                         >
