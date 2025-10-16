@@ -131,9 +131,12 @@ const Header: React.FC = () => {
                         navigate(platform === 'booking' ? '/booking' : '/events');
                       }
                     } else {
-                      // Navigate to cross-platform path - let PlatformRouter handle the redirect
-                      const targetPath = platform === 'events' ? '/events' : '/booking';
-                      navigate(targetPath);
+                      // Direct subdomain redirect for production to avoid back button issues
+                      if (platform === 'events') {
+                        window.location.replace('https://events.l8events.dk');
+                      } else if (platform === 'booking') {
+                        window.location.replace('https://booking.l8events.dk');
+                      }
                     }
                   }}
                   className="cursor-pointer"
@@ -249,9 +252,12 @@ const Header: React.FC = () => {
                                 navigate(platform === 'booking' ? '/booking' : '/events');
                               }
                             } else {
-                              // Navigate to cross-platform path - let PlatformRouter handle the redirect
-                              const targetPath = platform === 'events' ? '/events' : '/booking';
-                              navigate(targetPath);
+                              // Direct subdomain redirect for production to avoid back button issues
+                              if (platform === 'events') {
+                                window.location.replace('https://events.l8events.dk');
+                              } else if (platform === 'booking') {
+                                window.location.replace('https://booking.l8events.dk');
+                              }
                             }
                           }}
                           className="block cursor-pointer"
