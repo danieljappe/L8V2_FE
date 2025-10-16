@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Users, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Scene from './3DScene';
-import { getRedirectUrl } from '../utils/subdomainUtils';
+// No subdomain utilities needed
 
 const PlatformChoice: React.FC = () => {
   const navigate = useNavigate();
@@ -11,33 +11,9 @@ const PlatformChoice: React.FC = () => {
   const handlePlatformChoice = (platform: string) => {
     localStorage.setItem('l8-platform-choice', platform);
     if (platform === 'events') {
-      const redirectUrl = getRedirectUrl('events');
-      if (window.location.hostname.includes('localhost')) {
-        // Check if we're testing subdomain behavior
-        const urlParams = new URLSearchParams(window.location.search);
-        const testSubdomain = urlParams.get('test-subdomain');
-        if (testSubdomain) {
-          window.location.href = redirectUrl;
-        } else {
-          navigate('/events');
-        }
-      } else {
-        window.location.href = redirectUrl;
-      }
+      navigate('/home');
     } else if (platform === 'booking') {
-      const redirectUrl = getRedirectUrl('booking');
-      if (window.location.hostname.includes('localhost')) {
-        // Check if we're testing subdomain behavior
-        const urlParams = new URLSearchParams(window.location.search);
-        const testSubdomain = urlParams.get('test-subdomain');
-        if (testSubdomain) {
-          window.location.href = redirectUrl;
-        } else {
-          navigate('/booking');
-        }
-      } else {
-        window.location.href = redirectUrl;
-      }
+      navigate('/booking');
     }
   };
 
@@ -128,7 +104,7 @@ const PlatformChoice: React.FC = () => {
                 <Calendar className="w-10 h-10 text-white" />
               </div>
               <h1 className="text-6xl md:text-7xl font-light text-white mb-2">L8 Events</h1>
-              <h2 className="text-xl md:text-2xl font-light text-white/60">events.l8events.dk</h2>
+              <h2 className="text-xl md:text-2xl font-light text-white/60">Udforsk begivenheder</h2>
             </motion.div>
 
             {/* Description */}
@@ -179,7 +155,7 @@ const PlatformChoice: React.FC = () => {
                 <Users className="w-10 h-10 text-white" />
               </div>
               <h1 className="text-6xl md:text-7xl font-light text-white mb-2">L8 Booking</h1>
-              <h2 className="text-xl md:text-2xl font-light text-white/60">booking.l8events.dk</h2>
+              <h2 className="text-xl md:text-2xl font-light text-white/60">Book kunstnere</h2>
             </motion.div>
 
             {/* Description */}

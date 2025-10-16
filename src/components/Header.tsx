@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Image, Users, Settings } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getRedirectUrl, getPlatformFromSubdomain } from '../utils/subdomainUtils';
+import { getPlatformFromPath } from '../utils/subdomainUtils';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,31 +36,38 @@ const Header: React.FC = () => {
     };
   }, [isMobileMenuOpen]);
 
-  const navItems = [
-    { name: 'Begivenheder', path: '/events', icon: Calendar },
-    { name: 'Kunstnere', path: '/artists', icon: Users },
-    { name: 'Galleri', path: '/gallery', icon: Image },
-    { name: 'Om Os', path: '/about', icon: Info },
-    { name: 'Kontakt', path: '/contact', icon: Phone },
-    { name: 'Admin', path: '/admin', icon: Settings }
-  ];
+  // Get navigation items based on current platform
+  const getNavItems = () => {
+    const platform = getPlatformFromPath();
+    
+    if (platform === 'booking') {
+      return [
+        { name: 'Kunstnere', path: '/booking/artists', icon: Users },
+        { name: 'Book', path: '/booking', icon: Music },
+        { name: 'Om Os', path: '/booking/about', icon: Info }
+      ];
+    } else {
+      // Events platform navigation
+      return [
+        { name: 'Begivenheder', path: '/events', icon: Calendar },
+        { name: 'Kunstnere', path: '/artists', icon: Users },
+        { name: 'Galleri', path: '/gallery', icon: Image },
+        { name: 'Om Os', path: '/about', icon: Info },
+        { name: 'Kontakt', path: '/contact', icon: Phone },
+        { name: 'Admin', path: '/admin', icon: Settings }
+      ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   // Cross-reference navigation based on current platform
   const getCrossReferenceLink = () => {
-    const currentPath = location.pathname;
-    const platform = getPlatformFromSubdomain();
+    const platform = getPlatformFromPath();
     
-    // Use the subdomain utility for more robust detection
     if (platform === 'booking') {
       return { name: 'L8 Events', path: '/events', icon: Calendar };
     } else if (platform === 'events') {
-      return { name: 'L8 Booking', path: '/booking', icon: Users };
-    }
-    
-    // Fallback to path-based detection for localhost/main domain
-    if (currentPath.startsWith('/booking')) {
-      return { name: 'L8 Events', path: '/events', icon: Calendar };
-    } else if (currentPath.startsWith('/events') || currentPath === '/') {
       return { name: 'L8 Booking', path: '/booking', icon: Users };
     }
     return null;
@@ -84,12 +90,18 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/">
+          <Link to={getPlatformFromPath() === 'booking' ? '/booking' : '/'}>
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <div className={`w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center ${
+                getPlatformFromPath() === 'booking' 
+                  ? 'from-blue-500 to-cyan-500' 
+                  : 'from-purple-500 to-pink-500'
+              }`}>
                 <Music className="w-6 h-6 text-white" />
               </div>
-              <span className="text-white font-bold text-xl">L8</span>
+              <span className="text-white font-bold text-xl">
+                {getPlatformFromPath() === 'booking' ? 'L8 Booking' : 'L8'}
+              </span>
             </div>
           </Link>
 
@@ -116,36 +128,12 @@ const Header: React.FC = () => {
             {/* Cross-reference Link */}
             {crossReferenceLink && (
               <div className="border-l border-white/20 pl-4">
-                <div 
-                  onClick={() => {
-                    const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
-                    
-                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                      // Check if we're testing subdomain behavior
-                      const urlParams = new URLSearchParams(window.location.search);
-                      const testSubdomain = urlParams.get('test-subdomain');
-                      if (testSubdomain) {
-                        const redirectUrl = getRedirectUrl(platform);
-                        window.location.href = redirectUrl;
-                      } else {
-                        navigate(platform === 'booking' ? '/booking' : '/events');
-                      }
-                    } else {
-                      // Direct subdomain redirect for production to avoid back button issues
-                      if (platform === 'events') {
-                        window.location.replace('https://events.l8events.dk');
-                      } else if (platform === 'booking') {
-                        window.location.replace('https://booking.l8events.dk');
-                      }
-                    }
-                  }}
-                  className="cursor-pointer"
-                >
+                <Link to={crossReferenceLink.path}>
                   <div className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors text-white/60 hover:text-white hover:bg-white/5">
                     <crossReferenceLink.icon className="w-5 h-5" />
                     <span>{crossReferenceLink.name}</span>
                   </div>
-                </div>
+                </Link>
               </div>
             )}
           </nav>
@@ -159,8 +147,8 @@ const Header: React.FC = () => {
           </button>
         </div>
 
-        {/* Breadcrumbs - Only show on events pages */}
-        {location.pathname.startsWith('/events') && (
+        {/* Breadcrumbs - Show on all pages except root */}
+        {location.pathname !== '/' && (
           <div className="pb-4">
             <Breadcrumbs />
           </div>
@@ -186,17 +174,27 @@ const Header: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[240px] bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden"
+              className={`fixed top-0 right-0 h-full w-[240px] bg-gradient-to-br backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden ${
+                getPlatformFromPath() === 'booking' 
+                  ? 'from-blue-900/95 via-cyan-900/95 to-indigo-900/95'
+                  : 'from-purple-900/95 via-blue-900/95 to-indigo-900/95'
+              }`}
             >
               <div className="flex flex-col h-full">
                 {/* Menu Header */}
                 <div className="p-4 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                      <div className={`w-8 h-8 bg-gradient-to-br rounded-xl flex items-center justify-center ${
+                        getPlatformFromPath() === 'booking' 
+                          ? 'from-blue-500 to-cyan-500' 
+                          : 'from-purple-500 to-pink-500'
+                      }`}>
                         <Music className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-white font-bold text-lg">L8</span>
+                      <span className="text-white font-bold text-lg">
+                        {getPlatformFromPath() === 'booking' ? 'L8 Booking' : 'L8'}
+                      </span>
                     </div>
                     <button
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -237,31 +235,10 @@ const Header: React.FC = () => {
                     {/* Cross-reference Link */}
                     {crossReferenceLink && (
                       <div className="border-t border-white/20 pt-4">
-                        <div
-                          onClick={() => {
-                            const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
-                            setIsMobileMenuOpen(false);
-                            
-                            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                              // Check if we're testing subdomain behavior
-                              const urlParams = new URLSearchParams(window.location.search);
-                              const testSubdomain = urlParams.get('test-subdomain');
-                              if (testSubdomain) {
-                                const redirectUrl = getRedirectUrl(platform);
-                                window.location.href = redirectUrl;
-                              } else {
-                                navigate(platform === 'booking' ? '/booking' : '/events');
-                              }
-                            } else {
-                              // Direct subdomain redirect for production to avoid back button issues
-                              if (platform === 'events') {
-                                window.location.replace('https://events.l8events.dk');
-                              } else if (platform === 'booking') {
-                                window.location.replace('https://booking.l8events.dk');
-                              }
-                            }
-                          }}
-                          className="block cursor-pointer"
+                        <Link
+                          to={crossReferenceLink.path}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block"
                         >
                           <motion.div
                             whileHover={{ x: 5 }}
@@ -270,7 +247,7 @@ const Header: React.FC = () => {
                             <crossReferenceLink.icon className="w-5 h-5" />
                             <span className="text-base">{crossReferenceLink.name}</span>
                           </motion.div>
-                        </div>
+                        </Link>
                       </div>
                     )}
                   </div>

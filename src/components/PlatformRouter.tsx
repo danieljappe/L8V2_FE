@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getPlatformFromSubdomain, shouldShowPlatformChoice, getRedirectUrl } from '../utils/subdomainUtils';
+import { getPlatformFromPath, shouldShowPlatformChoice } from '../utils/subdomainUtils';
 import PlatformChoice from './PlatformChoice';
 
 interface PlatformRouterProps {
@@ -14,36 +14,12 @@ const PlatformRouter: React.FC<PlatformRouterProps> = ({ children }) => {
 
   useEffect(() => {
     const checkPlatform = () => {
-      const platform = getPlatformFromSubdomain();
       const showChoice = shouldShowPlatformChoice();
       
       // If we should show platform choice, don't redirect
       if (showChoice) {
         setIsChecking(false);
         return;
-      }
-      
-      
-      // Only handle subdomain logic in production (not localhost)
-      if (platform !== 'main' && !window.location.hostname.includes('localhost')) {
-        const currentPath = location.pathname;
-        
-        // Skip cross-platform navigation - let Header handle it
-        // This prevents PlatformRouter from interfering with manual cross-platform navigation
-        
-        // Handle other non-booking paths on booking subdomain
-        if (platform === 'booking' && !currentPath.startsWith('/booking') && !currentPath.startsWith('/events') && currentPath !== '/') {
-          const redirectUrl = getRedirectUrl('booking');
-          window.location.href = `${redirectUrl}/booking${currentPath}`;
-          return;
-        }
-        
-        // If on booking subdomain and on root path, redirect to /booking
-        if (platform === 'booking' && currentPath === '/') {
-          const redirectUrl = getRedirectUrl('booking');
-          window.location.href = `${redirectUrl}/booking`;
-          return;
-        }
       }
       
       setIsChecking(false);

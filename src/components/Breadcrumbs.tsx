@@ -8,8 +8,14 @@ const Breadcrumbs: React.FC = () => {
   const pathnames = location.pathname.split('/').filter((x) => x);
 
   const breadcrumbNameMap: { [key: string]: string } = {
+    home: 'Home',
     events: 'Begivenheder',
+    artists: 'Kunstnere',
     gallery: 'Galleri',
+    about: 'Om Os',
+    contact: 'Kontakt',
+    admin: 'Admin',
+    booking: 'Booking',
   };
 
   return (
@@ -18,7 +24,7 @@ const Breadcrumbs: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       className="flex items-center space-x-2 text-sm"
     >
-      <Link to="/">
+      <Link to="/home">
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

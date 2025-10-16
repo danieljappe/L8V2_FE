@@ -7,6 +7,8 @@ import AboutUs from './pages/AboutUs';
 import Contact from './pages/Contact';
 import Artists from './pages/Artists';
 import Booking from './pages/Booking';
+import BookingHome from './pages/BookingHome';
+import BookingArtists from './pages/BookingArtists';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Header from './components/Header';
@@ -37,21 +39,27 @@ const AppContent = () => {
 
   return (
     <div className="relative min-h-screen">
-      {!isAdminPage && !isLoginPage && !isBookingPage && !isEventsPage && (
-        <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 -z-10" />
+      {!isAdminPage && !isLoginPage && (
+        <div className={`fixed inset-0 bg-gradient-to-br -z-10 ${
+          isBookingPage 
+            ? 'from-blue-900 via-cyan-900 to-indigo-900'
+            : 'from-purple-900 via-blue-900 to-indigo-900'
+        }`} />
       )}
       <div className="relative z-10">
-        {!isAdminPage && !isLoginPage && !isBookingPage && !isEventsPage && <Header />}
+        {!isAdminPage && !isLoginPage && <Header />}
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/events" element={<Events />} />
             <Route path="/events/:eventId" element={<EventDetails />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/artists" element={<Artists />} />
-            <Route path="/booking" element={<Booking />} />
+            <Route path="/booking" element={<BookingHome />} />
+            <Route path="/booking/artists" element={<BookingArtists />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
           </Routes>

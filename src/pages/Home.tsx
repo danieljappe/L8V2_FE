@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, ArrowRight } from 'lucide-react';
 import UpcomingEvent from '../components/UpcomingEvent';
 import PreviousEventGallery from '../components/PreviousEventGallery';
-import { getRedirectUrl } from '../utils/subdomainUtils';
+// No subdomain utilities needed
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -35,14 +35,7 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="group cursor-pointer"
-                onClick={() => {
-                  if (window.location.hostname.includes('localhost')) {
-                    navigate('/events');
-                  } else {
-                    const redirectUrl = getRedirectUrl('events');
-                    window.location.href = redirectUrl;
-                  }
-                }}
+                onClick={() => navigate('/events')}
               >
                 <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl hover:bg-white/15 transition-all duration-300 hover:scale-105">
                   <div className="flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-2xl mb-6 mx-auto group-hover:bg-purple-500/30 transition-colors">
@@ -65,14 +58,7 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
                 className="group cursor-pointer"
-                onClick={() => {
-                  if (window.location.hostname.includes('localhost')) {
-                    navigate('/booking');
-                  } else {
-                    const redirectUrl = getRedirectUrl('booking');
-                    window.location.href = redirectUrl;
-                  }
-                }}
+                onClick={() => navigate('/booking')}
               >
                 <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl hover:bg-white/15 transition-all duration-300 hover:scale-105">
                   <div className="flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-2xl mb-6 mx-auto group-hover:bg-blue-500/30 transition-colors">
