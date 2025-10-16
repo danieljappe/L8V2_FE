@@ -120,9 +120,6 @@ const Header: React.FC = () => {
                   onClick={() => {
                     const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
                     
-                    // Set a flag to prevent PlatformRouter interference
-                    (window as any).isManualCrossPlatformNavigation = true;
-                    
                     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                       // Check if we're testing subdomain behavior
                       const urlParams = new URLSearchParams(window.location.search);
@@ -244,9 +241,6 @@ const Header: React.FC = () => {
                           onClick={() => {
                             const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
                             setIsMobileMenuOpen(false);
-                            
-                            // Set a flag to prevent PlatformRouter interference
-                            (window as any).isManualCrossPlatformNavigation = true;
                             
                             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                               // Check if we're testing subdomain behavior

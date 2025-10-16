@@ -23,33 +23,13 @@ const PlatformRouter: React.FC<PlatformRouterProps> = ({ children }) => {
         return;
       }
       
-      // Skip platform logic if manual cross-platform navigation is happening
-      if ((window as any).isManualCrossPlatformNavigation) {
-        // Clear the flag after a short delay to allow navigation to complete
-        setTimeout(() => {
-          (window as any).isManualCrossPlatformNavigation = false;
-        }, 100);
-        setIsChecking(false);
-        return;
-      }
       
       // Only handle subdomain logic in production (not localhost)
       if (platform !== 'main' && !window.location.hostname.includes('localhost')) {
         const currentPath = location.pathname;
         
-        // Redirect to appropriate platform if needed
-        if (platform === 'events' && currentPath.startsWith('/booking')) {
-          const redirectUrl = getRedirectUrl('booking');
-          window.location.href = `${redirectUrl}`;
-          return;
-        }
-        
-        // Handle cross-platform navigation - if on booking subdomain and trying to access events content
-        if (platform === 'booking' && currentPath.startsWith('/events')) {
-          const redirectUrl = getRedirectUrl('events');
-          window.location.href = `${redirectUrl}`;
-          return;
-        }
+        // Skip cross-platform navigation - let Header handle it
+        // This prevents PlatformRouter from interfering with manual cross-platform navigation
         
         // Handle other non-booking paths on booking subdomain
         if (platform === 'booking' && !currentPath.startsWith('/booking') && !currentPath.startsWith('/events') && currentPath !== '/') {
