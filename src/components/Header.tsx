@@ -3,7 +3,7 @@ import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Im
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getRedirectUrl } from '../utils/subdomainUtils';
+import { getRedirectUrl, getPlatformFromSubdomain } from '../utils/subdomainUtils';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -50,20 +50,30 @@ const Header: React.FC = () => {
   const getCrossReferenceLink = () => {
     const currentPath = location.pathname;
     const hostname = window.location.hostname;
+    const platform = getPlatformFromSubdomain();
     
-    // Check if we're on a subdomain
-    if (hostname.includes('booking.l8events.dk')) {
+    console.log('getCrossReferenceLink - hostname:', hostname);
+    console.log('getCrossReferenceLink - currentPath:', currentPath);
+    console.log('getCrossReferenceLink - platform:', platform);
+    
+    // Use the subdomain utility for more robust detection
+    if (platform === 'booking') {
+      console.log('Detected booking platform, returning L8 Events link');
       return { name: 'L8 Events', path: '/events', icon: Calendar };
-    } else if (hostname.includes('events.l8events.dk')) {
+    } else if (platform === 'events') {
+      console.log('Detected events platform, returning L8 Booking link');
       return { name: 'L8 Booking', path: '/booking', icon: Users };
     }
     
-    // Fallback to path-based detection for localhost
+    // Fallback to path-based detection for localhost/main domain
     if (currentPath.startsWith('/booking')) {
+      console.log('Detected /booking path, returning L8 Events link');
       return { name: 'L8 Events', path: '/events', icon: Calendar };
     } else if (currentPath.startsWith('/events') || currentPath === '/') {
+      console.log('Detected /events path or root, returning L8 Booking link');
       return { name: 'L8 Booking', path: '/booking', icon: Users };
     }
+    console.log('No cross-reference link found');
     return null;
   };
 
@@ -118,7 +128,12 @@ const Header: React.FC = () => {
               <div className="border-l border-white/20 pl-4">
                 <div 
                   onClick={() => {
+                    console.log('Cross-reference clicked!');
+                    console.log('crossReferenceLink.name:', crossReferenceLink.name);
                     const platform = crossReferenceLink.name === 'L8 Booking' ? 'booking' : 'events';
+                    console.log('Determined platform:', platform);
+                    console.log('Current hostname:', window.location.hostname);
+                    
                     if (window.location.hostname.includes('localhost')) {
                       // Check if we're testing subdomain behavior
                       const urlParams = new URLSearchParams(window.location.search);
@@ -131,8 +146,7 @@ const Header: React.FC = () => {
                       }
                     } else {
                       // Direct subdomain redirect for production
-                      console.log('Cross-reference click - platform:', platform);
-                      console.log('Current hostname:', window.location.hostname);
+                      console.log('Production environment detected');
                       
                       if (platform === 'events') {
                         console.log('Redirecting to events subdomain');
@@ -257,9 +271,16 @@ const Header: React.FC = () => {
                               }
                             } else {
                               // Direct subdomain redirect for production
-                              const subdomain = platform === 'booking' ? 'booking' : 'events';
-                              const path = platform === 'booking' ? '/booking' : '/events';
-                              window.location.href = `https://${subdomain}.l8events.dk${path}`;
+                              console.log('Mobile - Production environment detected');
+                              console.log('Mobile - Platform:', platform);
+                              
+                              if (platform === 'events') {
+                                console.log('Mobile - Redirecting to events subdomain');
+                                window.location.href = 'https://events.l8events.dk/events';
+                              } else if (platform === 'booking') {
+                                console.log('Mobile - Redirecting to booking subdomain');
+                                window.location.href = 'https://booking.l8events.dk/booking';
+                              }
                             }
                           }}
                           className="block cursor-pointer"
