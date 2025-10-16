@@ -276,7 +276,7 @@ const Header: React.FC = () => {
                               
                               if (platform === 'events') {
                                 console.log('Mobile - Redirecting to events subdomain');
-                                window.location.href = 'https://events.l8events.dk/events';
+                                window.location.href = 'https://events.l8events.dk/';
                               } else if (platform === 'booking') {
                                 console.log('Mobile - Redirecting to booking subdomain');
                                 window.location.href = 'https://booking.l8events.dk/booking';
