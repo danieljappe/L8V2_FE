@@ -29,15 +29,15 @@ const PlatformRouter: React.FC<PlatformRouterProps> = ({ children }) => {
         
         // Redirect to appropriate platform if needed
         if (platform === 'events' && currentPath.startsWith('/booking')) {
-          const redirectUrl = getRedirectUrl('events');
-          window.location.href = `${redirectUrl}${currentPath.replace('/booking', '')}`;
+          const redirectUrl = getRedirectUrl('booking');
+          window.location.href = `${redirectUrl}`;
           return;
         }
         
         // Handle cross-platform navigation - if on booking subdomain and trying to access events content
         if (platform === 'booking' && currentPath.startsWith('/events')) {
           const redirectUrl = getRedirectUrl('events');
-          window.location.href = `${redirectUrl}${currentPath}`;
+          window.location.href = `${redirectUrl}`;
           return;
         }
         

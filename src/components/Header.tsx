@@ -131,15 +131,9 @@ const Header: React.FC = () => {
                         navigate(platform === 'booking' ? '/booking' : '/events');
                       }
                     } else {
-                      // Direct subdomain redirect for production
-                      // Force immediate navigation to prevent router interference
-                      if (platform === 'events') {
-                        window.stop();
-                        window.location.assign('https://events.l8events.dk');
-                      } else if (platform === 'booking') {
-                        window.stop();
-                        window.location.assign('https://booking.l8events.dk');
-                      }
+                      // Navigate to cross-platform path - let PlatformRouter handle the redirect
+                      const targetPath = platform === 'events' ? '/events' : '/booking';
+                      navigate(targetPath);
                     }
                   }}
                   className="cursor-pointer"
@@ -255,15 +249,9 @@ const Header: React.FC = () => {
                                 navigate(platform === 'booking' ? '/booking' : '/events');
                               }
                             } else {
-                              // Direct subdomain redirect for production
-                              // Force immediate navigation to prevent router interference
-                              if (platform === 'events') {
-                                window.stop();
-                                window.location.assign('https://events.l8events.dk');
-                              } else if (platform === 'booking') {
-                                window.stop();
-                                window.location.assign('https://booking.l8events.dk');
-                              }
+                              // Navigate to cross-platform path - let PlatformRouter handle the redirect
+                              const targetPath = platform === 'events' ? '/events' : '/booking';
+                              navigate(targetPath);
                             }
                           }}
                           className="block cursor-pointer"
