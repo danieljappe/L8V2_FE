@@ -132,11 +132,13 @@ const Header: React.FC = () => {
                       }
                     } else {
                       // Direct subdomain redirect for production
-                      // Use window.location.replace to prevent back button issues
+                      // Force immediate navigation to prevent router interference
                       if (platform === 'events') {
-                        window.location.replace('https://events.l8events.dk');
+                        window.stop();
+                        window.location.assign('https://events.l8events.dk');
                       } else if (platform === 'booking') {
-                        window.location.replace('https://booking.l8events.dk');
+                        window.stop();
+                        window.location.assign('https://booking.l8events.dk');
                       }
                     }
                   }}
@@ -254,11 +256,13 @@ const Header: React.FC = () => {
                               }
                             } else {
                               // Direct subdomain redirect for production
-                              // Use window.location.replace to prevent back button issues
+                              // Force immediate navigation to prevent router interference
                               if (platform === 'events') {
-                                window.location.replace('https://events.l8events.dk');
+                                window.stop();
+                                window.location.assign('https://events.l8events.dk');
                               } else if (platform === 'booking') {
-                                window.location.replace('https://booking.l8events.dk');
+                                window.stop();
+                                window.location.assign('https://booking.l8events.dk');
                               }
                             }
                           }}
