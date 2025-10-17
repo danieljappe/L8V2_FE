@@ -249,6 +249,7 @@ const UpcomingEvent: React.FC = () => {
         <ArtistModal
           artist={selectedArtist}
           onClose={() => setSelectedArtist(null)}
+          isAdmin={false}
         />
       )}
     </section>

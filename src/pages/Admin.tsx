@@ -101,6 +101,7 @@ function mapApiArtistToAdminArtist(apiArtist: ApiArtist): Artist {
     imageUrl: apiArtist.imageUrl || '',
     website: apiArtist.website || '',
     socialMedia: apiArtist.socialMedia || [],
+    embeddings: apiArtist.embeddings || [],
     genre: apiArtist.genre || '',
     createdAt: apiArtist.createdAt,
     updatedAt: apiArtist.updatedAt

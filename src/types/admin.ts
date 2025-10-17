@@ -42,6 +42,15 @@ export interface Artist {
     platform: string;
     url: string;
   }>;
+  embeddings?: Array<{
+    id: string;
+    platform: 'spotify' | 'youtube' | 'soundcloud';
+    embedCode: string;
+    title?: string;
+    description?: string;
+    thumbnailUrl?: string;
+    createdAt: string;
+  }>;
   genre?: string;
   createdAt: string;
   updatedAt: string;

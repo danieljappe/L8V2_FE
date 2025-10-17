@@ -287,7 +287,7 @@ const Artists: React.FC = () => {
       </div>
 
       {/* Artist Modal */}
-      <ArtistModal artist={selectedArtist} onClose={handleCloseModal} />
+      <ArtistModal artist={selectedArtist} onClose={handleCloseModal} isAdmin={false} />
     </div>
   );
 };

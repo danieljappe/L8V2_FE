@@ -1,31 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Instagram, Globe, Youtube } from 'lucide-react';
+import { X, Globe, Music } from 'lucide-react';
 import { constructFullUrl } from '../utils/imageUtils';
 import { Artist } from '../services/api';
+import EmbeddingManager from './EmbeddingManager';
+import EmbedRenderer from './EmbedRenderer';
+import { normalizeSocialMedia } from '../utils/socialMediaUtils';
 
 interface ArtistModalProps {
   artist: Artist | null;
   onClose: () => void;
+  isAdmin?: boolean;
 }
 
-const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose }) => {
+const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose, isAdmin = false }) => {
+  const [embeddings, setEmbeddings] = useState(artist?.embeddings || []);
+
+  // Update embeddings when artist changes
+  useEffect(() => {
+    if (artist?.embeddings) {
+      setEmbeddings(artist.embeddings);
+    } else {
+      setEmbeddings([]);
+    }
+  }, [artist?.embeddings]);
+
   if (!artist) return null;
 
-  // Fix socialMedia data - handle both string and array formats
-  let socialMediaArray: Array<{ platform: string; url: string }> = [];
-  if (artist.socialMedia) {
-    if (Array.isArray(artist.socialMedia)) {
-      socialMediaArray = artist.socialMedia;
-    } else if (typeof artist.socialMedia === 'string') {
-      try {
-        // Parse JSON string to array
-        socialMediaArray = JSON.parse(artist.socialMedia);
-      } catch (error) {
-        socialMediaArray = [];
-      }
-    }
-  }
+  // Convert social media data to consistent array format
+  const socialMediaArray = normalizeSocialMedia(artist.socialMedia);
 
   return (
     <AnimatePresence>
@@ -146,6 +149,50 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose }) => {
                     </span>
                   )}
                 </div>
+              </div>
+
+              {/* Embeddings Section */}
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <Music className="w-5 h-5 mr-2" />
+                  Music & Media
+                </h3>
+                <p className="text-sm text-white/60 mb-4">
+                  Listen to music and watch videos from this artist
+                </p>
+                
+                {embeddings && embeddings.length > 0 ? (
+                  <div className="space-y-4">
+                    {embeddings.map((embedding) => (
+                      <EmbedRenderer
+                        key={embedding.id}
+                        embedCode={embedding.embedCode}
+                        platform={embedding.platform}
+                        title={embedding.title}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-white/60">
+                    <Music className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No music or media available yet</p>
+                    {!isAdmin && (
+                      <p className="text-sm mt-1">Check back later for music and videos</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Embedding Manager for Admins */}
+                {isAdmin && (
+                  <div className="mt-6">
+                    <EmbeddingManager
+                      artistId={artist.id}
+                      embeddings={embeddings}
+                      onEmbeddingsChange={setEmbeddings}
+                      isAdmin={isAdmin}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

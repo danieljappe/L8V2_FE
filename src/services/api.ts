@@ -169,6 +169,16 @@ const transformApiResponse = <T>(data: T): T => {
 };
 
 // Data interfaces based on backend models
+export interface Embedding {
+  id: string;
+  platform: 'spotify' | 'youtube' | 'soundcloud';
+  embedCode: string;
+  title?: string;
+  description?: string;
+  thumbnailUrl?: string;
+  createdAt: string;
+}
+
 export interface Artist {
   id: string;
   name: string;
@@ -179,6 +189,7 @@ export interface Artist {
     platform: string;
     url: string;
   }>;
+  embeddings?: Embedding[];
   genre?: string;
   createdAt: string;
   updatedAt: string;
@@ -274,6 +285,11 @@ export const apiService = {
   createArtist: (artist: Partial<Artist>) => apiClient.post<Artist>('/artists', artist),
   updateArtist: (id: string, artist: Partial<Artist>) => apiClient.put<Artist>(`/artists/${id}`, artist),
   deleteArtist: (id: string) => apiClient.delete<null>(`/artists/${id}`),
+
+  // Embeddings
+  addEmbedding: (artistId: string, embedCode: string) => apiClient.post<Embedding>(`/artists/${artistId}/embeddings`, { embedCode }),
+  updateEmbedding: (artistId: string, embeddingId: string, embedCode: string) => apiClient.put<Embedding>(`/artists/${artistId}/embeddings/${embeddingId}`, { embedCode }),
+  deleteEmbedding: (artistId: string, embeddingId: string) => apiClient.delete<null>(`/artists/${artistId}/embeddings/${embeddingId}`),
 
   // Events
   getEvents: () => apiClient.get<Event[]>('/events'),
