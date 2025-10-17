@@ -28,6 +28,7 @@ export interface Event {
   currentAttendees?: number;
   startTime?: string;
   imageUrl?: string;
+  billettoURL?: string;
   updatedAt?: string;
 }
 

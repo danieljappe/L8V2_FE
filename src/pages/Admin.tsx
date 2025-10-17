@@ -4,7 +4,7 @@ import DashboardOverview from '../components/admin/DashboardOverview';
 import EventsList from '../components/admin/EventsList';
 import ArtistsList from '../components/admin/ArtistsList';
 import VenuesList from '../components/admin/VenuesList';
-import GalleryList from './AdminDashboard/src/components/Gallery/GalleryList';
+import GalleryList from '../components/admin/GalleryList';
 import MessagesList from '../components/admin/MessagesList';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';
@@ -54,6 +54,7 @@ function mapApiEventToAdminEvent(apiEvent: ApiEvent): Event {
     currentAttendees: apiEvent.currentAttendees,
     startTime: apiEvent.startTime,
     imageUrl: apiEvent.imageUrl,
+    billettoURL: apiEvent.billettoURL,
     updatedAt: apiEvent.updatedAt
   } as Event;
 }
@@ -69,6 +70,7 @@ function mapAdminEventToApiEvent(event: Partial<Event>, venues?: Venue[]): Parti
     ticketPrice: Number(event.price) || 0,
     totalTickets: Number(event.capacity) || 0,
     imageUrl: event.image,
+    billettoURL: event.billettoURL,
     // Only allow valid status values
     status: ['upcoming', 'ongoing', 'completed', 'cancelled'].includes(event.status || '') ? event.status : 'upcoming',
   };

@@ -25,6 +25,7 @@ export default function EventForm({ event, onSubmit, onCancel, artists, venues, 
     price: 0,
     capacity: 0,
     image: '',
+    billettoURL: '',
     status: 'upcoming' as Event['status']
   });
 
@@ -41,6 +42,7 @@ export default function EventForm({ event, onSubmit, onCancel, artists, venues, 
         price: event.price,
         capacity: event.capacity,
         image: event.image,
+        billettoURL: event.billettoURL || '',
         status: event.status
       });
     }
@@ -59,7 +61,9 @@ export default function EventForm({ event, onSubmit, onCancel, artists, venues, 
     onSubmit({
       ...formData,
       artist: formData.artists.join(','),
-      venue: formData.venue
+      venue: formData.venue,
+      imageUrl: formData.image,
+      billettoURL: formData.billettoURL
     });
   };
 
@@ -373,6 +377,20 @@ export default function EventForm({ event, onSubmit, onCancel, artists, venues, 
               name="image"
               value={formData.image}
               onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Billetto URL
+            </label>
+            <input
+              type="url"
+              name="billettoURL"
+              value={formData.billettoURL}
+              onChange={handleChange}
+              placeholder="https://billetto.dk/events/..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>

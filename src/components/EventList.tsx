@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import { useEvents } from '../hooks/useApi';
 import { Event } from '../services/api';
+import { constructFullUrl } from '../utils/imageUtils';
 
 interface ProcessedEvent extends Event {
   status: 'upcoming' | 'past';
@@ -191,9 +192,16 @@ const EventList: React.FC = () => {
                   >
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-2 mx-auto overflow-hidden">
                       <img 
-                        src={eventArtist.artist.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300'} 
+                        src={eventArtist.artist.imageUrl ? constructFullUrl(eventArtist.artist.imageUrl) : 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist'} 
                         alt={eventArtist.artist.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback to stock photo if artist image fails to load
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist') {
+                            target.src = 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist';
+                          }
+                        }}
                       />
                     </div>
                     <p className="text-white font-medium text-center text-sm">{eventArtist.artist.name}</p>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { constructFullUrl } from '../../../../../utils/imageUtils';
+import { constructFullUrl } from '../../utils/imageUtils';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ImagePreviewProps {

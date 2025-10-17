@@ -105,13 +105,6 @@ export function useGalleryImage(id: string) {
   return useApi(() => apiService.getGalleryImage(id), [id]);
 }
 
-export function useTickets() {
-  return useApi(() => apiService.getTickets());
-}
-
-export function useTicket(id: string) {
-  return useApi(() => apiService.getTicket(id), [id]);
-}
 
 export function useEventArtists() {
   return useApi(() => apiService.getEventArtists());
@@ -186,9 +179,6 @@ export function useCreateVenue() {
   return useMutation(apiService.createVenue);
 }
 
-export function useCreateTicket() {
-  return useMutation(apiService.createTicket);
-}
 
 export function useCreateGalleryImage() {
   return useMutation(apiService.createGalleryImage);

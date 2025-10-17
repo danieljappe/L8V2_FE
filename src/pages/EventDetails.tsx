@@ -1,12 +1,13 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, MapPin, Music, ArrowLeft, Ticket, Users, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, MapPin, Music, Ticket, Users, AlertCircle } from 'lucide-react';
 import Header from '../components/Header';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useEvent } from '../hooks/useApi';
 import { Artist } from '../services/api';
+import { constructFullUrl } from '../utils/imageUtils';
 
 const EventDetails: React.FC = () => {
   const { eventId } = useParams();
@@ -18,28 +19,6 @@ const EventDetails: React.FC = () => {
 
   // Fetch event data from API only if eventId is valid
   const { data: event, loading, error } = useEvent(isValidEventId ? eventId : '');
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
 
   // Show loading state
   if (loading) {
@@ -100,19 +79,8 @@ const EventDetails: React.FC = () => {
   // Check if event is upcoming or past
   const isUpcoming = new Date(event.date) >= new Date();
 
-  // Generate ticket types based on event data
-  const ticketTypes = [
-    {
-      name: 'Standard',
-      price: '299 DKK',
-      features: ['Adgang til eventet', 'Gratis garderobe', 'Program']
-    },
-    {
-      name: 'VIP',
-      price: '599 DKK',
-      features: ['Adgang til eventet', 'Gratis garderobe', 'Program', 'VIP-område', 'Gratis drinks', 'Møde med kunstnere']
-    }
-  ];
+  // Billetto link for ticket purchase
+  const billettoLink = event.billettoURL || 'https://billetto.dk';
 
   return (
     <div className="min-h-screen overflow-x-hidden">
@@ -123,9 +91,18 @@ const EventDetails: React.FC = () => {
       <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src={event.venue?.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=1920'} 
+            src={event.imageUrl ? constructFullUrl(event.imageUrl) : (event.venue?.image ? constructFullUrl(event.venue.image) : 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image')} 
             alt={event.title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to venue image or stock photo if event image fails to load
+              const target = e.target as HTMLImageElement;
+              if (event.venue?.image && target.src !== constructFullUrl(event.venue.image)) {
+                target.src = constructFullUrl(event.venue.image);
+              } else if (target.src !== 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image') {
+                target.src = 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image';
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-purple-900/90"></div>
         </div>
@@ -189,7 +166,7 @@ const EventDetails: React.FC = () => {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {event.eventArtists.map((eventArtist, index) => (
+                  {event.eventArtists.map((eventArtist) => (
                     <motion.div
                       key={eventArtist.id}
                       whileHover={{ 
@@ -207,9 +184,16 @@ const EventDetails: React.FC = () => {
                           className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 overflow-hidden"
                         >
                           <img 
-                            src={eventArtist.artist.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300'} 
+                            src={eventArtist.artist.imageUrl ? constructFullUrl(eventArtist.artist.imageUrl) : 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist'} 
                             alt={eventArtist.artist.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback to stock photo if artist image fails to load
+                              const target = e.target as HTMLImageElement;
+                              if (target.src !== 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist') {
+                                target.src = 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist';
+                              }
+                            }}
                           />
                         </motion.div>
                         <div>
@@ -265,32 +249,33 @@ const EventDetails: React.FC = () => {
                   Billetter
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {ticketTypes.map((ticket, index) => (
-                    <motion.div
-                      key={ticket.name}
-                      whileHover={{ scale: 1.02, y: -5 }}
-                      className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
+                <div className="max-w-md mx-auto">
+                  <motion.div
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-center"
+                  >
+                    <div className="mb-6">
+                      <h3 className="text-2xl font-semibold text-white mb-2">Event Billet</h3>
+                      <p className="text-white/70 mb-4">
+                        Køb din billet til dette fantastiske event
+                      </p>
+                    </div>
+                    
+                    <motion.a
+                      href={billettoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
-                      <h3 className="text-xl font-semibold text-white mb-2">{ticket.name}</h3>
-                      <p className="text-2xl font-bold text-purple-300 mb-4">{ticket.price}</p>
-                      <ul className="space-y-2 mb-6">
-                        {ticket.features.map((feature, i) => (
-                          <li key={i} className="flex items-center text-white/80">
-                            <div className="w-1.5 h-1.5 bg-purple-300 rounded-full mr-2"></div>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      <motion.button
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-xl transition-all duration-300"
-                      >
-                        Køb {ticket.name} Billet
-                      </motion.button>
-                    </motion.div>
-                  ))}
+                      Køb Billet på Billetto
+                    </motion.a>
+                    
+                    <p className="text-white/60 text-sm mt-4">
+                      Du vil blive omdirigeret til Billetto for at gennemføre købet
+                    </p>
+                  </motion.div>
                 </div>
               </div>
             )}

@@ -21,22 +21,14 @@ const ConstraintErrorModal: React.FC<ConstraintErrorModalProps> = ({
   if (!isOpen) return null;
 
   const handleGoToEvents = () => {
-    // Navigate to events page - you can customize this based on your routing
-    if (window.location.pathname.includes('AdminDashboard')) {
-      window.location.href = '/AdminDashboard#events';
-    } else {
-      window.location.href = '/admin#events';
-    }
+    // Navigate to events page
+    window.location.href = '/admin#events';
     onClose();
   };
 
   const handleGoToEventArtists = () => {
-    // Navigate to event-artists management page if available
-    if (window.location.pathname.includes('AdminDashboard')) {
-      window.location.href = '/AdminDashboard#events';
-    } else {
-      window.location.href = '/admin#events';
-    }
+    // Navigate to event-artists management page
+    window.location.href = '/admin#events';
     onClose();
   };
 

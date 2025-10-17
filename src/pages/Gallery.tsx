@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import { useGalleryImages } from '../hooks/useApi';
 import { GalleryImage } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
-import ImagePreview from './AdminDashboard/src/components/Gallery/ImagePreview';
+import ImagePreview from '../components/admin/ImagePreview';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Gallery: React.FC = () => {

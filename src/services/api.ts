@@ -208,13 +208,13 @@ export interface Event {
   totalTickets: number;
   soldTickets: number;
   imageUrl?: string;
+  billettoURL?: string;
   isActive: boolean;
   status: string;
   capacity?: number;
   currentAttendees: number;
   venue?: Venue;
   eventArtists: EventArtist[];
-  tickets?: Ticket[];
   createdAt: string;
   updatedAt: string;
 }
@@ -256,15 +256,6 @@ export interface ContactMessage {
   updatedAt: string;
 }
 
-export interface Ticket {
-  id: string;
-  event: Event;
-  user?: any;
-  price: number;
-  status: 'available' | 'sold' | 'reserved';
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface User {
   id: string;
@@ -312,10 +303,6 @@ export const apiService = {
   getContactMessages: () => apiClient.get<ContactMessage[]>('/contact'),
   createContactMessage: (message: Partial<ContactMessage>) => apiClient.post<ContactMessage>('/contact', message),
 
-  // Tickets
-  getTickets: () => apiClient.get<Ticket[]>('/tickets'),
-  getTicket: (id: string) => apiClient.get<Ticket>(`/tickets/${id}`),
-  createTicket: (ticket: Partial<Ticket>) => apiClient.post<Ticket>('/tickets', ticket),
 
   // Event Artists
   getEventArtists: () => apiClient.get<EventArtist[]>('/event-artists'),
