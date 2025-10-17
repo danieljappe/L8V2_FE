@@ -254,13 +254,6 @@ const EventDetails: React.FC = () => {
                     whileHover={{ scale: 1.02, y: -5 }}
                     className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 text-center"
                   >
-                    <div className="mb-6">
-                      <h3 className="text-2xl font-semibold text-white mb-2">Event Billet</h3>
-                      <p className="text-white/70 mb-4">
-                        Køb din billet til dette fantastiske event
-                      </p>
-                    </div>
-                    
                     <motion.a
                       href={billettoLink}
                       target="_blank"
