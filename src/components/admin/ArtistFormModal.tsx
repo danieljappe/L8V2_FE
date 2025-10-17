@@ -21,6 +21,7 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
     website: '',
     socialMedia: [] as Array<{ platform: string; url: string }>,
     genre: '',
+    isBookable: false,
     embeddings: [] as any[]
   });
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,7 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
         website: artist.website || '',
         socialMedia: socialMediaArray,
         genre: artist.genre || '',
+        isBookable: artist.isBookable || false,
         embeddings: artist.embeddings || []
       });
     } else {
@@ -48,6 +50,7 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
         website: '',
         socialMedia: [],
         genre: '',
+        isBookable: false,
         embeddings: []
       });
     }
@@ -174,6 +177,20 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
+              </div>
+
+              {/* Bookable Status */}
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="isBookable"
+                  checked={formData.isBookable}
+                  onChange={(e) => setFormData({ ...formData, isBookable: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <label htmlFor="isBookable" className="text-sm font-medium text-gray-700">
+                  Available for booking
+                </label>
               </div>
 
               <div>

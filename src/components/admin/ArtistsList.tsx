@@ -133,6 +133,14 @@ export default function ArtistsList({
                       <span>website</span>
                     </div>
                   )}
+                  
+                  {/* Bookable Indicator */}
+                  {artist.isBookable && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-green-500">📅</span>
+                      <span>bookable</span>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Status Indicator */}

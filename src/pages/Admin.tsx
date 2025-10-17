@@ -103,6 +103,7 @@ function mapApiArtistToAdminArtist(apiArtist: ApiArtist): Artist {
     socialMedia: apiArtist.socialMedia || [],
     embeddings: apiArtist.embeddings || [],
     genre: apiArtist.genre || '',
+    isBookable: apiArtist.isBookable || false,
     createdAt: apiArtist.createdAt,
     updatedAt: apiArtist.updatedAt
   };

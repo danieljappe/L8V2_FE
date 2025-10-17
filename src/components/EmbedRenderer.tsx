@@ -75,7 +75,7 @@ const EmbedRenderer: React.FC<EmbedRendererProps> = ({
   const getPlatformIcon = () => {
     switch (platform) {
       case 'spotify':
-        return <Music className="w-8 h-8 text-green-500" />;
+        return <Music className="w-100 h-8 text-green-500" />;
       case 'youtube':
         return <Youtube className="w-8 h-8 text-red-500" />;
       case 'soundcloud':
@@ -101,15 +101,8 @@ const EmbedRenderer: React.FC<EmbedRendererProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 ${className}`}
+      className={`bg-white/5 backdrop-blur-sm rounded-xl p-0 border border-white/10 ${className}`}
     >
-      {title && (
-        <div className="flex items-center space-x-2 mb-4">
-          {getPlatformIcon()}
-          <h3 className="text-white font-medium">{title}</h3>
-        </div>
-      )}
-      
       <div className="relative">
         {!isLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/5 rounded-lg">

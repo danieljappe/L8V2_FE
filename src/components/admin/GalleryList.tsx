@@ -158,6 +158,7 @@ function GalleryForm({ item, onSubmit, onCancel }: {
   });
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [fileUploaded, setFileUploaded] = useState(false);
 
   // Update form data when item changes
   useEffect(() => {
@@ -185,13 +186,42 @@ function GalleryForm({ item, onSubmit, onCancel }: {
     setUploading(true);
     setUploadError(null);
     try {
-      const result = await apiService.uploadGalleryImage(file);
+      // Create FormData with file and all form data
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
+      uploadFormData.append('title', formData.caption || file.name);
+      uploadFormData.append('description', formData.caption || file.name);
+      uploadFormData.append('category', formData.category);
+      uploadFormData.append('tags', JSON.stringify(formData.tags));
+      uploadFormData.append('uploadedBy', formData.photographer || 'Admin');
+      
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/gallery/upload`, {
+        method: 'POST',
+        body: uploadFormData,
+        headers,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Image upload failed');
+      }
+      
+      const result = await response.json();
       setFormData(prev => ({
         ...prev,
-        filename: result.filename,
-        url: result.url,
+        filename: result.galleryImage.filename,
+        url: result.galleryImage.url,
+        caption: result.galleryImage.caption,
+        category: result.galleryImage.category,
+        photographer: result.galleryImage.photographer,
+        tags: result.galleryImage.tags,
+        isPublished: result.galleryImage.isPublished,
+        orderIndex: result.galleryImage.orderIndex,
         // Optionally set thumbnailUrl, mediumUrl, largeUrl if backend returns them
       }));
+      setFileUploaded(true);
     } catch (err: any) {
       setUploadError(err.message || 'Upload failed');
     } finally {
@@ -201,7 +231,19 @@ function GalleryForm({ item, onSubmit, onCancel }: {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ ...formData, updatedAt: new Date().toISOString() });
+    
+    // If we're adding a new item and a file was uploaded, the backend already created the record
+    // We just need to close the form since the record is already created
+    if (!item && fileUploaded) {
+      // For new items with file upload, the record is already created, just close the form
+      onCancel();
+    } else if (item) {
+      // For editing existing items, update the record
+      onSubmit({ ...formData, updatedAt: new Date().toISOString() });
+    } else {
+      // For new items without file upload, create a new record
+      onSubmit({ ...formData, updatedAt: new Date().toISOString() });
+    }
   };
 
   return (

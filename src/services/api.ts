@@ -191,6 +191,7 @@ export interface Artist {
   }>;
   embeddings?: Embedding[];
   genre?: string;
+  isBookable: boolean;
   createdAt: string;
   updatedAt: string;
 }

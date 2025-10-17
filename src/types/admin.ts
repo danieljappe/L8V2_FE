@@ -52,6 +52,7 @@ export interface Artist {
     createdAt: string;
   }>;
   genre?: string;
+  isBookable: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -48,8 +48,8 @@ const BookingArtists: React.FC = () => {
                          (artist.bio && artist.bio.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          (artist.genre && artist.genre.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesGenre = genreFilter === 'all' || artist.genre === genreFilter;
-    // Note: Price and availability filters would need additional data fields
-    return matchesSearch && matchesGenre;
+    const isBookable = artist.isBookable;
+    return matchesSearch && matchesGenre && isBookable;
   });
 
   // Get unique genres for filter
