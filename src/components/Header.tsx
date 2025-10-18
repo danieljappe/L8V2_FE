@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Image, Users, Settings } from 'lucide-react';
+import { Menu, X, Music, Calendar, Info, Phone, Image, Users, Settings } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -73,9 +73,9 @@ const Header: React.FC = () => {
   };
 
   const socialLinks = [
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com' },
-    { name: 'Facebook', icon: Facebook, href: 'https://facebook.com' },
-    { name: 'YouTube', icon: Youtube, href: 'https://youtube.com' }
+    { name: 'Instagram', icon: '/icons/Instagram_icon.png', href: 'https://www.instagram.com/aldrigl8/', size: 'w-5 h-5', padding: 'p-2' },
+    { name: 'Facebook', icon: '/icons/facebook_icon.png', href: 'https://www.facebook.com/profile.php?id=61556066605549', size: 'w-5 h-5', padding: 'p-2' },
+    { name: 'TikTok', icon: '/icons/tiktokicon.png', href: 'https://www.tiktok.com/@aldrigl8', size: 'w-8 h-8', padding: 'p-0.5' }
   ];
 
   return (
@@ -168,7 +168,7 @@ const Header: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm md:hidden z-40"
             />
 
             {/* Menu Panel */}
@@ -177,13 +177,13 @@ const Header: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`fixed top-0 right-0 h-full w-[240px] bg-gradient-to-br backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden ${
+              className={`fixed top-0 right-0 h-screen w-full max-w-[280px] bg-gradient-to-br backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden z-50 ${
                 getPlatformFromPath() === 'booking' 
                   ? 'from-booking-dark/95 via-booking-dark/95 to-booking-teal-dark/95'
                   : 'from-l8-dark/95 via-l8-blue-dark/95 to-l8-blue/95'
               }`}
             >
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col h-full pt-20">
                 {/* Menu Header */}
                 <div className="p-4 border-b border-white/10">
                   <div className="flex items-center justify-between">
@@ -258,7 +258,6 @@ const Header: React.FC = () => {
                 <div className="p-4 border-t border-white/10">
                   <div className="flex justify-center space-x-4">
                     {socialLinks.map((social) => {
-                      const Icon = social.icon;
                       return (
                         <motion.a
                           key={social.name}
@@ -267,9 +266,13 @@ const Header: React.FC = () => {
                           rel="noopener noreferrer"
                           whileHover={{ scale: 1.1, y: -2 }}
                           whileTap={{ scale: 0.95 }}
-                          className="p-2 bg-white/10 hover:bg-white/20 rounded-xl text-white/60 hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                          className={`${social.padding} bg-white/10 hover:bg-white/20 rounded-xl text-white/60 hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl`}
                         >
-                          <Icon className="w-5 h-5" />
+                          <img 
+                            src={social.icon} 
+                            alt={social.name} 
+                            className={`${social.size} object-contain`}
+                          />
                         </motion.a>
                       );
                     })}

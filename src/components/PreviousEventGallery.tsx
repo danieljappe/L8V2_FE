@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Heart, Share2 } from 'lucide-react';
+import { ArrowRight, Play, Share2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import { useGalleryImages, useEvents } from '../hooks/useApi';
-import { GalleryImage, Event } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
+import { GalleryImage } from '../services/api';
 
 const PreviousEventGallery: React.FC = () => {
+  const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
   // Fetch gallery images and events from API
   const { data: galleryImages, loading: galleryLoading, error: galleryError } = useGalleryImages();
   const { data: events, loading: eventsLoading, error: eventsError } = useEvents();
@@ -47,19 +52,38 @@ const PreviousEventGallery: React.FC = () => {
     !recentPastEvent || img.eventId === recentPastEvent.id
   ) || [];
 
-  // Use fallback images if no gallery images are available
-  const displayImages = eventGalleryImages.length > 0 ? eventGalleryImages : [
-    { id: '1', url: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'DJ performing' } as Partial<GalleryImage>,
-    { id: '2', url: 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'Crowd dancing' } as Partial<GalleryImage>,
-    { id: '3', url: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'Stage lights' } as Partial<GalleryImage>,
-    { id: '4', url: 'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'Concert atmosphere' } as Partial<GalleryImage>,
-  ];
+  // Use actual gallery images, sorted by orderIndex
+  const displayImages = eventGalleryImages
+    .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))
+    .slice(0, 4); // Show only the first 4 images
+
+  // Modal handlers
+  const handleImageClick = (image: GalleryImage, index: number) => {
+    setSelectedImage(image);
+    setCurrentImageIndex(index);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedImage(null);
+  };
+
+  const handlePreviousImage = () => {
+    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : displayImages.length - 1;
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(displayImages[newIndex]);
+  };
+
+  const handleNextImage = () => {
+    const newIndex = currentImageIndex < displayImages.length - 1 ? currentImageIndex + 1 : 0;
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(displayImages[newIndex]);
+  };
 
   // Show loading state
   if (galleryLoading || eventsLoading) {
     return (
       <section id="gallery" className="min-h-screen flex items-center justify-center p-4 snap-start">
-        <LoadingSpinner size="lg" text="Loading gallery..." />
+        <LoadingSpinner size="lg" text="Indlæser galleri..." />
       </section>
     );
   }
@@ -69,12 +93,12 @@ const PreviousEventGallery: React.FC = () => {
     return (
       <section id="gallery" className="min-h-screen flex items-center justify-center p-4 snap-start">
         <div className="text-center">
-          <p className="text-red-400 mb-4">Failed to load gallery</p>
+          <p className="text-red-400 mb-4">Kunne ikke indlæse galleri</p>
           <button 
             onClick={() => window.location.reload()}
             className="bg-l8-blue hover:bg-l8-blue-dark text-white px-4 py-2 rounded-lg"
           >
-            Retry
+            Prøv igen
           </button>
         </div>
       </section>
@@ -105,15 +129,15 @@ const PreviousEventGallery: React.FC = () => {
             variants={itemVariants}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4"
           >
-            Last Event Highlights
+            Genoplev sidste events højdepunkter
           </motion.h2>
           <motion.p 
             variants={itemVariants}
             className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4"
           >
             {recentPastEvent 
-              ? `Relive the magic of "${recentPastEvent.title}" - our most recent event with incredible performances and unforgettable moments.`
-              : 'Relive the magic of our most electrifying events with incredible performances and unforgettable moments.'
+              ? `Genoplev magien fra vores seneste event "${recentPastEvent.title}" `
+              : 'Genoplev magien fra vores mest elektriserende events med utrolige optrædener og uforglemmelige øjeblikke.'
             }
           </motion.p>
         </motion.div>
@@ -132,26 +156,19 @@ const PreviousEventGallery: React.FC = () => {
                 variants={itemVariants}
                 className="text-xl sm:text-2xl font-bold text-white"
               >
-                {recentPastEvent?.title || 'Recent Event'}
+                {recentPastEvent?.title || 'Seneste Event'}
               </motion.h3>
               <motion.p 
                 variants={itemVariants}
                 className="text-white/60 text-sm sm:text-base"
               >
                 {recentPastEvent 
-                  ? `${formatEventDate(recentPastEvent.date)} • ${recentPastEvent.venue?.name || 'Venue'}`
-                  : 'Recent event highlights'
+                  ? `${formatEventDate(recentPastEvent.date)} • ${recentPastEvent.venue?.name || 'Lokation'}`
+                  : 'Seneste event højdepunkter'
                 }
               </motion.p>
             </div>
             <div className="flex items-center space-x-2">
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-              >
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -163,22 +180,24 @@ const PreviousEventGallery: React.FC = () => {
           </motion.div>
 
           {/* Gallery Grid */}
-          <motion.div 
-            variants={containerVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
-          >
-            {displayImages.slice(0, 4).map((image, index) => (
+          {displayImages.length > 0 ? (
+            <motion.div 
+              variants={containerVariants}
+              className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
+            >
+              {displayImages.map((image, index) => (
               <motion.div 
                 key={image.id}
                 variants={itemVariants}
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 className="relative group cursor-pointer"
+                onClick={() => handleImageClick(image, index)}
               >
                 <div className="aspect-square rounded-2xl overflow-hidden">
                   <motion.img
                     src={image.url ? constructFullUrl(image.url) : ''}
-                    alt={image.caption || `Gallery image ${index + 1}`}
+                    alt={image.caption || `Galleri billede ${index + 1}`}
                     className="w-full h-full object-cover"
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.3 }}
@@ -206,17 +225,26 @@ const PreviousEventGallery: React.FC = () => {
               </motion.div>
             ))}
           </motion.div>
+          ) : (
+            <motion.div 
+              variants={itemVariants}
+              className="text-center py-8 mb-4 sm:mb-6"
+            >
+              <p className="text-white/60 text-sm sm:text-base">
+                Ingen galleri billeder tilgængelige for dette event
+              </p>
+            </motion.div>
+          )}
 
           {/* Stats */}
           <motion.div 
             variants={containerVariants}
-            className="grid grid-cols-3 gap-4 mb-4 sm:mb-6"
+            className="grid grid-cols-2 gap-4 mb-4 sm:mb-6"
           >
             {[
-              { value: recentPastEvent?.venue?.capacity ? `${Math.floor(recentPastEvent.venue.capacity * 0.8)}` : '2.5K', label: 'Attendees' },
-              { value: recentPastEvent?.eventArtists?.length?.toString() || '6', label: 'Artists' },
-              { value: '8hrs', label: 'Duration' }
-            ].map((stat, index) => (
+              { value: recentPastEvent?.eventArtists?.length?.toString() || '6', label: 'Kunstnere' },
+              { value: '8t', label: 'Varighed' }
+            ].map((stat) => (
               <motion.div 
                 key={stat.label}
                 variants={itemVariants}
@@ -239,27 +267,91 @@ const PreviousEventGallery: React.FC = () => {
             ))}
           </motion.div>
 
-          {/* View More Button */}
+          {/* Action Buttons */}
           <motion.div 
             variants={itemVariants}
-            className="text-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <motion.button 
-              whileHover={{ scale: 1.05, x: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all duration-300 border border-white/20 text-sm sm:text-base"
-            >
-              <span>View Full Gallery</span>
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
+            {recentPastEvent && (
+              <motion.button 
+                whileHover={{ scale: 1.05, x: 5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate(`/events/${recentPastEvent.id}`)}
+                className="inline-flex items-center space-x-2 bg-l8-blue hover:bg-l8-blue-dark text-white font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all duration-300 border border-l8-blue/20 text-sm sm:text-base"
               >
-                <ArrowRight className="w-4 h-4" />
-              </motion.div>
-            </motion.button>
+                <span>Se Event</span>
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </motion.div>
+              </motion.button>
+            )}
+            
           </motion.div>
         </motion.div>
       </motion.div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+          onClick={handleCloseModal}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="relative max-w-6xl max-h-[90vh] bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={handleCloseModal}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Navigation buttons */}
+            {displayImages.length > 1 && (
+              <>
+                <button
+                  onClick={handlePreviousImage}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={handleNextImage}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+            
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <img
+                src={selectedImage.url ? constructFullUrl(selectedImage.url) : ''}
+                alt={selectedImage.caption || `Galleri billede ${currentImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                style={{ maxHeight: 'calc(100vh - 80px)' }}
+              />
+            </div>
+            
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center bg-black bg-opacity-50 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <p className="text-white text-sm font-medium">
+                {selectedImage.caption || `Galleri billede ${currentImageIndex + 1}`}
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </section>
   );
 };
