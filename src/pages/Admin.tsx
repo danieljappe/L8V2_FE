@@ -133,7 +133,7 @@ function mapApiGalleryToAdminGallery(apiGallery: any): GalleryItem {
     mediumUrl: constructFullUrl(apiGallery.mediumUrl),
     largeUrl: constructFullUrl(apiGallery.largeUrl),
     caption: apiGallery.caption || '',
-    event: apiGallery.eventId || '',
+    eventId: apiGallery.eventId || '',
     photographer: apiGallery.photographer || '',
     tags: apiGallery.tags || [],
     category: apiGallery.category || 'event',
@@ -371,7 +371,7 @@ export default function Admin() {
     // Convert admin GalleryItem to API GalleryImage format
     const apiGalleryData = {
       ...galleryData,
-      eventId: galleryData.event || undefined,
+      eventId: galleryData.eventId || undefined,
     };
     const res = await apiService.createGalleryImage(apiGalleryData);
     if (res.data) {
@@ -386,7 +386,7 @@ export default function Admin() {
     // Convert admin GalleryItem to API GalleryImage format
     const apiGalleryData = {
       ...galleryData,
-      eventId: galleryData.event || undefined,
+      eventId: galleryData.eventId || undefined,
     };
     const res = await apiService.updateGalleryImage(id, apiGalleryData);
     if (res.data) {

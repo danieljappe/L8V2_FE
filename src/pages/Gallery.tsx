@@ -1,20 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Calendar, User, Tag, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Camera, Calendar, User, Tag, ArrowLeft, ArrowRight, MapPin, Clock, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { useGalleryImages } from '../hooks/useApi';
-import { GalleryImage } from '../services/api';
+import { GalleryImage, Event, apiService } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
-import ImagePreview from '../components/admin/ImagePreview';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Gallery: React.FC = () => {
+  const navigate = useNavigate();
   const { data: images, loading, error } = useGalleryImages();
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [eventMap, setEventMap] = useState<Record<string, Event>>({});
 
   // Filter published images - temporarily show all images for debugging
   const publishedImages = images || [];
+
+  // Fetch events for event linking
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await apiService.getEvents();
+        if (response.data) {
+          // Create event map for quick lookup
+          const map: Record<string, Event> = {};
+          response.data.forEach(event => {
+            map[event.id] = event;
+          });
+          setEventMap(map);
+        }
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -40,24 +62,23 @@ const Gallery: React.FC = () => {
     }
   };
 
-  const pageVariants = {
-    initial: {
-      opacity: 0,
-      y: 20
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
+
+  const handleImageClick = (image: GalleryImage, index: number, event?: React.MouseEvent) => {
+    // If the image is linked to an event and the click is on the event info area, navigate to event
+    if (image.eventId && event?.target instanceof HTMLElement) {
+      const eventInfoElement = event.target.closest('[data-event-info]');
+      if (eventInfoElement) {
+        navigate(`/events/${image.eventId}`);
+        return;
       }
     }
-  };
-
-  const handleImageClick = (image: GalleryImage, index: number) => {
+    
     setSelectedImage(image);
     setCurrentImageIndex(index);
+  };
+
+  const handleEventNavigation = (eventId: string) => {
+    navigate(`/events/${eventId}`);
   };
 
   const handleCloseModal = () => {
@@ -167,57 +188,39 @@ const Gallery: React.FC = () => {
                 variants={containerVariants}
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8"
               >
-                {publishedImages.map((image, index) => (
-                  <motion.div
-                    key={image.id}
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleImageClick(image, index)}
-                    className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden shadow-2xl cursor-pointer transition-all duration-300 group"
-                  >
-                    <div className="relative aspect-square overflow-hidden">
-                      <img
-                        src={constructFullUrl(image.url)}
-                        alt={image.caption || 'Gallery image'}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                        <p className="text-sm font-medium">Klik for at se større</p>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-white font-semibold text-lg mb-3 group-hover:text-purple-300 transition-colors duration-300">
-                        {image.caption || 'Untitled'}
-                      </h3>
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2 text-white/70">
-                          <Calendar className="w-4 h-4 text-purple-300" />
-                          <span className="text-sm">
-                            {new Date(image.createdAt).toLocaleDateString('da-DK', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </span>
+                {publishedImages.map((image, index) => {
+                  const linkedEvent = image.eventId ? eventMap[image.eventId] : null;
+                  return (
+                    <motion.div
+                      key={image.id}
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.02, y: -5 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={(e) => handleImageClick(image, index, e)}
+                      className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden shadow-2xl cursor-pointer transition-all duration-300 group"
+                    >
+                      <div className="relative aspect-square overflow-hidden">
+                        <img
+                          src={constructFullUrl(image.url)}
+                          alt={image.caption || 'Gallery image'}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        {linkedEvent && (
+                          <div className="absolute top-3 left-3">
+                            <span className="bg-blue-600 text-white px-3 py-1 text-xs font-medium rounded-full flex items-center shadow-lg">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Event
+                            </span>
+                          </div>
+                        )}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                          <p className="text-sm font-medium">Klik for at se større</p>
                         </div>
-                        {image.photographer && (
-                          <div className="flex items-center space-x-2 text-white/70">
-                            <User className="w-4 h-4 text-purple-300" />
-                            <span className="text-sm">{image.photographer}</span>
-                          </div>
-                        )}
-                        {image.category && (
-                          <div className="flex items-center space-x-2 text-white/70">
-                            <Tag className="w-4 h-4 text-purple-300" />
-                            <span className="text-sm">{image.category}</span>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </motion.div>
             )}
           </motion.div>
@@ -280,6 +283,38 @@ const Gallery: React.FC = () => {
               <h3 className="text-white font-semibold text-xl mb-3">
                 {selectedImage.caption || 'Untitled'}
               </h3>
+              
+              {/* Event Information in Modal */}
+              {selectedImage.eventId && eventMap[selectedImage.eventId] && (
+                <div className="mb-6 p-4 bg-blue-500/20 border border-blue-400/30 rounded-2xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center text-blue-200 font-medium">
+                      <Calendar className="w-5 h-5 mr-2" />
+                      {eventMap[selectedImage.eventId].title}
+                    </div>
+                    <button
+                      onClick={() => handleEventNavigation(selectedImage.eventId!)}
+                      className="flex items-center text-blue-300 hover:text-blue-200 transition-colors duration-200"
+                    >
+                      <span className="text-sm mr-1">Se event</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm text-blue-300">
+                      <Clock className="w-4 h-4 mr-2" />
+                      {new Date(eventMap[selectedImage.eventId].date).toLocaleDateString('da-DK')} kl. {eventMap[selectedImage.eventId].startTime}
+                    </div>
+                    {eventMap[selectedImage.eventId].venue && (
+                      <div className="flex items-center text-sm text-blue-300">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        {eventMap[selectedImage.eventId].venue?.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-white/70">
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4 text-purple-300" />

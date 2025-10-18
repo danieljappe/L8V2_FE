@@ -327,9 +327,26 @@ export const apiService = {
   removeArtistFromEvent: (eventId: string, artistId: string) => apiClient.delete<{ message: string; removedArtist: string; eventTitle: string }>(`/event-artists/event/${eventId}/artist/${artistId}`),
 
   // Gallery image upload
-  uploadGalleryImage: async (file: File) => {
+  uploadGalleryImage: async (file: File, metadata?: {
+    title?: string;
+    description?: string;
+    category?: string;
+    tags?: string[];
+    uploadedBy?: string;
+    eventId?: string;
+  }) => {
     const formData = new FormData();
     formData.append('image', file);
+    
+    if (metadata) {
+      if (metadata.title) formData.append('title', metadata.title);
+      if (metadata.description) formData.append('description', metadata.description);
+      if (metadata.category) formData.append('category', metadata.category);
+      if (metadata.tags) formData.append('tags', JSON.stringify(metadata.tags));
+      if (metadata.uploadedBy) formData.append('uploadedBy', metadata.uploadedBy);
+      if (metadata.eventId) formData.append('eventId', metadata.eventId);
+    }
+    
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
     const response = await fetch(`${API_BASE_URL}/gallery/upload`, {

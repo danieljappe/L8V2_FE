@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Image, Tag, User } from 'lucide-react';
+import { Plus, Edit, Trash2, Tag, User, Calendar, MapPin, Clock } from 'lucide-react';
 import { GalleryItem } from '../../types/admin';
-import { apiService } from '../../services/api';
+import { apiService, Event } from '../../services/api';
 
 interface GalleryListProps {
   gallery: GalleryItem[];
@@ -18,6 +18,33 @@ export default function GalleryList({
 }: GalleryListProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [eventMap, setEventMap] = useState<Record<string, Event>>({});
+
+  // Fetch events for dropdown and create event map
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoadingEvents(true);
+      try {
+        const response = await apiService.getEvents();
+        if (response.data) {
+          setEvents(response.data);
+          // Create event map for quick lookup
+          const map: Record<string, Event> = {};
+          response.data.forEach(event => {
+            map[event.id] = event;
+          });
+          setEventMap(map);
+        }
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   const handleEdit = (item: GalleryItem) => {
     setEditingItem(item);
@@ -81,66 +108,118 @@ export default function GalleryList({
           item={editingItem}
           onSubmit={handleFormSubmit}
           onCancel={handleCancel}
+          onAddGallery={onAddGallery}
+          events={events}
+          loadingEvents={loadingEvents}
         />
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {gallery.map((item) => (
-          <div key={item.id} className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-              {item.url && (
-                <img
-                  src={item.url}
-                  alt={item.caption || item.filename}
-                  className="w-full h-48 object-cover"
-                />
-              )}
-            </div>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold text-gray-900">{item.caption || item.filename}</h3>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(item.category)}`}>
-                  {item.category}
-                </span>
-              </div>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.photographer}</p>
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-500">
-                  <User className="w-4 h-4 mr-2" />
-                  {item.photographer}
-                </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Tag className="w-4 h-4 mr-2" />
-                  {(item.tags || []).join(', ')}
+        {gallery.map((item) => {
+          const linkedEvent = item.eventId ? eventMap[item.eventId] : null;
+          return (
+            <div key={item.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="aspect-w-16 aspect-h-9 bg-gray-200 relative">
+                {item.url && (
+                  <img
+                    src={item.url}
+                    alt={item.caption || item.filename}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                {linkedEvent && (
+                  <div className="absolute top-2 left-2">
+                    <span className="bg-blue-600 text-white px-2 py-1 text-xs font-medium rounded-full flex items-center">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Event
+                    </span>
+                  </div>
+                )}
+                <div className="absolute top-2 right-2">
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(item.category)}`}>
+                    {item.category}
+                  </span>
                 </div>
               </div>
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => handleEdit(item)}
-                  className="text-blue-600 hover:text-blue-900 p-1"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="text-red-600 hover:text-red-900 p-1"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              <div className="p-6">
+                <div className="mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                    {item.caption || item.filename}
+                  </h3>
+                  {linkedEvent && (
+                    <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center text-sm font-medium text-blue-900 mb-1">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        {linkedEvent.title}
+                      </div>
+                      <div className="flex items-center text-xs text-blue-700">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {new Date(linkedEvent.date).toLocaleDateString()} at {linkedEvent.startTime}
+                      </div>
+                      {linkedEvent.venue && (
+                        <div className="flex items-center text-xs text-blue-700 mt-1">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {linkedEvent.venue.name}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  {item.photographer && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <User className="w-4 h-4 mr-2" />
+                      <span className="truncate">{item.photographer}</span>
+                    </div>
+                  )}
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Tag className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{(item.tags || []).join(', ')}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>Order: {item.orderIndex}</span>
+                    <span className={`px-2 py-1 rounded-full ${item.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {item.isPublished ? 'Published' : 'Draft'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                    title="Edit image"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                    title="Delete image"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
 // Simple GalleryForm component
-function GalleryForm({ item, onSubmit, onCancel }: {
+function GalleryForm({ item, onSubmit, onCancel, onAddGallery, events, loadingEvents }: {
   item?: GalleryItem | null;
   onSubmit: (galleryData: Omit<GalleryItem, 'id' | 'createdAt'>) => void;
   onCancel: () => void;
+  onAddGallery: (galleryData: Omit<GalleryItem, 'id' | 'createdAt'>) => void;
+  events: Event[];
+  loadingEvents: boolean;
 }) {
   const [formData, setFormData] = useState({
     filename: item?.filename || '',
@@ -149,7 +228,7 @@ function GalleryForm({ item, onSubmit, onCancel }: {
     mediumUrl: item?.mediumUrl || '',
     largeUrl: item?.largeUrl || '',
     caption: item?.caption || '',
-    event: item?.event || '',
+    eventId: item?.eventId || '',
     photographer: item?.photographer || '',
     tags: item?.tags || [],
     category: item?.category || 'event' as GalleryItem['category'],
@@ -158,7 +237,7 @@ function GalleryForm({ item, onSubmit, onCancel }: {
   });
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [fileUploaded, setFileUploaded] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Update form data when item changes
   useEffect(() => {
@@ -170,7 +249,7 @@ function GalleryForm({ item, onSubmit, onCancel }: {
         mediumUrl: item.mediumUrl || '',
         largeUrl: item.largeUrl || '',
         caption: item.caption || '',
-        event: item.event || '',
+        eventId: item.eventId || '',
         photographer: item.photographer || '',
         tags: item.tags || [],
         category: item.category || 'event',
@@ -180,63 +259,62 @@ function GalleryForm({ item, onSubmit, onCancel }: {
     }
   }, [item]);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setUploadError(null);
-    try {
-      // Create FormData with file and all form data
-      const uploadFormData = new FormData();
-      uploadFormData.append('image', file);
-      uploadFormData.append('title', formData.caption || file.name);
-      uploadFormData.append('description', formData.caption || file.name);
-      uploadFormData.append('category', formData.category);
-      uploadFormData.append('tags', JSON.stringify(formData.tags));
-      uploadFormData.append('uploadedBy', formData.photographer || 'Admin');
-      
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
-      
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/gallery/upload`, {
-        method: 'POST',
-        body: uploadFormData,
-        headers,
-      });
-      
-      if (!response.ok) {
-        throw new Error('Image upload failed');
-      }
-      
-      const result = await response.json();
+    if (file) {
+      setSelectedFile(file);
+      setUploadError(null);
+      // Update form data with file name as default caption
       setFormData(prev => ({
         ...prev,
-        filename: result.galleryImage.filename,
-        url: result.galleryImage.url,
-        caption: result.galleryImage.caption,
-        category: result.galleryImage.category,
-        photographer: result.galleryImage.photographer,
-        tags: result.galleryImage.tags,
-        isPublished: result.galleryImage.isPublished,
-        orderIndex: result.galleryImage.orderIndex,
-        // Optionally set thumbnailUrl, mediumUrl, largeUrl if backend returns them
+        caption: prev.caption || file.name,
       }));
-      setFileUploaded(true);
-    } catch (err: any) {
-      setUploadError(err.message || 'Upload failed');
-    } finally {
-      setUploading(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // If we're adding a new item and a file was uploaded, the backend already created the record
-    // We just need to close the form since the record is already created
-    if (!item && fileUploaded) {
-      // For new items with file upload, the record is already created, just close the form
-      onCancel();
+    if (!item && selectedFile) {
+      // For new items with file upload, upload the file and create the record
+      setUploading(true);
+      setUploadError(null);
+      try {
+        const result = await apiService.uploadGalleryImage(selectedFile, {
+          title: formData.caption || selectedFile.name,
+          description: formData.caption || selectedFile.name,
+          category: formData.category,
+          tags: formData.tags,
+          uploadedBy: formData.photographer || 'Admin',
+          eventId: formData.eventId || undefined,
+        });
+        
+        // Create the gallery item with uploaded data
+        const newGalleryItem = {
+          filename: result.galleryImage.filename,
+          url: result.galleryImage.url,
+          thumbnailUrl: result.galleryImage.thumbnailUrl,
+          mediumUrl: result.galleryImage.mediumUrl,
+          largeUrl: result.galleryImage.largeUrl,
+          caption: result.galleryImage.caption,
+          eventId: result.galleryImage.eventId,
+          photographer: result.galleryImage.photographer,
+          tags: result.galleryImage.tags,
+          category: result.galleryImage.category,
+          orderIndex: result.galleryImage.orderIndex,
+          isPublished: result.galleryImage.isPublished,
+          id: result.galleryImage.id,
+          createdAt: result.galleryImage.createdAt,
+          updatedAt: result.galleryImage.updatedAt || result.galleryImage.createdAt,
+        };
+        
+        onAddGallery(newGalleryItem);
+        onCancel(); // Close the form since the item is now added
+      } catch (err: any) {
+        setUploadError(err.message || 'Upload failed');
+      } finally {
+        setUploading(false);
+      }
     } else if (item) {
       // For editing existing items, update the record
       onSubmit({ ...formData, updatedAt: new Date().toISOString() });
@@ -285,6 +363,27 @@ function GalleryForm({ item, onSubmit, onCancel }: {
           </div>
           
           <div>
+            <label htmlFor="gallery-event" className="block text-sm font-medium text-gray-700 mb-1">Event (Optional)</label>
+            <select
+              id="gallery-event"
+              value={formData.eventId}
+              onChange={(e) => setFormData({...formData, eventId: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value="">No event selected</option>
+              {loadingEvents ? (
+                <option disabled>Loading events...</option>
+              ) : (
+                events.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.title} - {new Date(event.date).toLocaleDateString()}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+          
+          <div>
             <label htmlFor="gallery-caption" className="block text-sm font-medium text-gray-700 mb-1">Caption</label>
             <input
               id="gallery-caption"
@@ -305,6 +404,9 @@ function GalleryForm({ item, onSubmit, onCancel }: {
               onChange={handleFileChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
+            {selectedFile && (
+              <p className="text-xs text-green-600 mt-1">Selected: {selectedFile.name}</p>
+            )}
             {uploading && <p className="text-xs text-blue-600 mt-1">Uploading...</p>}
             {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
             {formData.url && (
@@ -372,9 +474,14 @@ function GalleryForm({ item, onSubmit, onCancel }: {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={uploading}
+              className={`flex-1 px-4 py-2 rounded-lg ${
+                uploading 
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
             >
-              {item ? 'Update' : 'Create'}
+              {uploading ? 'Uploading...' : (item ? 'Update' : 'Create')}
             </button>
           </div>
         </form>

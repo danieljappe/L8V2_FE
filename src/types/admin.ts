@@ -78,7 +78,7 @@ export interface GalleryItem {
   mediumUrl?: string;
   largeUrl?: string;
   caption?: string;
-  event?: string | null;
+  eventId?: string | null;
   photographer?: string;
   tags?: string[];
   category: 'event' | 'venue' | 'artist' | 'other';
