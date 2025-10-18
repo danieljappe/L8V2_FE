@@ -73,31 +73,7 @@ const EventList: React.FC = () => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  // Removed unused getColorClasses function
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 50, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
-      }
-    }
-  };
+  // Removed unused animation variants for better mobile compatibility
 
   // Show loading state
   if (loading) {
@@ -293,44 +269,30 @@ const EventList: React.FC = () => {
 
   return (
     <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-16">
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        className="container mx-auto max-w-6xl w-full"
-      >
-        <motion.div variants={itemVariants} className="text-center mb-8 sm:mb-12">
-          <motion.h1 
-            variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4"
-          >
+      {/* Debug info for iPhone */}
+      <div className="fixed top-0 left-0 bg-black/80 text-white text-xs p-2 z-50 pointer-events-none">
+        Events: {sortedEvents.length} | Loading: {loading.toString()} | Error: {error || 'none'}
+      </div>
+      
+      <div className="container mx-auto max-w-6xl w-full opacity-100">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
             Alle Begivenheder
-          </motion.h1>
-          <motion.p 
-            variants={itemVariants}
-            className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4"
-          >
+          </h1>
+          <p className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4">
             Udforsk vores kommende og tidligere begivenheder. Find din næste fantastiske oplevelse eller relive magiske øjeblikke fra fortiden.
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
-        <motion.div 
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full">
           {sortedEvents.map((event) => (
-            <motion.div
+            <div
               key={event.id}
-              variants={itemVariants}
-              whileHover={{ scale: 1.02, y: -5 }}
-              whileTap={{ scale: 0.98 }}
               onClick={() => navigate(`/events/${event.id}`)}
-              className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl cursor-pointer transition-all duration-300 group"
+              className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl cursor-pointer transition-all duration-300 group hover:scale-105 active:scale-95"
             >
               {/* Event Status Badge */}
-              <motion.div
-                variants={itemVariants}
+              <div
                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-4 ${
                   event.status === 'upcoming' 
                     ? 'bg-green-500/20 text-green-200 border border-green-300/30' 
@@ -338,21 +300,17 @@ const EventList: React.FC = () => {
                 }`}
               >
                 {event.status === 'upcoming' ? 'Kommende' : 'Afsluttet'}
-              </motion.div>
+              </div>
 
               {/* Event Title */}
-              <motion.h3 
-                variants={itemVariants}
+              <h3 
                 className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover:text-l8-beige transition-colors duration-300"
               >
                 {event.title}
-              </motion.h3>
+              </h3>
 
               {/* Event Details */}
-              <motion.div
-                variants={itemVariants}
-                className="space-y-3 mb-6"
-              >
+              <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3 text-white/80">
                   <Calendar className="w-4 h-4 text-l8-beige flex-shrink-0" />
                   <span className="text-sm">
@@ -372,15 +330,15 @@ const EventList: React.FC = () => {
                   <MapPin className="w-4 h-4 text-l8-beige flex-shrink-0" />
                   <span className="text-sm truncate">{event.venue?.name || 'TBA'}</span>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Artists Preview */}
               {event.eventArtists && event.eventArtists.length > 0 && (
-                <motion.div variants={itemVariants} className="mb-6">
-                  <motion.h4 className="text-sm font-semibold text-white/80 mb-3 flex items-center">
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-white/80 mb-3 flex items-center">
                     <Music className="w-4 h-4 mr-2 text-l8-beige" />
                     Kunstnere
-                  </motion.h4>
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {event.eventArtists.slice(0, 3).map((eventArtist) => (
                       <span 
@@ -396,33 +354,28 @@ const EventList: React.FC = () => {
                       </span>
                     )}
                   </div>
-                </motion.div>
+                </div>
               )}
 
               {/* Event Description */}
-              <motion.p 
-                variants={itemVariants}
-                className="text-white/70 text-sm leading-relaxed mb-6 line-clamp-3"
-              >
+              <p className="text-white/70 text-sm leading-relaxed mb-6 line-clamp-3">
                 {event.description}
-              </motion.p>
+              </p>
 
               {/* CTA Button - now just for style, not navigation */}
-              <motion.div variants={itemVariants} className="text-center">
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
+              <div className="text-center">
+                <button
                   className="bg-gradient-to-r from-l8-blue to-l8-blue-light hover:from-l8-blue-dark hover:to-l8-blue text-white font-semibold px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 w-full text-sm pointer-events-none"
                   tabIndex={-1}
                 >
                   <Ticket className="w-4 h-4" />
                   <span>{event.status === 'upcoming' ? 'Se Detaljer' : 'Se Opsummering'}</span>
-                </motion.button>
-              </motion.div>
-            </motion.div>
+                </button>
+              </div>
+            </div>
           ))}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 };

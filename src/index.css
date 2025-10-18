@@ -65,3 +65,48 @@
     margin-top: 0.75rem;
   }
 }
+
+/* iPhone-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific fixes */
+  .backdrop-blur-xl {
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+  
+  /* Fix for iOS Safari flexbox issues */
+  .flex {
+    display: -webkit-flex;
+    display: flex;
+  }
+  
+  /* Fix for iOS Safari grid issues */
+  .grid {
+    display: -webkit-grid;
+    display: grid;
+  }
+  
+  /* Ensure proper rendering on iOS */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Fix for iOS Safari viewport issues */
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Fix for iOS Safari transform issues */
+  .hover\:scale-105:hover {
+    -webkit-transform: scale(1.05);
+    transform: scale(1.05);
+  }
+  
+  .active\:scale-95:active {
+    -webkit-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+}
