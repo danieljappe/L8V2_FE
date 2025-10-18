@@ -4,13 +4,27 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, ArrowRight } from 'lucide-react';
 import UpcomingEvent from '../components/UpcomingEvent';
 import PreviousEventGallery from '../components/PreviousEventGallery';
+import { useSEO } from '../hooks/useSEO';
+import { StructuredData, createOrganizationSchema, createWebSiteSchema } from '../components/StructuredData';
 // No subdomain utilities needed
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
+  // SEO optimization
+  useSEO({
+    title: 'L8 Events - Uforglemmelige Musikkopplevelser',
+    description: 'L8 Events skaber uforglemmelige musikkopplevelser med elektronisk musik. Book kunstnere, deltag i vores begivenheder og oplev noget ekstraordinært. Professionel event management og booking service.',
+    keywords: 'L8 Events, elektronisk musik, event booking, kunstnere, musikkopplevelser, events, booking, musik, elektronisk, DJ, producer, l8events',
+    url: '/'
+  });
+
   return (
     <div className="min-h-screen overflow-x-hidden">
+      {/* Structured Data for SEO */}
+      <StructuredData data={createOrganizationSchema()} />
+      <StructuredData data={createWebSiteSchema()} />
+      
       {/* Main Content */}
       <main className="relative z-10 pt-6">
         <UpcomingEvent />

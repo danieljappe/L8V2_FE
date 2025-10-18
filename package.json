@@ -12,7 +12,8 @@
     "build:events": "cross-env VITE_PLATFORM=events vite build",
     "build:booking": "cross-env VITE_PLATFORM=booking vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
