@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Tag, User, Calendar, MapPin, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, Tag, User, Calendar, MapPin, Clock, Copy, Check } from 'lucide-react';
 import { GalleryItem } from '../../types/admin';
 import { apiService, Event } from '../../services/api';
 
@@ -21,6 +21,7 @@ export default function GalleryList({
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [eventMap, setEventMap] = useState<Record<string, Event>>({});
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   // Fetch events for dropdown and create event map
   useEffect(() => {
@@ -72,6 +73,28 @@ export default function GalleryList({
     setEditingItem(null);
   };
 
+  const handleCopyUrl = async (url: string) => {
+    try {
+      // Construct full URL if it's a relative path
+      const fullUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+      await navigator.clipboard.writeText(fullUrl);
+      setCopiedUrl(url);
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setCopiedUrl(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy URL:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2000);
+    }
+  };
+
   const getCategoryColor = (category: GalleryItem['category']) => {
     switch (category) {
       case 'event':
@@ -119,28 +142,50 @@ export default function GalleryList({
           const linkedEvent = item.eventId ? eventMap[item.eventId] : null;
           return (
             <div key={item.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="aspect-w-16 aspect-h-9 bg-gray-200 relative">
-                {item.url && (
-                  <img
-                    src={item.url}
-                    alt={item.caption || item.filename}
-                    className="w-full h-48 object-cover"
-                  />
-                )}
-                {linkedEvent && (
-                  <div className="absolute top-2 left-2">
-                    <span className="bg-blue-600 text-white px-2 py-1 text-xs font-medium rounded-full flex items-center">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      Event
-                    </span>
-                  </div>
-                )}
-                <div className="absolute top-2 right-2">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(item.category)}`}>
-                    {item.category}
-                  </span>
-                </div>
-              </div>
+                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 relative group">
+                        {item.url && (
+                          <img
+                            src={item.url}
+                            alt={item.caption || item.filename}
+                            className="w-full h-48 object-cover"
+                          />
+                        )}
+                        {linkedEvent && (
+                          <div className="absolute top-2 left-2">
+                            <span className="bg-blue-600 text-white px-2 py-1 text-xs font-medium rounded-full flex items-center">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Event
+                            </span>
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(item.category)}`}>
+                            {item.category}
+                          </span>
+                        </div>
+                        
+                        {/* Copy URL Button */}
+                        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopyUrl(item.url);
+                            }}
+                            className={`p-2 rounded-full shadow-lg transition-colors ${
+                              copiedUrl === item.url 
+                                ? 'bg-green-500 text-white' 
+                                : 'bg-black/70 text-white hover:bg-black/90'
+                            }`}
+                            title={copiedUrl === item.url ? 'URL copied!' : 'Copy image URL'}
+                          >
+                            {copiedUrl === item.url ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
               <div className="p-6">
                 <div className="mb-3">
                   <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
