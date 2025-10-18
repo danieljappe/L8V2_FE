@@ -34,3 +34,34 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+  /* Ensure proper mobile viewport handling */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Fix for mobile grid layouts */
+  .grid {
+    gap: 1rem;
+  }
+  
+  /* Ensure text is readable on mobile */
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  /* Fix for mobile touch interactions */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Ensure proper spacing on mobile */
+  .space-y-3 > * + * {
+    margin-top: 0.75rem;
+  }
+}

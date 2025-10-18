@@ -15,10 +15,38 @@ interface ProcessedEvent extends Event {
 
 const EventList: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<ProcessedEvent | null>(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const navigate = useNavigate();
 
   // Fetch events from API
   const { data: events, loading, error } = useEvents();
+
+  // Monitor network status
+  React.useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Debug logging for mobile issues
+  React.useEffect(() => {
+    console.log('EventList Debug:', {
+      loading,
+      error,
+      eventsCount: events?.length || 0,
+      userAgent: navigator.userAgent,
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
+  }, [loading, error, events]);
 
   // Process events data
   const processedEvents: ProcessedEvent[] = events?.map(event => ({
@@ -45,17 +73,7 @@ const EventList: React.FC = () => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  const getColorClasses = (color: string) => {
-    const colors = {
-      'l8-blue': 'bg-l8-blue/20 border-l8-blue/30 text-l8-blue-light',
-      'l8-beige': 'bg-l8-beige/20 border-l8-beige/30 text-l8-beige-light',
-      'l8-blue-light': 'bg-l8-blue-light/20 border-l8-blue-light/30 text-l8-blue',
-      'l8-beige-dark': 'bg-l8-beige-dark/20 border-l8-beige-dark/30 text-l8-beige',
-      'l8-blue-dark': 'bg-l8-blue-dark/20 border-l8-blue-dark/30 text-l8-blue-light',
-      'l8-beige-light': 'bg-l8-beige-light/20 border-l8-beige-light/30 text-l8-beige-dark'
-    };
-    return colors[color as keyof typeof colors] || colors['l8-blue'];
-  };
+  // Removed unused getColorClasses function
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -90,18 +108,53 @@ const EventList: React.FC = () => {
     );
   }
 
+  // Show offline state
+  if (!isOnline) {
+    return (
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 lg:pt-16">
+        <div className="text-center max-w-md mx-auto">
+          <p className="text-yellow-400 mb-4 text-lg">You're offline</p>
+          <p className="text-white/60 mb-6 text-sm">
+            Please check your internet connection and try again.
+          </p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-l8-blue hover:bg-l8-blue-dark text-white px-6 py-3 rounded-lg font-semibold w-full sm:w-auto"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   // Show error state
   if (error) {
     return (
       <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 lg:pt-16">
-        <div className="text-center">
-          <p className="text-red-400 mb-4">Failed to load events</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-l8-blue hover:bg-l8-blue-dark text-white px-4 py-2 rounded-lg"
-          >
-            Retry
-          </button>
+        <div className="text-center max-w-md mx-auto">
+          <p className="text-red-400 mb-4 text-lg">Failed to load events</p>
+          <p className="text-white/60 mb-6 text-sm">
+            Error: {error}
+          </p>
+          <div className="space-y-3">
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-l8-blue hover:bg-l8-blue-dark text-white px-6 py-3 rounded-lg font-semibold w-full sm:w-auto"
+            >
+              Retry
+            </button>
+            <button 
+              onClick={() => {
+                // Clear any cached data and retry
+                localStorage.clear();
+                window.location.reload();
+              }}
+              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold w-full sm:w-auto ml-0 sm:ml-3"
+            >
+              Clear Cache & Retry
+            </button>
+          </div>
         </div>
       </section>
     );
@@ -184,8 +237,8 @@ const EventList: React.FC = () => {
                 <Music className="w-5 h-5 mr-2 text-l8-beige" />
                 Kunstnere
               </motion.h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {selectedEvent.eventArtists?.map((eventArtist, index) => (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {selectedEvent.eventArtists?.map((eventArtist) => (
                   <motion.div
                     key={eventArtist.id}
                     className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10"
@@ -245,7 +298,7 @@ const EventList: React.FC = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="container mx-auto max-w-6xl"
+        className="container mx-auto max-w-6xl w-full"
       >
         <motion.div variants={itemVariants} className="text-center mb-8 sm:mb-12">
           <motion.h1 
@@ -264,7 +317,7 @@ const EventList: React.FC = () => {
 
         <motion.div 
           variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full"
         >
           {sortedEvents.map((event) => (
             <motion.div

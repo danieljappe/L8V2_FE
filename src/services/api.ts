@@ -1,5 +1,13 @@
 // API Base URL - adjust this based on your backend deployment
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (() => {
+  // Auto-detect environment
+  const currentOrigin = window.location.origin;
+  if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
+    return 'http://localhost:3000/api';
+  }
+  // Production fallback
+  return 'https://l8events.dk/api';
+})();
 
 // Helper function to construct full image URLs
 const constructImageUrl = (imageUrl: string | null | undefined): string => {

@@ -23,19 +23,21 @@ export function useApi<T>(
     error: null,
   });
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (retryCount = 0) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
       const result = await apiCall();
       
       if (result.error) {
+        console.error('API Error:', result.error);
         setState({
           data: null,
           loading: false,
           error: result.error,
         });
       } else if (result.data) {
+        console.log('API Success:', result.data);
         setState({
           data: result.data,
           loading: false,
@@ -43,6 +45,16 @@ export function useApi<T>(
         });
       }
     } catch (error) {
+      console.error('API Request Failed:', error);
+      
+      // Retry logic for network errors
+      if (retryCount < 2 && error instanceof Error && 
+          (error.message.includes('fetch') || error.message.includes('network'))) {
+        console.log(`Retrying API call (attempt ${retryCount + 1})`);
+        setTimeout(() => fetchData(retryCount + 1), 1000 * (retryCount + 1));
+        return;
+      }
+      
       setState({
         data: null,
         loading: false,
