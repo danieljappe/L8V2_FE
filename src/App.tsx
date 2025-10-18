@@ -9,6 +9,7 @@ import Artists from './pages/Artists';
 import Booking from './pages/Booking';
 import BookingHome from './pages/BookingHome';
 import BookingArtists from './pages/BookingArtists';
+import ArtistPage from './pages/ArtistPage';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Header from './components/Header';
@@ -60,6 +61,8 @@ const AppContent = () => {
             <Route path="/artists" element={<Artists />} />
             <Route path="/booking" element={<BookingHome />} />
             <Route path="/booking/artists" element={<BookingArtists />} />
+            <Route path="/booking/artists/:artistName" element={<ArtistPage />} />
+            <Route path="/booking/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
           </Routes>

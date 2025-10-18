@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Users, Music, Star, Search } from 'lucide-react';
 import { apiService, Artist } from '../services/api';
 import ArtistModal from '../components/ArtistModal';
@@ -13,6 +14,11 @@ const BookingArtists: React.FC = () => {
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [genreFilter, setGenreFilter] = useState<string>('all');
+
+  // Helper function to convert artist name to URL-friendly format
+  const getArtistUrl = (artistName: string) => {
+    return artistName.toLowerCase().replace(/\s+/g, '-');
+  };
 
   useEffect(() => {
     const fetchArtists = async () => {
@@ -145,16 +151,19 @@ const BookingArtists: React.FC = () => {
               </div>
             ) : (
               filteredArtists.map((artist, index) => (
-                <motion.div
+                <Link
                   key={artist.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.02, y: -8 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleArtistClick(artist)}
-                  className="group cursor-pointer"
+                  to={`/booking/artists/${getArtistUrl(artist.name)}`}
+                  className="group"
                 >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.05 }}
+                    whileHover={{ scale: 1.02, y: -8 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="cursor-pointer"
+                  >
                   <div className="relative">
                     {/* Modern Artist Card */}
                     <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-slate-800/30 to-slate-900/50 backdrop-blur-sm border border-white/5 group-hover:border-white/20 transition-all duration-500 shadow-lg group-hover:shadow-2xl group-hover:shadow-blue-500/10">
@@ -205,7 +214,8 @@ const BookingArtists: React.FC = () => {
                       <p className="text-slate-400 text-sm font-medium">{artist.genre}</p>
                     </div>
                   </div>
-                </motion.div>
+                  </motion.div>
+                </Link>
               ))
             )}
           </div>

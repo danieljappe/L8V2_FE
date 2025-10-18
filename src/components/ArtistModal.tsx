@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Globe, Music, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { X, Globe, Music, Calendar, ExternalLink } from 'lucide-react';
 import { constructFullUrl } from '../utils/imageUtils';
 import { Artist } from '../services/api';
 import EmbeddingManager from './EmbeddingManager';
@@ -26,6 +27,11 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose, isAdmin = fa
   }, [artist?.embeddings]);
 
   if (!artist) return null;
+
+  // Helper function to convert artist name to URL-friendly format
+  const getArtistUrl = (artistName: string) => {
+    return artistName.toLowerCase().replace(/\s+/g, '-');
+  };
 
   // Convert social media data to consistent array format
   const socialMediaArray = normalizeSocialMedia(artist.socialMedia);
@@ -159,6 +165,18 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose, isAdmin = fa
                       <span>Available for booking</span>
                     </span>
                   )}
+                </div>
+
+                {/* View Full Profile Button */}
+                <div className="mt-6">
+                  <Link
+                    to={`/booking/artists/${getArtistUrl(artist.name)}`}
+                    onClick={onClose}
+                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <span>View Full Profile</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
 
