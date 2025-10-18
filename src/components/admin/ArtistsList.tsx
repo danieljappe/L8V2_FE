@@ -86,7 +86,7 @@ export default function ArtistsList({
               ) : null}
               {/* Fallback placeholder */}
               <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-white text-xl font-bold">{artist.name.charAt(0).toUpperCase()}</span>
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function ArtistsList({
                   {/* Social Media Count */}
                   {artist.socialMedia && Array.isArray(artist.socialMedia) && artist.socialMedia.length > 0 && (
                     <div className="flex items-center space-x-1">
-                      <span className="text-purple-500">📱</span>
+                      <span className="text-l8-blue">📱</span>
                       <span>{artist.socialMedia.length} social</span>
                     </div>
                   )}
@@ -181,8 +181,8 @@ export default function ArtistsList({
       {/* Empty State */}
       {artists.length === 0 && (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-l8-beige-light to-l8-beige rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-l8-blue to-l8-blue-dark rounded-full flex items-center justify-center">
               <span className="text-white text-2xl">👨‍🎤</span>
             </div>
           </div>

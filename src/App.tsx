@@ -43,8 +43,8 @@ const AppContent = () => {
       {!isAdminPage && !isLoginPage && (
         <div className={`fixed inset-0 bg-gradient-to-br -z-10 ${
           isBookingPage 
-            ? 'from-blue-900 via-cyan-900 to-indigo-900'
-            : 'from-purple-900 via-blue-900 to-indigo-900'
+            ? 'from-booking-dark via-booking-dark to-booking-teal-dark'
+            : 'from-l8-dark via-l8-blue-dark to-l8-blue'
         }`} />
       )}
       <div className="relative z-10">

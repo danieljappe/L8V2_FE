@@ -74,7 +74,7 @@ const UpcomingEvent: React.FC = () => {
           <p className="text-red-400 mb-4">Failed to load events</p>
           <button 
             onClick={() => window.location.reload()}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+            className="bg-l8-blue hover:bg-l8-blue-dark text-white px-4 py-2 rounded-lg"
           >
             Retry
           </button>
@@ -129,10 +129,10 @@ const UpcomingEvent: React.FC = () => {
             <motion.div
               variants={itemVariants}
               whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center px-3 py-2 sm:px-4 bg-purple-500/20 backdrop-blur-sm rounded-full border border-purple-300/30 mb-4 sm:mb-6"
+              className="inline-flex items-center px-3 py-2 sm:px-4 bg-l8-blue/20 backdrop-blur-sm rounded-full border border-l8-blue/30 mb-4 sm:mb-6"
             >
-              <Ticket className="w-4 h-4 text-purple-300 mr-2" />
-              <span className="text-purple-200 text-xs sm:text-sm font-medium">Næste Begivenhed</span>
+              <Ticket className="w-4 h-4 text-l8-beige mr-2" />
+              <span className="text-l8-beige-light text-xs sm:text-sm font-medium">Næste Begivenhed</span>
             </motion.div>
 
             {/* Event Title */}
@@ -143,7 +143,7 @@ const UpcomingEvent: React.FC = () => {
               {upcomingEvent.title}
               <motion.span 
                 variants={itemVariants}
-                className="block text-purple-300 text-lg sm:text-2xl md:text-3xl font-medium mt-2"
+                className="block text-l8-beige text-lg sm:text-2xl md:text-3xl font-medium mt-2"
               >
                 {upcomingEvent.venue?.name || 'Multi-Kunstner Oplevelse'}
               </motion.span>
@@ -182,7 +182,7 @@ const UpcomingEvent: React.FC = () => {
                 variants={itemVariants}
                 className="text-lg sm:text-xl font-semibold text-white mb-4 flex items-center"
               >
-                <Music className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-300" />
+                <Music className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-l8-beige" />
                 Fremhævede Kunstnere
               </motion.h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -202,7 +202,7 @@ const UpcomingEvent: React.FC = () => {
                     <motion.div 
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.6 }}
-                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-2 sm:mb-3 mx-auto overflow-hidden"
+                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full mb-2 sm:mb-3 mx-auto overflow-hidden"
                     >
                       <img 
                         src={artist.image || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=300'} 
@@ -210,8 +210,8 @@ const UpcomingEvent: React.FC = () => {
                         className="w-full h-full object-cover"
                       />
                     </motion.div>
-                    <p className="text-white font-medium text-center text-xs sm:text-sm group-hover:text-purple-300 transition-colors duration-300">{artist.name}</p>
-                    <p className="text-purple-300 text-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">{artist.genre}</p>
+                    <p className="text-white font-medium text-center text-xs sm:text-sm group-hover:text-l8-beige transition-colors duration-300">{artist.name}</p>
+                    <p className="text-l8-beige text-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">{artist.genre}</p>
                   </motion.div>
                 ))}
               </div>
@@ -234,7 +234,7 @@ const UpcomingEvent: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 mx-auto text-sm sm:text-base"
+                className="bg-gradient-to-r from-l8-blue to-l8-blue-light hover:from-l8-blue-dark hover:to-l8-blue text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 mx-auto text-sm sm:text-base"
               >
                 <Ticket className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Book Billetter</span>

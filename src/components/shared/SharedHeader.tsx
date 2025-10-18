@@ -94,9 +94,11 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ platform = 'events' }) => {
           {/* Logo */}
           <Link to="/">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                <Music className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/l8logo.png" 
+                alt="L8 Logo" 
+                className="w-10 h-10 object-contain rounded-xl"
+              />
               <span className="text-white font-bold text-xl">L8</span>
               {platform && (
                 <span className="text-white/60 text-sm font-medium">
@@ -175,16 +177,22 @@ const SharedHeader: React.FC<SharedHeaderProps> = ({ platform = 'events' }) => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[240px] bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden"
+              className={`fixed top-0 right-0 h-full w-[240px] bg-gradient-to-br backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden ${
+                platform === 'booking' 
+                  ? 'from-booking-dark/95 via-booking-dark/95 to-booking-teal-dark/95'
+                  : 'from-l8-dark/95 via-l8-blue-dark/95 to-l8-blue/95'
+              }`}
             >
               <div className="flex flex-col h-full">
                 {/* Menu Header */}
                 <div className="p-4 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                        <Music className="w-5 h-5 text-white" />
-                      </div>
+                      <img 
+                        src="/l8logo.png" 
+                        alt="L8 Logo" 
+                        className="w-8 h-8 object-contain rounded-lg"
+                      />
                       <span className="text-white font-bold text-lg">L8</span>
                       {platform && (
                         <span className="text-white/60 text-xs">

@@ -34,7 +34,7 @@ const PlatformChoice: React.FC = () => {
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <div 
-            className="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-purple-700/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-gradient-to-br from-l8-dark/50 to-l8-blue-dark/50 backdrop-blur-sm"
             style={{
               clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
               maskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)',
@@ -59,7 +59,7 @@ const PlatformChoice: React.FC = () => {
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         >
           <div 
-            className="absolute inset-0 bg-gradient-to-br from-blue-900/50 to-blue-700/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-gradient-to-br from-booking-dark/50 to-booking-dark/70 backdrop-blur-sm"
             style={{
               clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
               maskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)',
@@ -101,7 +101,11 @@ const PlatformChoice: React.FC = () => {
               className="mb-8"
             >
               <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 transition-all duration-300">
-                <Calendar className="w-10 h-10 text-white" />
+                <img 
+                  src="/l8logo.png" 
+                  alt="L8 Logo" 
+                  className="w-12 h-12 object-contain rounded-2xl"
+                />
               </div>
               <h1 className="text-6xl md:text-7xl font-light text-white mb-2">L8 Events</h1>
               <h2 className="text-xl md:text-2xl font-light text-white/60">Udforsk begivenheder</h2>
@@ -152,7 +156,11 @@ const PlatformChoice: React.FC = () => {
               className="mb-8"
             >
               <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 transition-all duration-300">
-                <Users className="w-10 h-10 text-white" />
+                <img 
+                  src="/l8logo.png" 
+                  alt="L8 Logo" 
+                  className="w-12 h-12 object-contain rounded-2xl"
+                />
               </div>
               <h1 className="text-6xl md:text-7xl font-light text-white mb-2">L8 Booking</h1>
               <h2 className="text-xl md:text-2xl font-light text-white/60">Book kunstnere</h2>

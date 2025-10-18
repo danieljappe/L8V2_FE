@@ -30,11 +30,11 @@ const BookingHome: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
       {/* Hero Section */}
       <div className="relative min-h-screen overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+        <div className="absolute inset-0 bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
           <div className="absolute inset-0 bg-black/5" />
         </div>
         
@@ -141,7 +141,7 @@ const BookingHome: React.FC = () => {
                 viewport={{ once: true }}
                 className="text-center p-8 bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-booking-orange to-booking-teal rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-4">
@@ -175,7 +175,7 @@ const BookingHome: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="px-8 py-4 bg-gradient-to-r from-booking-orange to-booking-teal text-white font-semibold rounded-full hover:from-booking-orange-dark hover:to-booking-teal-dark transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Start Booking Nu
               <ArrowRight className="inline-block w-5 h-5 ml-2" />

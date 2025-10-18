@@ -29,7 +29,7 @@ const EventList: React.FC = () => {
   })) || [];
 
   function getEventColor(eventId: string): string {
-    const colors = ['purple', 'blue', 'green', 'orange', 'pink', 'indigo'];
+    const colors = ['l8-blue', 'l8-beige', 'l8-blue-light', 'l8-beige-dark', 'l8-blue-dark', 'l8-beige-light'];
     // Simple hash function to convert string to number
     let hash = 0;
     for (let i = 0; i < eventId.length; i++) {
@@ -47,14 +47,14 @@ const EventList: React.FC = () => {
 
   const getColorClasses = (color: string) => {
     const colors = {
-      purple: 'bg-purple-500/20 border-purple-300/30 text-purple-200',
-      blue: 'bg-blue-500/20 border-blue-300/30 text-blue-200',
-      green: 'bg-green-500/20 border-green-300/30 text-green-200',
-      orange: 'bg-orange-500/20 border-orange-300/30 text-orange-200',
-      pink: 'bg-pink-500/20 border-pink-300/30 text-pink-200',
-      indigo: 'bg-indigo-500/20 border-indigo-300/30 text-indigo-200'
+      'l8-blue': 'bg-l8-blue/20 border-l8-blue/30 text-l8-blue-light',
+      'l8-beige': 'bg-l8-beige/20 border-l8-beige/30 text-l8-beige-light',
+      'l8-blue-light': 'bg-l8-blue-light/20 border-l8-blue-light/30 text-l8-blue',
+      'l8-beige-dark': 'bg-l8-beige-dark/20 border-l8-beige-dark/30 text-l8-beige',
+      'l8-blue-dark': 'bg-l8-blue-dark/20 border-l8-blue-dark/30 text-l8-blue-light',
+      'l8-beige-light': 'bg-l8-beige-light/20 border-l8-beige-light/30 text-l8-beige-dark'
     };
-    return colors[color as keyof typeof colors] || colors.purple;
+    return colors[color as keyof typeof colors] || colors['l8-blue'];
   };
 
   const containerVariants = {
@@ -84,7 +84,7 @@ const EventList: React.FC = () => {
   // Show loading state
   if (loading) {
     return (
-      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 lg:pt-16">
         <LoadingSpinner size="lg" text="Loading events..." />
       </section>
     );
@@ -93,12 +93,12 @@ const EventList: React.FC = () => {
   // Show error state
   if (error) {
     return (
-      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 lg:pt-16">
         <div className="text-center">
           <p className="text-red-400 mb-4">Failed to load events</p>
           <button 
             onClick={() => window.location.reload()}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+            className="bg-l8-blue hover:bg-l8-blue-dark text-white px-4 py-2 rounded-lg"
           >
             Retry
           </button>
@@ -110,7 +110,7 @@ const EventList: React.FC = () => {
   // Show empty state
   if (!events || events.length === 0) {
     return (
-      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 lg:pt-16">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white mb-4">No Events Found</h2>
           <p className="text-white/70">Check back soon for upcoming events!</p>
@@ -121,7 +121,7 @@ const EventList: React.FC = () => {
 
   if (selectedEvent) {
     return (
-      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+      <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 lg:pt-16">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -150,7 +150,7 @@ const EventList: React.FC = () => {
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
             >
               <div className="flex items-center space-x-3 text-white/80 bg-white/5 p-3 rounded-2xl">
-                <Calendar className="w-5 h-5 text-purple-300" />
+                <Calendar className="w-5 h-5 text-l8-beige" />
                 <div>
                   <p className="text-sm text-white/60">Dato</p>
                   <p className="font-semibold">
@@ -164,14 +164,14 @@ const EventList: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3 text-white/80 bg-white/5 p-3 rounded-2xl">
-                <Clock className="w-5 h-5 text-purple-300" />
+                <Clock className="w-5 h-5 text-l8-beige" />
                 <div>
                   <p className="text-sm text-white/60">Tidspunkt</p>
                   <p className="font-semibold">{selectedEvent.startTime || '21:00'}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3 text-white/80 bg-white/5 p-3 rounded-2xl">
-                <MapPin className="w-5 h-5 text-purple-300" />
+                <MapPin className="w-5 h-5 text-l8-beige" />
                 <div>
                   <p className="text-sm text-white/60">Sted</p>
                   <p className="font-semibold">{selectedEvent.venue?.name || 'TBA'}</p>
@@ -181,7 +181,7 @@ const EventList: React.FC = () => {
 
             <motion.div className="mb-6">
               <motion.h3 className="text-xl font-semibold text-white mb-3 flex items-center">
-                <Music className="w-5 h-5 mr-2 text-purple-300" />
+                <Music className="w-5 h-5 mr-2 text-l8-beige" />
                 Kunstnere
               </motion.h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -190,7 +190,7 @@ const EventList: React.FC = () => {
                     key={eventArtist.id}
                     className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-2 mx-auto overflow-hidden">
+                    <div className="w-10 h-10 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full mb-2 mx-auto overflow-hidden">
                       <img 
                         src={eventArtist.artist.imageUrl ? constructFullUrl(eventArtist.artist.imageUrl) : 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist'} 
                         alt={eventArtist.artist.name}
@@ -225,7 +225,7 @@ const EventList: React.FC = () => {
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => navigate(`/events/${selectedEvent.id}`)}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 mx-auto"
+                  className="bg-gradient-to-r from-l8-blue to-l8-blue-light hover:from-l8-blue-dark hover:to-l8-blue text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 mx-auto"
                 >
                   <Ticket className="w-5 h-5" />
                   <span>Se Detaljer & Køb Billetter</span>
@@ -239,7 +239,7 @@ const EventList: React.FC = () => {
   }
 
   return (
-    <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20">
+    <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-0">
       <motion.div 
         variants={containerVariants}
         initial="hidden"
@@ -290,7 +290,7 @@ const EventList: React.FC = () => {
               {/* Event Title */}
               <motion.h3 
                 variants={itemVariants}
-                className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover:text-purple-300 transition-colors duration-300"
+                className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover:text-l8-beige transition-colors duration-300"
               >
                 {event.title}
               </motion.h3>
@@ -301,7 +301,7 @@ const EventList: React.FC = () => {
                 className="space-y-3 mb-6"
               >
                 <div className="flex items-center space-x-3 text-white/80">
-                  <Calendar className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-l8-beige flex-shrink-0" />
                   <span className="text-sm">
                     {new Date(event.date).toLocaleDateString('da-DK', {
                       weekday: 'short',
@@ -312,11 +312,11 @@ const EventList: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex items-center space-x-3 text-white/80">
-                  <Clock className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                  <Clock className="w-4 h-4 text-l8-beige flex-shrink-0" />
                   <span className="text-sm">{event.startTime || '21:00'}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-white/80">
-                  <MapPin className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-l8-beige flex-shrink-0" />
                   <span className="text-sm truncate">{event.venue?.name || 'TBA'}</span>
                 </div>
               </motion.div>
@@ -325,7 +325,7 @@ const EventList: React.FC = () => {
               {event.eventArtists && event.eventArtists.length > 0 && (
                 <motion.div variants={itemVariants} className="mb-6">
                   <motion.h4 className="text-sm font-semibold text-white/80 mb-3 flex items-center">
-                    <Music className="w-4 h-4 mr-2 text-purple-300" />
+                    <Music className="w-4 h-4 mr-2 text-l8-beige" />
                     Kunstnere
                   </motion.h4>
                   <div className="flex flex-wrap gap-2">
@@ -359,7 +359,7 @@ const EventList: React.FC = () => {
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 w-full text-sm pointer-events-none"
+                  className="bg-gradient-to-r from-l8-blue to-l8-blue-light hover:from-l8-blue-dark hover:to-l8-blue text-white font-semibold px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 w-full text-sm pointer-events-none"
                   tabIndex={-1}
                 >
                   <Ticket className="w-4 h-4" />

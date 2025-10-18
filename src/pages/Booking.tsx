@@ -103,7 +103,7 @@ const Booking: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
         <LoadingSpinner />
       </div>
     );
@@ -111,7 +111,7 @@ const Booking: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Music className="w-8 h-8 text-red-400" />
@@ -124,7 +124,7 @@ const Booking: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
       {/* Booking Platform Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -136,9 +136,11 @@ const Booking: React.FC = () => {
             {/* Logo */}
             <Link to="/booking">
               <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
+                <img 
+                  src="/l8logo.png" 
+                  alt="L8 Logo" 
+                  className="w-10 h-10 object-contain rounded-xl"
+                />
                 <div>
                   <span className="text-white font-bold text-xl">L8 Booking</span>
                   <div className="text-white/60 text-xs">booking.l8events.dk</div>
@@ -212,9 +214,11 @@ const Booking: React.FC = () => {
                 <div className="p-4 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
+                      <img 
+                        src="/l8logo.png" 
+                        alt="L8 Logo" 
+                        className="w-8 h-8 object-contain rounded-lg"
+                      />
                       <span className="text-white font-bold text-lg">L8 Booking</span>
                     </div>
                     <button
@@ -301,7 +305,7 @@ const Booking: React.FC = () => {
       {/* Featured Artists Landing Section */}
       <div className="relative min-h-screen overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+        <div className="absolute inset-0 bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
           <div className="absolute inset-0 bg-black/5" />
         </div>
         
@@ -353,7 +357,7 @@ const Booking: React.FC = () => {
                        
                        {/* Fallback placeholder */}
                        <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
-                         <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                         <div className="w-20 h-20 bg-gradient-to-br from-booking-orange to-booking-teal rounded-2xl flex items-center justify-center shadow-lg">
                            <span className="text-white text-3xl font-bold">
                              {artist.name.charAt(0).toUpperCase()}
                            </span>
@@ -502,7 +506,7 @@ const Booking: React.FC = () => {
                      
                      {/* Fallback placeholder */}
                      <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
-                       <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                       <div className="w-20 h-20 bg-gradient-to-br from-booking-orange to-booking-teal rounded-2xl flex items-center justify-center shadow-lg">
                          <span className="text-white text-3xl font-bold">
                            {artist.name.charAt(0).toUpperCase()}
                          </span>

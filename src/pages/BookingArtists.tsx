@@ -63,7 +63,7 @@ const BookingArtists: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
         <LoadingSpinner />
       </div>
     );
@@ -71,7 +71,7 @@ const BookingArtists: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Music className="w-8 h-8 text-red-400" />
@@ -181,7 +181,7 @@ const BookingArtists: React.FC = () => {
                       
                       {/* Fallback placeholder */}
                       <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        <div className="w-20 h-20 bg-gradient-to-br from-booking-orange to-booking-teal rounded-2xl flex items-center justify-center shadow-lg">
                           <span className="text-white text-3xl font-bold">
                             {artist.name.charAt(0).toUpperCase()}
                           </span>

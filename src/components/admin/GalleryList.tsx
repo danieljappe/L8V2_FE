@@ -52,7 +52,7 @@ export default function GalleryList({
       case 'artist':
         return 'bg-green-100 text-green-800';
       case 'venue':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-l8-beige/20 text-l8-beige-dark';
       case 'other':
         return 'bg-orange-100 text-orange-800';
       default:

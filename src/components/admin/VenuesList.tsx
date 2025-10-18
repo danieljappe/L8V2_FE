@@ -72,8 +72,8 @@ export default function VenuesList({
         {venues.map((venue) => (
           <div key={venue.id} className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-l8-beige/20 rounded-lg flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-l8-blue" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{venue.name}</h3>

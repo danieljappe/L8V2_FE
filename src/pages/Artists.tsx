@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Music, Star, Globe, Instagram } from 'lucide-react';
+import { Users, Music, Globe } from 'lucide-react';
 import { apiService, Artist } from '../services/api';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -92,18 +92,18 @@ const Artists: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50" />
-        <div className="relative z-10 container mx-auto px-4 py-4 sm:py-6">
+    <div className="min-h-screen overflow-x-hidden">
+      {/* Main Content */}
+      <main className="relative z-10 pt-20 pb-16">
+        {/* Hero Section */}
+        <div className="container mx-auto px-4 py-4 sm:py-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full flex items-center justify-center mx-auto mb-3">
               <Users className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
@@ -114,9 +114,8 @@ const Artists: React.FC = () => {
             </p>
           </motion.div>
         </div>
-      </div>
 
-      {/* Search and Filter Section */}
+        {/* Search and Filter Section */}
       {artists.length > 0 && (
         <div className="container mx-auto px-4">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-4 max-w-4xl mx-auto">
@@ -128,7 +127,7 @@ const Artists: React.FC = () => {
                   placeholder="Søg efter kunstnere, genre eller beskrivelse..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-l8-blue focus:border-transparent transition-all duration-200"
                 />
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +140,7 @@ const Artists: React.FC = () => {
               <select
                 value={genreFilter}
                 onChange={(e) => setGenreFilter(e.target.value)}
-                className="px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                className="px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-l8-blue focus:border-transparent transition-all duration-200"
               >
                 {genres.map(genre => (
                   <option key={genre} value={genre} className="bg-gray-800 text-white">
@@ -161,8 +160,8 @@ const Artists: React.FC = () => {
         </div>
       )}
 
-      {/* Artists Grid */}
-      <div className="container mx-auto px-4 py-12">
+        {/* Artists Grid */}
+        <div className="container mx-auto px-4 py-12">
         {filteredArtists.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -193,7 +192,7 @@ const Artists: React.FC = () => {
               >
                 <div className="relative">
                   {/* Artist Image Card */}
-                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-4 border-white/10 group-hover:border-purple-500/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200">
+                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-4 border-white/10 group-hover:border-l8-blue/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200">
                     {artist.imageUrl ? (
                       <img
                         src={constructFullUrl(artist.imageUrl)}
@@ -209,7 +208,7 @@ const Artists: React.FC = () => {
                     {/* Fallback placeholder */}
                     <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
                       <div className="text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                        <div className="w-20 h-20 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
                           <span className="text-white text-3xl font-bold">{artist.name.charAt(0).toUpperCase()}</span>
                         </div>
                         <p className="text-gray-500 text-sm font-medium">No Image</p>
@@ -241,7 +240,7 @@ const Artists: React.FC = () => {
                     <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="text-center">
                         <h3 className="text-white font-bold text-lg mb-1">{artist.name}</h3>
-                        <p className="text-purple-300 text-sm mb-2">{artist.genre}</p>
+                        <p className="text-l8-beige text-sm mb-2">{artist.genre}</p>
                         {artist.bio && (
                           <p className="text-white/80 text-xs line-clamp-2">
                             {artist.bio}
@@ -258,7 +257,7 @@ const Artists: React.FC = () => {
 
                   {/* Artist Info Below Image */}
                   <div className="mt-4 text-center">
-                    <h3 className="text-white font-bold text-lg mb-1 group-hover:text-purple-300 transition-colors">
+                    <h3 className="text-white font-bold text-lg mb-1 group-hover:text-l8-beige transition-colors">
                       {artist.name}
                     </h3>
                     <p className="text-white/60 text-sm mb-2">{artist.genre}</p>
@@ -284,10 +283,11 @@ const Artists: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Artist Modal */}
-      <ArtistModal artist={selectedArtist} onClose={handleCloseModal} isAdmin={false} />
+        {/* Artist Modal */}
+        <ArtistModal artist={selectedArtist} onClose={handleCloseModal} isAdmin={false} />
+      </main>
     </div>
   );
 };

@@ -100,8 +100,8 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose, isAdmin = fa
                       {media.platform.toLowerCase().includes('facebook') && <span className="text-blue-600 text-2xl font-bold">📘</span>}
                       {media.platform.toLowerCase().includes('tiktok') && <span className="text-pink-400 text-2xl font-bold">🎵</span>}
                       {media.platform.toLowerCase().includes('linkedin') && <span className="text-blue-700 text-2xl font-bold">💼</span>}
-                      {media.platform.toLowerCase().includes('twitch') && <span className="text-purple-400 text-2xl font-bold">🎮</span>}
-                      {media.platform.toLowerCase().includes('discord') && <span className="text-indigo-400 text-2xl font-bold">💬</span>}
+                      {media.platform.toLowerCase().includes('twitch') && <span className="text-l8-blue text-2xl font-bold">🎮</span>}
+                      {media.platform.toLowerCase().includes('discord') && <span className="text-l8-beige text-2xl font-bold">💬</span>}
                       {!media.platform.toLowerCase().includes('instagram') && 
                        !media.platform.toLowerCase().includes('youtube') && 
                        !media.platform.toLowerCase().includes('spotify') && 

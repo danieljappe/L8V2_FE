@@ -46,7 +46,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
     >
       <div className="relative">
         {/* Artist Image Card */}
-        <div className={`relative w-full aspect-square rounded-2xl overflow-hidden border-4 border-white/10 group-hover:border-purple-500/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 ${
+        <div className={`relative w-full aspect-square rounded-2xl overflow-hidden border-4 border-white/10 group-hover:border-l8-blue/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 ${
           isBookingVariant ? 'group-hover:border-blue-500/50' : ''
         }`}>
           {artist.imageUrl ? (
@@ -64,7 +64,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
           {/* Fallback placeholder */}
           <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
             <div className="text-center">
-              <div className={`w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg ${
+              <div className={`w-20 h-20 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg ${
                 isBookingVariant ? 'from-blue-400 to-cyan-500' : ''
               }`}>
                 <span className="text-white text-3xl font-bold">{artist.name.charAt(0).toUpperCase()}</span>
@@ -115,7 +115,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
             <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="text-center">
                 <h3 className="text-white font-bold text-lg mb-1">{artist.name}</h3>
-                <p className="text-purple-300 text-sm mb-2">{artist.genre}</p>
+                <p className="text-l8-beige text-sm mb-2">{artist.genre}</p>
                 {artist.bio && (
                   <p className="text-white/80 text-xs line-clamp-2">
                     {artist.bio}
@@ -144,7 +144,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
 
         {/* Artist Info Below Image */}
         <div className="mt-4 text-center">
-          <h3 className={`text-white font-bold text-lg mb-1 group-hover:text-purple-300 transition-colors ${
+          <h3 className={`text-white font-bold text-lg mb-1 group-hover:text-l8-beige transition-colors ${
             isBookingVariant ? 'group-hover:text-blue-300' : ''
           }`}>
             {artist.name}

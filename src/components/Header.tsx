@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Music, Calendar, Info, Phone, Instagram, Facebook, Youtube, Image, Users, Settings } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPlatformFromPath } from '../utils/subdomainUtils';
@@ -9,6 +9,7 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,19 +62,15 @@ const Header: React.FC = () => {
 
   const navItems = getNavItems();
 
-  // Cross-reference navigation based on current platform
-  const getCrossReferenceLink = () => {
+  // Platform switch handler
+  const handlePlatformSwitch = () => {
     const platform = getPlatformFromPath();
-    
     if (platform === 'booking') {
-      return { name: 'L8 Events', path: '/events', icon: Calendar };
-    } else if (platform === 'events') {
-      return { name: 'L8 Booking', path: '/booking', icon: Users };
+      navigate('/events');
+    } else {
+      navigate('/booking');
     }
-    return null;
   };
-
-  const crossReferenceLink = getCrossReferenceLink();
 
   const socialLinks = [
     { name: 'Instagram', icon: Instagram, href: 'https://instagram.com' },
@@ -89,30 +86,47 @@ const Header: React.FC = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link to={getPlatformFromPath() === 'booking' ? '/booking' : '/'}>
-            <div className="flex items-center space-x-2">
-              <div className={`w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center ${
-                getPlatformFromPath() === 'booking' 
-                  ? 'from-blue-500 to-cyan-500' 
-                  : 'from-purple-500 to-pink-500'
-              }`}>
-                <Music className="w-6 h-6 text-white" />
+          {/* Logo and Platform Switch */}
+          <div className="flex items-center space-x-3">
+            {/* Platform Switch Icon */}
+            <button
+              onClick={handlePlatformSwitch}
+              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all duration-300 text-white/80 hover:text-white"
+              title={`Switch to ${getPlatformFromPath() === 'booking' ? 'Events' : 'Booking'}`}
+            >
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-5 h-5"
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </motion.div>
+            </button>
+
+            <Link to={getPlatformFromPath() === 'booking' ? '/booking' : '/'}>
+              <div className="flex items-center space-x-2">
+                <img 
+                  src="/l8logo.png" 
+                  alt="L8 Logo" 
+                  className="w-10 h-10 object-contain rounded-xl"
+                />
+                <span className="text-white font-bold text-xl">
+                  {getPlatformFromPath() === 'booking' ? 'Booking' : 'Events'}
+                </span>
               </div>
-              <span className="text-white font-bold text-xl">
-                {getPlatformFromPath() === 'booking' ? 'L8 Booking' : 'L8'}
-              </span>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <Link key={item.path} to={item.path}>
                   <div
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors ${
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-colors whitespace-nowrap ${
                       location.pathname === item.path
                         ? 'bg-white/10 text-white'
                         : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -125,17 +139,6 @@ const Header: React.FC = () => {
               );
             })}
             
-            {/* Cross-reference Link */}
-            {crossReferenceLink && (
-              <div className="border-l border-white/20 pl-4">
-                <Link to={crossReferenceLink.path}>
-                  <div className="flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors text-white/60 hover:text-white hover:bg-white/5">
-                    <crossReferenceLink.icon className="w-5 h-5" />
-                    <span>{crossReferenceLink.name}</span>
-                  </div>
-                </Link>
-              </div>
-            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -176,8 +179,8 @@ const Header: React.FC = () => {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className={`fixed top-0 right-0 h-full w-[240px] bg-gradient-to-br backdrop-blur-xl border-l border-white/10 shadow-2xl md:hidden ${
                 getPlatformFromPath() === 'booking' 
-                  ? 'from-blue-900/95 via-cyan-900/95 to-indigo-900/95'
-                  : 'from-purple-900/95 via-blue-900/95 to-indigo-900/95'
+                  ? 'from-booking-dark/95 via-booking-dark/95 to-booking-teal-dark/95'
+                  : 'from-l8-dark/95 via-l8-blue-dark/95 to-l8-blue/95'
               }`}
             >
               <div className="flex flex-col h-full">
@@ -185,13 +188,11 @@ const Header: React.FC = () => {
                 <div className="p-4 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <div className={`w-8 h-8 bg-gradient-to-br rounded-xl flex items-center justify-center ${
-                        getPlatformFromPath() === 'booking' 
-                          ? 'from-blue-500 to-cyan-500' 
-                          : 'from-purple-500 to-pink-500'
-                      }`}>
-                        <Music className="w-5 h-5 text-white" />
-                      </div>
+                      <img 
+                        src="/l8logo.png" 
+                        alt="L8 Logo" 
+                        className="w-8 h-8 object-contain rounded-lg"
+                      />
                       <span className="text-white font-bold text-lg">
                         {getPlatformFromPath() === 'booking' ? 'L8 Booking' : 'L8'}
                       </span>
@@ -232,24 +233,24 @@ const Header: React.FC = () => {
                       );
                     })}
                     
-                    {/* Cross-reference Link */}
-                    {crossReferenceLink && (
-                      <div className="border-t border-white/20 pt-4">
-                        <Link
-                          to={crossReferenceLink.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block"
-                        >
-                          <motion.div
-                            whileHover={{ x: 5 }}
-                            className="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 text-white/60 hover:text-white hover:bg-white/5"
-                          >
-                            <crossReferenceLink.icon className="w-5 h-5" />
-                            <span className="text-base">{crossReferenceLink.name}</span>
-                          </motion.div>
-                        </Link>
-                      </div>
-                    )}
+                    {/* Platform Switch Button */}
+                    <div className="border-t border-white/20 pt-4">
+                      <motion.button
+                        whileHover={{ x: 5 }}
+                        onClick={() => {
+                          handlePlatformSwitch();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 text-white/60 hover:text-white hover:bg-white/5"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        <span className="text-base">
+                          Switch to {getPlatformFromPath() === 'booking' ? 'Events' : 'Booking'}
+                        </span>
+                      </motion.button>
+                    </div>
                   </div>
                 </nav>
 

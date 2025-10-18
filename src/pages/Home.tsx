@@ -12,7 +12,7 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Main Content */}
-      <main className="relative z-10">
+      <main className="relative z-10 pt-6">
         <UpcomingEvent />
         <PreviousEventGallery />
         
@@ -38,14 +38,14 @@ const Home: React.FC = () => {
                 onClick={() => navigate('/events')}
               >
                 <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl hover:bg-white/15 transition-all duration-300 hover:scale-105">
-                  <div className="flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-2xl mb-6 mx-auto group-hover:bg-purple-500/30 transition-colors">
-                    <Calendar className="w-8 h-8 text-purple-300" />
+                  <div className="flex items-center justify-center w-16 h-16 bg-l8-blue/20 rounded-2xl mb-6 mx-auto group-hover:bg-l8-blue/30 transition-colors">
+                    <Calendar className="w-8 h-8 text-l8-beige" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4">Events</h3>
                   <p className="text-white/70 mb-6">
                     Discover our upcoming events and immerse yourself in the world of electronic music.
                   </p>
-                  <div className="flex items-center justify-center text-purple-300 group-hover:text-purple-200 transition-colors">
+                  <div className="flex items-center justify-center text-l8-beige group-hover:text-l8-beige-light transition-colors">
                     <span className="mr-2">Explore Events</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>

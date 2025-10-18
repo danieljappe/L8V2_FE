@@ -70,7 +70,7 @@ const ArtistPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
         <LoadingSpinner />
       </div>
     );
@@ -78,7 +78,7 @@ const ArtistPage: React.FC = () => {
 
   if (error || !artist) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Music className="w-8 h-8 text-red-400" />
@@ -100,21 +100,10 @@ const ArtistPage: React.FC = () => {
   const socialMediaArray = normalizeSocialMedia(artist.socialMedia);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-cyan-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
       {/* Header */}
       <div className="relative pt-24 pb-8">
-        <div className="container mx-auto px-4">
-          {/* Back Button */}
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            onClick={() => navigate('/booking/artists')}
-            className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors mb-8"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back to Artists</span>
-          </motion.button>
+        <div className="container mx-auto px-4 pt-6">
 
           {/* Artist Hero Section */}
           <div className="grid lg:grid-cols-2 gap-8 items-center">
@@ -140,7 +129,7 @@ const ArtistPage: React.FC = () => {
                 
                 {/* Fallback placeholder */}
                 <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
-                  <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-32 h-32 bg-gradient-to-br from-booking-orange to-booking-teal rounded-2xl flex items-center justify-center shadow-lg">
                     <span className="text-white text-5xl font-bold">
                       {artist.name.charAt(0).toUpperCase()}
                     </span>
@@ -191,7 +180,7 @@ const ArtistPage: React.FC = () => {
                  <div className="flex justify-start">
                    <button
                      onClick={handleBookingClick}
-                     className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                     className="px-6 py-3 bg-gradient-to-r from-booking-orange to-booking-teal text-white font-semibold rounded-full hover:from-booking-orange-dark hover:to-booking-teal-dark transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                    >
                      <Calendar className="w-4 h-4" />
                      <span>Book Denne Artist</span>
@@ -328,7 +317,7 @@ const ArtistPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={handleBookingClick}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              className="px-6 py-3 bg-gradient-to-r from-booking-orange to-booking-teal text-white font-semibold rounded-full hover:from-booking-orange-dark hover:to-booking-teal-dark transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
             >
               <Calendar className="w-4 h-4" />
               <span>Start Booking Process</span>

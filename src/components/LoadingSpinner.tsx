@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  color?: 'white' | 'purple';
+  color?: 'white' | 'l8-blue';
   text?: string;
 }
 
@@ -20,7 +20,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   const colorClasses = {
     white: 'border-white/20 border-t-white',
-    purple: 'border-purple-500/20 border-t-purple-500'
+    'l8-blue': 'border-l8-blue/20 border-t-l8-blue'
   };
 
   return (

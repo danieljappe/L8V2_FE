@@ -44,7 +44,7 @@ const EventDetails: React.FC = () => {
             <p className="text-white/70 mb-4">The event ID in the URL is not valid.</p>
             <button 
               onClick={() => navigate('/events')}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
+              className="bg-l8-blue hover:bg-l8-blue-dark text-white px-6 py-3 rounded-lg transition-colors"
             >
               Back to Events
             </button>
@@ -66,7 +66,7 @@ const EventDetails: React.FC = () => {
             <p className="text-white/70 mb-4">The event you're looking for doesn't exist or has been removed.</p>
             <button 
               onClick={() => navigate('/events')}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
+              className="bg-l8-blue hover:bg-l8-blue-dark text-white px-6 py-3 rounded-lg transition-colors"
             >
               Back to Events
             </button>
@@ -104,7 +104,7 @@ const EventDetails: React.FC = () => {
               }
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-purple-900/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-l8-dark/90"></div>
         </div>
         
         {/* Event Title and Info */}
@@ -115,7 +115,7 @@ const EventDetails: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3 text-white/80 bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-              <Calendar className="w-5 h-5 text-purple-300" />
+              <Calendar className="w-5 h-5 text-l8-beige" />
               <div>
                 <p className="text-sm text-white/60">Dato</p>
                 <p className="font-semibold">
@@ -129,14 +129,14 @@ const EventDetails: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3 text-white/80 bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-              <Clock className="w-5 h-5 text-purple-300" />
+              <Clock className="w-5 h-5 text-l8-beige" />
               <div>
                 <p className="text-sm text-white/60">Tidspunkt</p>
                 <p className="font-semibold">{event.startTime || '21:00'}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 text-white/80 bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-              <MapPin className="w-5 h-5 text-purple-300" />
+              <MapPin className="w-5 h-5 text-l8-beige" />
               <div>
                 <p className="text-sm text-white/60">Sted</p>
                 <p className="font-semibold">{event.venue?.name || 'TBA'}</p>
@@ -147,7 +147,7 @@ const EventDetails: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 bg-gradient-to-b from-purple-900/80 via-black/50 to-purple-900/80 min-h-screen">
+      <main className="relative z-10 bg-gradient-to-b from-l8-dark/80 via-black/50 to-l8-dark/80 min-h-screen">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
             {/* Description */}
@@ -161,7 +161,7 @@ const EventDetails: React.FC = () => {
             {event.eventArtists && event.eventArtists.length > 0 && (
               <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
-                  <Music className="w-6 h-6 mr-2 text-purple-300" />
+                  <Music className="w-6 h-6 mr-2 text-l8-beige" />
                   Kunstnere
                 </h2>
 
@@ -177,11 +177,11 @@ const EventDetails: React.FC = () => {
                       onClick={() => setSelectedArtist(eventArtist.artist)}
                       className="group relative bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20 cursor-pointer overflow-hidden"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-l8-blue/20 to-l8-blue-light/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative flex items-start space-x-4">
                         <motion.div 
                           whileHover={{ scale: 1.1, rotate: 5 }}
-                          className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 overflow-hidden"
+                          className="w-16 h-16 rounded-xl bg-gradient-to-br from-l8-blue to-l8-blue-light flex-shrink-0 overflow-hidden"
                         >
                           <img 
                             src={eventArtist.artist.imageUrl ? constructFullUrl(eventArtist.artist.imageUrl) : 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=Artist'} 
@@ -197,12 +197,12 @@ const EventDetails: React.FC = () => {
                           />
                         </motion.div>
                         <div>
-                          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors duration-300">
+                          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-l8-beige transition-colors duration-300">
                             {eventArtist.artist.name}
                           </h3>
-                          <p className="text-purple-300 text-sm mb-2">{eventArtist.artist.genre}</p>
+                          <p className="text-l8-beige text-sm mb-2">{eventArtist.artist.genre}</p>
                           <p className="text-white/90 text-sm line-clamp-2">{eventArtist.artist.bio}</p>
-                          <div className="mt-3 text-purple-300 text-sm font-medium">
+                          <div className="mt-3 text-l8-beige text-sm font-medium">
                             Klik for at læse mere →
                           </div>
                         </div>
@@ -217,7 +217,7 @@ const EventDetails: React.FC = () => {
             {event.venue && (
               <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
-                  <MapPin className="w-6 h-6 mr-2 text-purple-300" />
+                  <MapPin className="w-6 h-6 mr-2 text-l8-beige" />
                   Lokation
                 </h2>
 
@@ -232,7 +232,7 @@ const EventDetails: React.FC = () => {
                   </div>
                   <div className="bg-black/20 rounded-2xl p-4">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Users className="w-5 h-5 text-purple-300" />
+                      <Users className="w-5 h-5 text-l8-beige" />
                       <span className="text-white font-semibold">Kapacitet</span>
                     </div>
                     <p className="text-white/70">{event.venue.capacity.toLocaleString()} personer</p>
@@ -245,7 +245,7 @@ const EventDetails: React.FC = () => {
             {isUpcoming && (
               <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
-                  <Ticket className="w-6 h-6 mr-2 text-purple-300" />
+                  <Ticket className="w-6 h-6 mr-2 text-l8-beige" />
                   Billetter
                 </h2>
 
@@ -264,7 +264,7 @@ const EventDetails: React.FC = () => {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
-                      className="inline-block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                      className="inline-block w-full bg-gradient-to-r from-l8-blue to-l8-blue-light hover:from-l8-blue-dark hover:to-l8-blue text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
                       Køb Billet på Billetto
                     </motion.a>
@@ -286,7 +286,7 @@ const EventDetails: React.FC = () => {
                 </p>
                 <button
                   onClick={() => navigate('/events')}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+                  className="bg-l8-blue hover:bg-l8-blue-dark text-white font-semibold px-6 py-3 rounded-xl transition-colors"
                 >
                   Se Andre Events
                 </button>

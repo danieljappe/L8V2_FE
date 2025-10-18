@@ -45,7 +45,7 @@ export default function DashboardOverview({
       change: '+2%',
       trend: 'up',
       icon: MapPin,
-      color: 'bg-purple-500'
+      color: 'bg-l8-blue'
     },
     {
       title: 'Gallery Items',

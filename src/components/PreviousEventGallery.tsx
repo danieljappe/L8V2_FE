@@ -72,7 +72,7 @@ const PreviousEventGallery: React.FC = () => {
           <p className="text-red-400 mb-4">Failed to load gallery</p>
           <button 
             onClick={() => window.location.reload()}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+            className="bg-l8-blue hover:bg-l8-blue-dark text-white px-4 py-2 rounded-lg"
           >
             Retry
           </button>
