@@ -22,6 +22,7 @@ export const createOrganizationSchema = () => ({
   "name": "L8 Events",
   "url": "https://l8events.dk",
   "logo": "https://l8events.dk/l8logo.png",
+  "image": "https://l8events.dk/l8logo.png",
   "description": "L8 Events skaber uforglemmelige musikkopplevelser med elektronisk musik. Professionel event management og booking service.",
   "sameAs": [
     "https://www.facebook.com/l8events",
