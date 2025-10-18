@@ -239,7 +239,7 @@ const EventList: React.FC = () => {
   }
 
   return (
-    <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-0">
+    <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-16">
       <motion.div 
         variants={containerVariants}
         initial="hidden"
