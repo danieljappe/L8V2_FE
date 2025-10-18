@@ -35,18 +35,6 @@ const EventList: React.FC = () => {
     };
   }, []);
 
-  // Debug logging for mobile issues
-  React.useEffect(() => {
-    console.log('EventList Debug:', {
-      loading,
-      error,
-      eventsCount: events?.length || 0,
-      userAgent: navigator.userAgent,
-      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
-    });
-  }, [loading, error, events]);
 
   // Process events data
   const processedEvents: ProcessedEvent[] = events?.map(event => ({
@@ -269,11 +257,6 @@ const EventList: React.FC = () => {
 
   return (
     <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-16">
-      {/* Debug info for iPhone */}
-      <div className="fixed top-0 left-0 bg-black/80 text-white text-xs p-2 z-50 pointer-events-none">
-        Events: {sortedEvents.length} | Loading: {loading.toString()} | Error: {error || 'none'}
-      </div>
-      
       <div className="container mx-auto max-w-6xl w-full opacity-100">
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
