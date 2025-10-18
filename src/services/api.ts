@@ -227,6 +227,7 @@ export interface Event {
   currentAttendees: number;
   venue?: Venue;
   eventArtists: EventArtist[];
+  galleryImages?: GalleryImage[];
   createdAt: string;
   updatedAt: string;
 }

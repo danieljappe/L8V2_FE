@@ -46,6 +46,8 @@ function Model({ mousePosition }: ModelProps) {
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.position.set(0, 0, -20);
+      // Scale down the model to make it smaller
+      modelRef.current.scale.setScalar(0.7);
     }
   }, []);
 

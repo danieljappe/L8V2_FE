@@ -25,64 +25,36 @@ const PlatformChoice: React.FC = () => {
       </div>
       
       {/* Split Background Overlay with Circular Cutout */}
-      <div className="absolute inset-0 flex z-10">
+      <div className="absolute inset-0 flex flex-col md:flex-row z-10">
         {/* Left Side - Events */}
         <motion.div 
           className="flex-1 relative"
-          initial={{ x: '-100%' }}
-          animate={{ x: 0 }}
+          initial={{ x: '-100%', y: '-100%' }}
+          animate={{ x: 0, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-l8-dark/50 to-l8-blue-dark/50 backdrop-blur-sm"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
-              maskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)',
-              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)'
-            }}
-          />
-          <div 
-            className="absolute inset-0 bg-black/10"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
-              maskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)',
-              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 100% 50%, transparent 140px, black 140px)'
-            }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-br from-l8-dark/50 to-l8-blue-dark/50 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/10" />
         </motion.div>
         
         {/* Right Side - Booking */}
         <motion.div 
           className="flex-1 relative"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
+          initial={{ x: '100%', y: '100%' }}
+          animate={{ x: 0, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         >
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-booking-dark/50 to-booking-dark/70 backdrop-blur-sm"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
-              maskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)',
-              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)'
-            }}
-          />
-          <div 
-            className="absolute inset-0 bg-black/10"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%)',
-              maskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)',
-              WebkitMaskImage: 'radial-gradient(ellipse 140px 160px at 0% 50%, transparent 140px, black 140px)'
-            }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-br from-booking-dark/50 to-booking-dark/70 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/10" />
         </motion.div>
       </div>
 
 
       {/* Content */}
-      <div className="relative z-30 h-screen flex">
+      <div className="relative z-30 h-screen flex flex-col md:flex-row">
         {/* Left Side - Events */}
         <motion.div 
-          className="flex-1 flex items-center justify-center relative group cursor-pointer"
+          className="flex-1 flex items-center justify-center relative group cursor-pointer min-h-[50vh] md:min-h-full"
           onClick={() => handlePlatformChoice('events')}
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
@@ -107,8 +79,8 @@ const PlatformChoice: React.FC = () => {
                   className="w-12 h-12 object-contain rounded-2xl"
                 />
               </div>
-              <h1 className="text-6xl md:text-7xl font-light text-white mb-2">L8 Events</h1>
-              <h2 className="text-xl md:text-2xl font-light text-white/60">Udforsk begivenheder</h2>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-2">L8 Events</h1>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-light text-white/60">Udforsk begivenheder</h2>
             </motion.div>
 
             {/* Description */}
@@ -116,7 +88,7 @@ const PlatformChoice: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="text-white/60 text-lg max-w-md mx-auto mb-8 group-hover:text-white/80 transition-colors duration-300"
+              className="text-white/60 text-base sm:text-lg max-w-md mx-auto mb-8 group-hover:text-white/80 transition-colors duration-300"
             >
               Udforsk vores kommende og tidligere events. Køb din billet idag!
             </motion.p>
@@ -137,7 +109,7 @@ const PlatformChoice: React.FC = () => {
 
         {/* Right Side - Booking */}
         <motion.div 
-          className="flex-1 flex items-center justify-center relative group cursor-pointer"
+          className="flex-1 flex items-center justify-center relative group cursor-pointer min-h-[50vh] md:min-h-full"
           onClick={() => handlePlatformChoice('booking')}
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
@@ -162,8 +134,8 @@ const PlatformChoice: React.FC = () => {
                   className="w-12 h-12 object-contain rounded-2xl"
                 />
               </div>
-              <h1 className="text-6xl md:text-7xl font-light text-white mb-2">L8 Booking</h1>
-              <h2 className="text-xl md:text-2xl font-light text-white/60">Book kunstnere</h2>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-2">L8 Booking</h1>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-light text-white/60">Book kunstnere</h2>
             </motion.div>
 
             {/* Description */}
@@ -171,7 +143,7 @@ const PlatformChoice: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="text-white/60 text-lg max-w-md mx-auto mb-8 group-hover:text-white/80 transition-colors duration-300"
+              className="text-white/60 text-base sm:text-lg max-w-md mx-auto mb-8 group-hover:text-white/80 transition-colors duration-300"
             >
               Udforsk og book talentfulde kunstnere til din næste begivenhed
             </motion.p>

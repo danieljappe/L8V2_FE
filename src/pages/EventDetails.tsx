@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, MapPin, Music, Ticket, Users, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, MapPin, Music, Ticket, Users, AlertCircle, Camera } from 'lucide-react';
 import Header from '../components/Header';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useEvent } from '../hooks/useApi';
-import { Artist } from '../services/api';
+import { Artist, GalleryImage } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
 
 const EventDetails: React.FC = () => {
@@ -156,6 +156,62 @@ const EventDetails: React.FC = () => {
                 {event.description}
               </p>
             </div>
+
+            {/* Gallery Images Section */}
+            {event.galleryImages && event.galleryImages.length > 0 && (
+              <div className="bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center">
+                  <Camera className="w-6 h-6 mr-2 text-l8-beige" />
+                  Galleri
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {event.galleryImages
+                    .filter(img => img.isPublished)
+                    .sort((a, b) => a.orderIndex - b.orderIndex)
+                    .map((image) => (
+                    <motion.div
+                      key={image.id}
+                      whileHover={{ scale: 1.02, y: -5 }}
+                      className="group relative bg-black/20 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 cursor-pointer"
+                    >
+                      <div className="aspect-square relative overflow-hidden">
+                        <img 
+                          src={image.largeUrl ? constructFullUrl(image.largeUrl) : 
+                               image.mediumUrl ? constructFullUrl(image.mediumUrl) : 
+                               image.url ? constructFullUrl(image.url) : 
+                               'https://via.placeholder.com/400x400/1a1a2e/ffffff?text=Image'} 
+                          alt={image.caption || 'Event gallery image'}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            if (target.src !== 'https://via.placeholder.com/400x400/1a1a2e/ffffff?text=Image') {
+                              target.src = 'https://via.placeholder.com/400x400/1a1a2e/ffffff?text=Image';
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                      
+                      {(image.caption || image.photographer) && (
+                        <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                          {image.caption && (
+                            <p className="text-white text-sm font-medium mb-1 line-clamp-2">
+                              {image.caption}
+                            </p>
+                          )}
+                          {image.photographer && (
+                            <p className="text-white/70 text-xs">
+                              Foto: {image.photographer}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Artists Section */}
             {event.eventArtists && event.eventArtists.length > 0 && (

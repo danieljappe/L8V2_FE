@@ -83,7 +83,7 @@ const Scene = () => {
 
   return (
     <Canvas 
-      camera={{ position: [0, 0, 0], fov: 90 }}
+      camera={{ position: [0, 0, 0], fov: 75 }}
       style={{ background: 'linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)' }}
     >
       {/* Moving atmospheric background elements */}
