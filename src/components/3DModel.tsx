@@ -20,9 +20,8 @@ function Model({ mousePosition }: ModelProps) {
   const rotationSpeed = 0.05;
 
   useEffect(() => {
-    if (!camera) return; // Ensure camera is defined
+    if (!camera) return;
 
-    // Update the target position based on mouse position
     const updateTarget = () => {
       planeNormal.set(0, 0, 1).normalize();
       plane.setFromNormalAndCoplanarPoint(planeNormal, scene.position);
@@ -33,7 +32,7 @@ function Model({ mousePosition }: ModelProps) {
     };
 
     updateTarget();
-  }, [camera, mousePosition, scene.position]); // Update whenever mousePosition changes
+  }, [camera, mousePosition, scene.position]);
 
   useFrame(() => {
     if (modelRef.current) {
@@ -46,7 +45,6 @@ function Model({ mousePosition }: ModelProps) {
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.position.set(0, 0, -20);
-      // Scale down the model to make it smaller
       modelRef.current.scale.setScalar(0.7);
     }
   }, []);

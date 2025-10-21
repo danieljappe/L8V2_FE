@@ -39,6 +39,11 @@ export const getStaticPages = (): SitemapEntry[] => [
     priority: 1.0
   },
   {
+    url: '/home',
+    changefreq: 'weekly',
+    priority: 0.9
+  },
+  {
     url: '/events',
     changefreq: 'daily',
     priority: 0.9
@@ -57,6 +62,16 @@ export const getStaticPages = (): SitemapEntry[] => [
     url: '/booking',
     changefreq: 'monthly',
     priority: 0.8
+  },
+  {
+    url: '/booking/artists',
+    changefreq: 'monthly',
+    priority: 0.7
+  },
+  {
+    url: '/booking/contact',
+    changefreq: 'monthly',
+    priority: 0.6
   },
   {
     url: '/about',
@@ -83,11 +98,11 @@ export const addDynamicPages = (events: any[], artists: any[]): SitemapEntry[] =
     });
   });
 
-  // Add artist pages
+  // Add artist pages for booking platform
   artists.forEach(artist => {
     const slug = artist.name.toLowerCase().replace(/\s+/g, '-');
     dynamicPages.push({
-      url: `/artists/${slug}`,
+      url: `/booking/artists/${slug}`,
       lastmod: artist.updatedAt ? new Date(artist.updatedAt).toISOString().split('T')[0] : undefined,
       changefreq: 'monthly',
       priority: 0.7
