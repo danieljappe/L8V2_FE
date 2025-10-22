@@ -6,6 +6,7 @@ import { apiService, Artist } from '../services/api';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { constructFullUrl } from '../utils/imageUtils';
+import { useSEO } from '../hooks/useSEO';
 
 const Booking: React.FC = () => {
   const [artists, setArtists] = useState<Artist[]>([]);
@@ -19,6 +20,14 @@ const Booking: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+
+  // SEO optimization
+  useSEO({
+    title: 'L8 Booking - Book Kunstnere til Din Event',
+    description: 'Book talentfulde kunstnere til din event gennem L8 Booking. Udforsk vores portfolio af DJs, producere og musikere. Professionel booking service for events i Danmark.',
+    keywords: 'L8 Booking, book kunstnere, event booking, DJ booking, producer booking, musik booking, event management, kunstnere til events, booking service',
+    url: '/booking'
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -321,7 +330,7 @@ const Booking: React.FC = () => {
                 L8 Booking
               </h1>
               <p className="text-xl md:text-2xl text-white/60 mb-8 max-w-2xl mx-auto font-light">
-                Udforsk og book talentfulde kunstnere
+                Udforsk og book talentfulde kunstnere til din event. Se også vores <Link to="/events" className="text-booking-orange hover:text-booking-teal transition-colors underline">kommende events</Link> og <Link to="/about" className="text-booking-orange hover:text-booking-teal transition-colors underline">lær mere om L8 Events</Link>.
               </p>
             </motion.div>
           </div>

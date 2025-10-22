@@ -5,9 +5,9 @@ import { useSEO } from '../hooks/useSEO';
 const Events: React.FC = () => {
   // SEO optimization
   useSEO({
-    title: 'Events - Kommende Begivenheder',
-    description: 'Udforsk L8 Events kommende begivenheder og oplev uforglemmelige musikkopplevelser med elektronisk musik. Find datoer, lokationer og billetinformation.',
-    keywords: 'L8 Events, kommende events, elektronisk musik events, begivenheder, billetter, musikkopplevelser, event kalender',
+    title: 'L8 Events - Kommende Begivenheder og Musikkopplevelser',
+    description: 'Udforsk L8 Events kommende begivenheder og oplev uforglemmelige musikkopplevelser med elektronisk musik. Find datoer, lokationer, billetter og book kunstnere til din event.',
+    keywords: 'L8 Events, kommende events, elektronisk musik events, begivenheder, billetter, musikkopplevelser, event kalender, DJ events, musik events Danmark, event booking',
     url: '/events'
   });
 

@@ -60,8 +60,8 @@ export const getStaticPages = (): SitemapEntry[] => [
   },
   {
     url: '/booking',
-    changefreq: 'monthly',
-    priority: 0.8
+    changefreq: 'weekly',
+    priority: 0.9
   },
   {
     url: '/booking/artists',
@@ -76,7 +76,7 @@ export const getStaticPages = (): SitemapEntry[] => [
   {
     url: '/about',
     changefreq: 'monthly',
-    priority: 0.6
+    priority: 0.8
   },
   {
     url: '/contact',

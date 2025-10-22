@@ -3,6 +3,7 @@ import { Users, Heart, Rocket, Star, ArrowRight, Linkedin, Github } from 'lucide
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEvents } from '../hooks/useApi';
+import { useSEO } from '../hooks/useSEO';
 
 const useCountAnimation = (end: number, duration: number = 2) => {
   const count = useMotionValue(0);
@@ -22,6 +23,14 @@ const useCountAnimation = (end: number, duration: number = 2) => {
 const AboutUs = () => {
   const { data: events, loading: eventsLoading } = useEvents();
   const [eventCount, setEventCount] = useState(0);
+
+  // SEO optimization
+  useSEO({
+    title: 'Om L8 Events - Vores Mission og Team',
+    description: 'Lær mere om L8 Events team og vores mission om at skabe uforglemmelige musikkopplevelser. Vi er dedikeret til at styrke den danske musikscene gennem innovative events.',
+    keywords: 'L8 Events om os, team, mission, dansk musik, event management, musikkopplevelser, elektronisk musik, event organisatorer, musik fællesskab',
+    url: '/about'
+  });
 
   useEffect(() => {
     if (events && !eventsLoading) {
@@ -165,7 +174,7 @@ const AboutUs = () => {
           transition={{ delay: 0.3 }}
           className="text-xl text-l8-beige max-w-3xl mx-auto"
         >
-          Vi er et passioneret team dedikeret til at skabe innovative løsninger, der gør en forskel.
+          Vi er et passioneret team dedikeret til at skabe innovative løsninger, der gør en forskel. Udforsk vores <Link to="/events" className="text-l8-blue hover:text-l8-blue-light transition-colors underline">kommende events</Link> eller <Link to="/booking" className="text-l8-blue hover:text-l8-blue-light transition-colors underline">book kunstnere</Link> til din event.
         </motion.p>
       </motion.div>
 
