@@ -260,10 +260,10 @@ const EventList: React.FC = () => {
       <div className="container mx-auto max-w-6xl w-full opacity-100">
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            Alle Begivenheder
+            Events
           </h1>
           <p className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4">
-            Udforsk vores kommende og tidligere begivenheder. Find din næste fantastiske oplevelse eller relive magiske øjeblikke fra fortiden.
+            Udforsk vores kommende og tidligere afholdte events. Dont be L8.
           </p>
         </div>
 

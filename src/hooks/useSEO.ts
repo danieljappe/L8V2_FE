@@ -19,7 +19,7 @@ export const useSEO = ({
 }: SEOProps) => {
   useEffect(() => {
     const baseTitle = 'L8 Events';
-    const baseDescription = 'L8 Events skaber events for den danske upcoming scene. Deltag i vores begivenheder, book kunstnere og få en unik oplevelse.';
+    const baseDescription = 'L8 Events skaber events med fokus på vækstlaget i dansk musik og agerer som booker for spirrende artister. Kom for koncerterne, bliv for festen. Dont be L8!';
     const baseUrl = 'https://l8events.dk';
     
     const finalTitle = title ? `${title} | ${baseTitle}` : baseTitle;

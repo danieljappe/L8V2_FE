@@ -107,10 +107,10 @@ const Artists: React.FC = () => {
               <Users className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-              Vores Kunstnere
+              Artister igennem tiden
             </h1>
             <p className="text-base text-white/80 max-w-2xl mx-auto">
-              Udforsk de talentfulde kunstnere, der bringer musikken til live på L8
+              Skud ud til alle de artister der har optrådt hos L8. Her kan du få et overblik over hvem de er.
             </p>
           </motion.div>
         </div>

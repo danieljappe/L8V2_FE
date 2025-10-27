@@ -164,7 +164,7 @@ const Gallery: React.FC = () => {
                 variants={itemVariants}
                 className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4"
               >
-                Udforsk vores samling af fantastiske billeder fra begivenheder, kunstnere og magiske øjeblikke.
+                Mærk viben fra tidligere events
               </motion.p>
             </motion.div>
 
