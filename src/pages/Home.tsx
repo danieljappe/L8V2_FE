@@ -59,7 +59,7 @@ const Home: React.FC = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4">Begivenheder</h3>
                   <p className="text-white/70 mb-6 flex-grow">
-                    Opdag vores kommende begivenheder eller genoplev vores tidligere events.
+                    Opdag vores kommende begivenheder eller se highlights fra tidligere events.
                   </p>
                   <div className="flex items-center justify-center text-l8-beige group-hover:text-l8-beige-light transition-colors mt-auto">
                     <span className="mr-2">Udforsk Begivenheder</span>
@@ -82,7 +82,7 @@ const Home: React.FC = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4">Booking</h3>
                   <p className="text-white/70 mb-6 flex-grow">
-                    Book talentfulde kunstnere til dine events og skab uforglemmelige oplevelser.
+                    Book talentfulde artister til dine events og skab uforglemmelige oplevelser.
                   </p>
                   <div className="flex items-center justify-center text-blue-300 group-hover:text-blue-200 transition-colors mt-auto">
                     <span className="mr-2">Book Kunstnere</span>

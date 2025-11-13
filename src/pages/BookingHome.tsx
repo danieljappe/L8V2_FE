@@ -7,23 +7,23 @@ const BookingHome: React.FC = () => {
   const features = [
     {
       icon: Users,
-      title: 'Talentfulde Kunstnere',
-      description: 'Udforsk vores samling af professionelle kunstnere og musikere'
+      title: 'Talentfulde Artister',
+      description: 'Udforsk vores hold af spirrende artister'
     },
     {
       icon: Calendar,
       title: 'Nem Booking',
-      description: 'Book dine favorit kunstnere direkte gennem vores platform'
+      description: 'Book dine favorit artist direkte gennem vores platform'
     },
     {
       icon: Star,
-      title: 'Høj Kvalitet',
-      description: 'Kun de bedste kunstnere med dokumenteret erfaring og kvalitet'
+      title: 'Ny Energi',
+      description: 'Hos os finder du Danmarks næste bølge af artister'
     }
   ];
 
   const stats = [
-    { number: '50+', label: 'Kunstnere' },
+    { number: '50+', label: 'Artister' },
     { number: '100+', label: 'Bookinger' },
     { number: '5', label: 'Års Erfaring' },
     { number: '98%', label: 'Tilfredshed' }
@@ -50,7 +50,7 @@ const BookingHome: React.FC = () => {
                 L8 Booking
               </h1>
               <p className="text-xl md:text-2xl text-white/60 mb-8 max-w-2xl mx-auto font-light">
-                Book talentfulde kunstnere til din næste begivenhed
+                Book talentfulde artister til din næste begivenhed
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/booking/artists">
@@ -74,28 +74,6 @@ const BookingHome: React.FC = () => {
                 </Link>
               </div>
             </motion.div>
-          </div>
-
-          {/* Stats Section */}
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl md:text-5xl font-bold text-white mb-2">
-                    {stat.number}
-                  </div>
-                  <div className="text-white/60 font-medium">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -124,7 +102,7 @@ const BookingHome: React.FC = () => {
               Hvorfor Vælge L8 Booking?
             </h2>
             <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
-              Vi forbinder dig med de bedste kunstnere og sikrer en perfekt oplevelse
+              Vi forbinder dig med artisterne og sikrer en smooth oplevelse.
             </p>
           </motion.div>
         </div>
@@ -169,7 +147,7 @@ const BookingHome: React.FC = () => {
             Klar til at Booke?
           </h2>
           <p className="text-xl text-white/60 mb-8 font-light">
-            Udforsk vores kunstnere og find den perfekte match til din begivenhed
+            Udforsk vores artister og find det perfekte match til dit næste event
           </p>
           <Link to="/booking/artists">
             <motion.button

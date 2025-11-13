@@ -73,7 +73,7 @@ const Contact = () => {
         >
           <h1 className="text-4xl font-bold text-white mb-4">Kontakt Os</h1>
           <p className="text-xl text-white/80">
-            Har du spørgsmål? Vi vil gerne høre fra dig. Send os en besked, og vi svarer så hurtigt som muligt.
+          Har du et projekt, en release, et budskab eller noget helt fjerde som du tænker vi skal høre om? Så tøv ikke med et række ud!
           </p>
         </motion.div>
 
@@ -89,14 +89,14 @@ const Contact = () => {
                 <Mail className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="text-lg font-medium text-white">E-mail</h3>
-                  <p className="mt-2 text-white/80">kontakt@l8.dk</p>
+                  <p className="mt-2 text-white/80">kontaktl8@outlook.dk</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
                 <Phone className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="text-lg font-medium text-white">Telefon</h3>
-                  <p className="mt-2 text-white/80">+45 12 34 56 78</p>
+                  <p className="mt-2 text-white/80">+45 50 52 22 93 (Mikkel Mourier)</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -104,9 +104,7 @@ const Contact = () => {
                 <div>
                   <h3 className="text-lg font-medium text-white">Åbningstider</h3>
                   <p className="mt-2 text-white/80">
-                    Mandag - Fredag: 9:00 - 17:00<br />
-                    Lørdag: 10:00 - 14:00<br />
-                    Søndag: Lukket
+                    Aldrig lukket. Aldrig L8
                   </p>
                 </div>
               </div>

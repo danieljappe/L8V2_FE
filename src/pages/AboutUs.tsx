@@ -99,6 +99,7 @@ const AboutUs = () => {
       name: "Mikkel Danø Mourier",
       role: "CEO & Founder",
       image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
+      // TODO: Mail
     },
     {
       name: "Joachim Engelhart Illigen",
@@ -108,6 +109,11 @@ const AboutUs = () => {
     {
       name: "Jacob Kruse",
       role: "Event Afholder",
+      image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
+    },
+    {
+      name: "Nabil Hussein",
+      role: "Rolle",
       image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
     }
   ];
@@ -174,7 +180,7 @@ const AboutUs = () => {
           transition={{ delay: 0.3 }}
           className="text-xl text-l8-beige max-w-3xl mx-auto"
         >
-          Vi er et passioneret team dedikeret til at skabe innovative løsninger, der gør en forskel. Udforsk vores <Link to="/events" className="text-l8-blue hover:text-l8-blue-light transition-colors underline">kommende events</Link> eller <Link to="/booking" className="text-l8-blue hover:text-l8-blue-light transition-colors underline">book kunstnere</Link> til din event.
+          L8 kuraterer events med fokus på den nye bølge af dansk musik. Vi arbejder for at løfte og showcase artister i vækstlaget – og fungerer som bindeled mellem de nye talenter og de etablerede spillesteder. Siden vores første event i marts 2024 er vi vokset fra et lille festlokale i Sydhavnen til en scene på Distortion - og alt der i mellem. <br></br> Udforsk vores <Link to="/events" className="text-l8-blue hover:text-l8-blue-light transition-colors underline">kommende events</Link> eller <Link to="/booking" className="text-l8-blue hover:text-l8-blue-light transition-colors underline">book kunstnere</Link> til dit event.
         </motion.p>
       </motion.div>
 
@@ -248,7 +254,7 @@ const AboutUs = () => {
           transition={{ duration: 0.6 }}
           className="text-3xl font-bold text-center mb-12"
         >
-          Vores Team
+          Holdet bag L8
         </motion.h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {teamMembers.map((member, index) => (
@@ -292,33 +298,6 @@ const AboutUs = () => {
         </div>
       </motion.div>
 
-      {/* Mission Statement */}
-      <motion.div
-        variants={fadeIn}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="max-w-4xl mx-auto mt-20 text-center"
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl font-bold mb-6"
-        >
-          Vores Mission
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-l8-beige text-lg leading-relaxed"
-        >
-          Vi tror på at skubbe grænserne for hvad der er muligt, og skabe oplevelser der inspirerer og innovater.
-          Vores mission er at styrke virksomheder og enkeltpersoner gennem banebrydende teknologi og kreative løsninger.
-        </motion.p>
-      </motion.div>
-
       {/* Contact CTA Section */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -334,7 +313,7 @@ const AboutUs = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-l8-beige to-l8-blue"
           >
-            Klar til at Komme i Gang?
+            Ræk ud til os
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -342,7 +321,7 @@ const AboutUs = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-l8-beige text-lg mb-8"
           >
-            Lad os skabe noget fantastisk sammen. Kom i kontakt med vores team i dag.
+            Vi brænder for at skabe og arbejde sammen med kulturskabere, ildsjæle, musikelskere, artister, brands og alt der imellem - alt i mens vi dygtiggører vores håndværk og forstørrer vores platform med et fokus på kvalitet, autenticitet og fællesskab som pejlemærket. <br/><br/> Har du et projekt, en release, et budskab eller noget helt fjerde som du tænker vi skal høre om? Så tøv ikke med et række ud!
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

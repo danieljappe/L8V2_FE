@@ -110,7 +110,7 @@ const Artists: React.FC = () => {
               Artister igennem tiden
             </h1>
             <p className="text-base text-white/80 max-w-2xl mx-auto">
-              Skud ud til alle de artister der har optrådt hos L8. Her kan du få et overblik over hvem de er.
+              L8 Hall of Fame - Skud ud til alle de artister der har optrådt hos L8. <br/>Her kan du få et overblik over hvem de er.
             </p>
           </motion.div>
         </div>

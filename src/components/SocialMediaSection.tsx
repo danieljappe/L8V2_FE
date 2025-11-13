@@ -7,19 +7,19 @@ const SocialMediaSection: React.FC = () => {
       name: 'Instagram', 
       icon: '/icons/Instagram_icon.png', 
       href: 'https://www.instagram.com/aldrigl8/',
-      description: 'Følg os for bagom-scenes indhold og event updates'
+      description: ''
     },
     { 
       name: 'Facebook', 
       icon: '/icons/facebook_icon.png', 
       href: 'https://www.facebook.com/profile.php?id=61556066605549',
-      description: 'Bliv opdateret på vores events og deltag i diskussioner'
+      description: ''
     },
     { 
       name: 'TikTok', 
       icon: '/icons/tiktokicon.png', 
       href: 'https://www.tiktok.com/@aldrigl8',
-      description: 'Se korte videoer fra vores events og kunstnere'
+      description: ''
     }
   ];
 
@@ -58,7 +58,7 @@ const SocialMediaSection: React.FC = () => {
       >
         <motion.div variants={itemVariants} className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            Følg Os
+            Følg Med
           </h2>
           <p className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto px-4">
             Hold dig opdateret på vores events, kunstnere og de seneste nyheder fra L8 Events

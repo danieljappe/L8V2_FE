@@ -15,6 +15,8 @@ import Login from './pages/Login';
 import Header from './components/Header';
 import PlatformRouter from './components/PlatformRouter';
 import { useAuth } from './hooks/useAuth';
+import CookieSettingsButton from './components/CookieSettingsButton';
+import CookieConsentBanner from './components/CookieConsentBanner';
 import { AuthProvider } from './contexts/AuthContext';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
@@ -78,6 +80,8 @@ const App = () => {
       <AuthProvider>
         <PlatformRouter>
           <AppContent />
+          <CookieSettingsButton />
+          <CookieConsentBanner />
         </PlatformRouter>
       </AuthProvider>
     </Router>
