@@ -33,7 +33,7 @@ const CookiePreferences: React.FC<ConsentPreferencesProps> = ({ preferences, onC
             disabled
             className="bg-gray-600 text-white px-3 py-1 rounded text-xs cursor-not-allowed"
           >
-            Påkrevet
+            Påkrævet
           </button>
         </div>
       </div>

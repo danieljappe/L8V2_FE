@@ -147,3 +147,4 @@ Potential improvements to consider:
 - Add hreflang support for internationalization
 - Implement sitemap indexing for large sites
 - Add automatic sitemap submission to search engines
+

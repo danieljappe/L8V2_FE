@@ -29,9 +29,9 @@ const PlatformChoice: React.FC = () => {
         {/* Left Side - Events */}
         <motion.div 
           className="flex-1 relative"
-          initial={{ x: '-100%', y: '-100%' }}
-          animate={{ x: 0, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          initial={{ x: '-100%' }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         >
           <div 
             className="absolute inset-0 bg-gradient-to-br from-l8-dark/50 to-l8-blue-dark/50 backdrop-blur-sm hidden md:block"
@@ -57,8 +57,8 @@ const PlatformChoice: React.FC = () => {
         {/* Right Side - Booking */}
         <motion.div 
           className="flex-1 relative"
-          initial={{ x: '100%', y: '100%' }}
-          animate={{ x: 0, y: 0 }}
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         >
           <div 
@@ -169,7 +169,7 @@ const PlatformChoice: React.FC = () => {
                 />
               </div>
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-2">L8 Booking</h1>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-light text-white/60">Book kunstnere</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-light text-white/60">Book artister</h2>
             </motion.div>
 
             {/* Description */}
@@ -179,7 +179,7 @@ const PlatformChoice: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.8 }}
               className="text-white/60 text-base sm:text-lg max-w-md mx-auto mb-8 group-hover:text-white/80 transition-colors duration-300"
             >
-              Udforsk og book talentfulde kunstnere til din næste begivenhed
+              Udforsk og book talentfulde artister til din næste begivenhed
             </motion.p>
 
             {/* CTA */}
@@ -189,7 +189,7 @@ const PlatformChoice: React.FC = () => {
               transition={{ duration: 0.6, delay: 1.0 }}
               className="flex items-center justify-center space-x-2 text-white/60 group-hover:text-white transition-colors duration-300"
             >
-              <span className="text-sm font-medium">Udforsk kunstnere</span>
+              <span className="text-sm font-medium">Udforsk booking</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
             </motion.div>
 
