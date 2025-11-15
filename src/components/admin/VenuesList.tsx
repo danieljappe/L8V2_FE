@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, MapPin, Users, DollarSign, Mail, Phone } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin } from 'lucide-react';
 import { Venue } from '../../types/admin';
+import VenueMapEmbed from '../VenueMapEmbed';
+
+const DEFAULT_VENUE_FORM: Partial<Venue> = {
+  name: '',
+  address: '',
+  city: '',
+  description: '',
+  amenities: [],
+  imageUrl: '',
+  mapEmbedHtml: ''
+};
 
 interface VenuesListProps {
   venues: Venue[];
-  onAddVenue: (venueData: Omit<Venue, 'id' | 'createdAt'>) => void;
+  onAddVenue: (venueData: Partial<Venue>) => void;
   onUpdateVenue: (venue: Venue) => void;
   onDeleteVenue: (id: string) => void;
 }
@@ -29,7 +40,7 @@ export default function VenuesList({
     }
   };
 
-  const handleFormSubmit = (venueData: Omit<Venue, 'id' | 'createdAt'>) => {
+  const handleFormSubmit = (venueData: Partial<Venue>) => {
     if (editingVenue) {
       onUpdateVenue({ ...editingVenue, ...venueData });
       setEditingVenue(null);
@@ -88,15 +99,32 @@ export default function VenuesList({
                 <MapPin className="w-4 h-4 mr-2" />
                 {venue.address}
               </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Users className="w-4 h-4 mr-2" />
-                Capacity: {venue.capacity}
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <DollarSign className="w-4 h-4 mr-2" />
-                ${venue.pricePerHour}/hour
-              </div>
+              {venue.city && (
+                <p className="text-sm text-gray-500">
+                  {venue.city}
+                </p>
+              )}
             </div>
+
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Google Maps Preview
+              </p>
+              {!venue.mapEmbedHtml && (
+                <span className="text-xs text-gray-400 italic">Not provided</span>
+              )}
+            </div>
+            {venue.mapEmbedHtml ? (
+              <div className="rounded-xl overflow-hidden border border-gray-100">
+                <VenueMapEmbed
+                  embedHtml={venue.mapEmbedHtml}
+                  title={`${venue.name} location`}
+                  height={180}
+                />
+              </div>
+            ) : null}
+          </div>
 
             <div className="flex justify-end space-x-2">
               <button
@@ -122,43 +150,24 @@ export default function VenuesList({
 // Simple VenueForm component
 function VenueForm({ venue, onSubmit, onCancel }: {
   venue?: Venue | null;
-  onSubmit: (venueData: Omit<Venue, 'id' | 'createdAt'>) => void;
+  onSubmit: (venueData: Partial<Venue>) => void;
   onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    city: '',
-    capacity: 0,
-    description: '',
-    amenities: [] as string[],
-    image: '',
-    pricePerHour: 0
-  });
+  const [formData, setFormData] = useState<Partial<Venue>>({ ...DEFAULT_VENUE_FORM });
 
   useEffect(() => {
     if (venue) {
       setFormData({
-        name: venue.name || '',
-        address: venue.address || '',
-        city: venue.city || '',
-        capacity: venue.capacity || 0,
-        description: venue.description || '',
+        name: venue.name,
+        address: venue.address,
+        city: venue.city,
+        description: venue.description,
         amenities: venue.amenities || [],
-        image: venue.image || '',
-        pricePerHour: venue.pricePerHour || 0
+        imageUrl: venue.imageUrl,
+        mapEmbedHtml: venue.mapEmbedHtml || ''
       });
     } else {
-      setFormData({
-        name: '',
-        address: '',
-        city: '',
-        capacity: 0,
-        description: '',
-        amenities: [],
-        image: '',
-        pricePerHour: 0
-      });
+      setFormData({ ...DEFAULT_VENUE_FORM });
     }
   }, [venue]);
 
@@ -168,97 +177,97 @@ function VenueForm({ venue, onSubmit, onCancel }: {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-auto max-h-[90vh] flex flex-col">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
             {venue ? 'Edit Venue' : 'Add New Venue'}
           </h2>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label htmlFor="venue-name" className="block text-sm font-medium text-gray-700 mb-1">Venue Name</label>
-            <input
-              id="venue-name"
-              type="text"
-              placeholder="Venue Name"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
-            />
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 p-6 space-y-4 overflow-y-auto">
+            <div>
+              <label htmlFor="venue-name" className="block text-sm font-medium text-gray-700 mb-1">Venue Name</label>
+              <input
+                id="venue-name"
+                type="text"
+                placeholder="Venue Name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="venue-address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <input
+                id="venue-address"
+                type="text"
+                placeholder="Address"
+                value={formData.address}
+                onChange={(e) => setFormData({...formData, address: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="venue-city" className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <input
+                id="venue-city"
+                type="text"
+                placeholder="City"
+                value={formData.city || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label htmlFor="venue-description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                id="venue-description"
+                placeholder="Description"
+                value={formData.description || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                rows={3}
+              />
+            </div>
+            <div>
+              <label htmlFor="venue-image-url" className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+              <input
+                id="venue-image-url"
+                type="text"
+                placeholder="https://example.com/image.jpg"
+                value={formData.imageUrl || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label htmlFor="venue-map-embed" className="block text-sm font-medium text-gray-700 mb-1">
+                Google Maps Embed (iframe)
+              </label>
+              <textarea
+                id="venue-map-embed"
+                placeholder='<iframe src="https://www.google.com/maps/embed?..." />'
+                value={formData.mapEmbedHtml || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, mapEmbedHtml: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-xs"
+                rows={4}
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="venue-address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input
-              id="venue-address"
-              type="text"
-              placeholder="Address"
-              value={formData.address}
-              onChange={(e) => setFormData({...formData, address: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="venue-city" className="block text-sm font-medium text-gray-700 mb-1">City</label>
-            <input
-              id="venue-city"
-              type="text"
-              placeholder="City"
-              value={formData.city}
-              onChange={(e) => setFormData({...formData, city: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="venue-capacity" className="block text-sm font-medium text-gray-700 mb-1">Capacity (number of people)</label>
-            <input
-              id="venue-capacity"
-              type="number"
-              placeholder="Capacity"
-              value={formData.capacity}
-              onChange={(e) => setFormData({...formData, capacity: Number(e.target.value)})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="venue-price" className="block text-sm font-medium text-gray-700 mb-1">Price per Hour (USD)</label>
-            <input
-              id="venue-price"
-              type="number"
-              placeholder="Price per Hour"
-              value={formData.pricePerHour}
-              onChange={(e) => setFormData({...formData, pricePerHour: Number(e.target.value)})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="venue-description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              id="venue-description"
-              placeholder="Description"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              rows={3}
-              required
-            />
-          </div>
-          <div className="flex space-x-2">
+          <div className="p-6 border-t border-gray-200 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               {venue ? 'Update' : 'Create'}
             </button>

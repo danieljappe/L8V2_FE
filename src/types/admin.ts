@@ -61,13 +61,14 @@ export interface Venue {
   id: string;
   name: string;
   address: string;
-  city: string;
-  capacity: number;
-  description: string;
+  city?: string;
+  description?: string;
   amenities: string[];
-  image: string;
-  pricePerHour: number;
+  imageUrl?: string;
+  images?: string[];
+  mapEmbedHtml?: string | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface GalleryItem {

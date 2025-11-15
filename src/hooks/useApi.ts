@@ -105,7 +105,7 @@ export function useVenues() {
   return useApi(() => apiService.getVenues());
 }
 
-export function useVenue(id: number) {
+export function useVenue(id: string) {
   return useApi(() => apiService.getVenue(id), [id]);
 }
 

@@ -98,13 +98,9 @@ export const mockVenues: Venue[] = [
     name: 'Central Park Arena',
     address: '123 Central Park Ave',
     city: 'New York',
-    capacity: 5000,
     description: 'A large outdoor arena perfect for major events and festivals.',
     amenities: ['Parking', 'Food & Beverage', 'VIP Areas', 'Sound System'],
-    contactEmail: 'info@centralparkarena.com',
-    contactPhone: '+1-555-0200',
-    image: '/images/venue1.jpg',
-    pricePerHour: 5000,
+    imageUrl: '/images/venue1.jpg',
     createdAt: '2024-01-01T06:00:00Z'
   },
   {
@@ -112,13 +108,9 @@ export const mockVenues: Venue[] = [
     name: 'Blue Note Club',
     address: '456 Jazz Street',
     city: 'New York',
-    capacity: 200,
     description: 'An intimate jazz club with excellent acoustics.',
     amenities: ['Bar', 'VIP Seating', 'Professional Sound', 'Lighting'],
-    contactEmail: 'booking@bluenote.com',
-    contactPhone: '+1-555-0201',
-    image: '/images/venue2.jpg',
-    pricePerHour: 800,
+    imageUrl: '/images/venue2.jpg',
     createdAt: '2024-01-02T07:30:00Z'
   },
   {
@@ -126,13 +118,9 @@ export const mockVenues: Venue[] = [
     name: 'Stadium Arena',
     address: '789 Stadium Blvd',
     city: 'Los Angeles',
-    capacity: 10000,
     description: 'A massive stadium perfect for large concerts and events.',
     amenities: ['Parking', 'Concessions', 'VIP Suites', 'Professional Stage'],
-    contactEmail: 'events@stadiumarena.com',
-    contactPhone: '+1-555-0202',
-    image: '/images/venue3.jpg',
-    pricePerHour: 15000,
+    imageUrl: '/images/venue3.jpg',
     createdAt: '2024-01-03T09:00:00Z'
   }
 ];

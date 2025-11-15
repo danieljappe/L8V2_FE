@@ -116,12 +116,13 @@ function mapApiVenueToAdminVenue(apiVenue: ApiVenue): Venue {
     name: apiVenue.name,
     address: apiVenue.address || '',
     city: apiVenue.city || '',
-    capacity: apiVenue.capacity || 0,
     description: apiVenue.description || '',
     amenities: [],
-    image: apiVenue.image || '',
-    pricePerHour: 0,
+    imageUrl: apiVenue.imageUrl || '',
+    images: apiVenue.images || [],
+    mapEmbedHtml: apiVenue.mapEmbedHtml || '',
     createdAt: apiVenue.createdAt,
+    updatedAt: apiVenue.updatedAt,
   };
 }
 
@@ -339,7 +340,7 @@ export default function Admin() {
   };
 
   // Venue handlers
-  const handleAddVenue = async (venueData: Omit<Venue, 'id' | 'createdAt'>) => {
+  const handleAddVenue = async (venueData: Partial<Venue>) => {
     const res = await apiService.createVenue(venueData);
     if (res.data) {
       setVenues((prev) => [...prev, mapApiVenueToAdminVenue(res.data as ApiVenue)]);

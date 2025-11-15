@@ -6,8 +6,9 @@ import Header from '../components/Header';
 import ArtistModal from '../components/ArtistModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useEvent } from '../hooks/useApi';
-import { Artist, GalleryImage } from '../services/api';
+import { Artist } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
+import VenueMapEmbed from '../components/VenueMapEmbed';
 
 const EventDetails: React.FC = () => {
   const { eventId } = useParams();
@@ -91,14 +92,14 @@ const EventDetails: React.FC = () => {
       <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src={event.imageUrl ? constructFullUrl(event.imageUrl) : (event.venue?.image ? constructFullUrl(event.venue.image) : 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image')} 
+            src={event.imageUrl ? constructFullUrl(event.imageUrl) : (event.venue?.imageUrl ? constructFullUrl(event.venue.imageUrl) : 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image')} 
             alt={event.title}
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback to venue image or stock photo if event image fails to load
               const target = e.target as HTMLImageElement;
-              if (event.venue?.image && target.src !== constructFullUrl(event.venue.image)) {
-                target.src = constructFullUrl(event.venue.image);
+              if (event.venue?.imageUrl && target.src !== constructFullUrl(event.venue.imageUrl)) {
+                target.src = constructFullUrl(event.venue.imageUrl);
               } else if (target.src !== 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image') {
                 target.src = 'https://via.placeholder.com/1920x1080/1a1a2e/ffffff?text=Event+Image';
               }
@@ -281,19 +282,36 @@ const EventDetails: React.FC = () => {
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">{event.venue.name}</h3>
                     <p className="text-white/70 mb-2">{event.venue.address}</p>
-                    <p className="text-white/70 mb-4">{event.venue.city}</p>
+                    {event.venue.city && (
+                      <p className="text-white/70 mb-4">{event.venue.city}</p>
+                    )}
                     {event.venue.description && (
                       <p className="text-white/80 text-sm leading-relaxed">{event.venue.description}</p>
                     )}
                   </div>
-                  <div className="bg-black/20 rounded-2xl p-4">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Users className="w-5 h-5 text-l8-beige" />
-                      <span className="text-white font-semibold">Kapacitet</span>
+                  {(event.capacity || event.totalTickets) && (
+                    <div className="bg-black/20 rounded-2xl p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Users className="w-5 h-5 text-l8-beige" />
+                        <span className="text-white font-semibold">Kapacitet</span>
+                      </div>
+                      <p className="text-white/70">
+                        {(event.capacity || event.totalTickets)?.toLocaleString()} personer
+                      </p>
                     </div>
-                    <p className="text-white/70">{event.venue.capacity.toLocaleString()} personer</p>
-                  </div>
+                  )}
                 </div>
+                {event.venue.mapEmbedHtml && (
+                  <div className="mt-6">
+                    <div className="bg-black/20 rounded-2xl p-3 border border-white/10">
+                      <VenueMapEmbed
+                        embedHtml={event.venue.mapEmbedHtml}
+                        title={`Kort over ${event.venue.name}`}
+                        height={360}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

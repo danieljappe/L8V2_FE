@@ -205,13 +205,14 @@ export interface Artist {
 }
 
 export interface Venue {
-  id: number;
+  id: string;
   name: string;
   address: string;
-  city: string;
-  capacity: number;
-  description?: string;
-  image?: string;
+  city?: string;
+  description?: string | null;
+  imageUrl?: string;
+  images?: string[];
+  mapEmbedHtml?: string | null;
   events?: Event[];
   createdAt: string;
   updatedAt: string;
@@ -313,10 +314,10 @@ export const apiService = {
 
   // Venues
   getVenues: () => apiClient.get<Venue[]>('/venues'),
-  getVenue: (id: number) => apiClient.get<Venue>(`/venues/${id}`),
+  getVenue: (id: string) => apiClient.get<Venue>(`/venues/${id}`),
   createVenue: (venue: Partial<Venue>) => apiClient.post<Venue>('/venues', venue),
-  updateVenue: (id: string | number, venue: Partial<Venue>) => apiClient.put<Venue>(`/venues/${id}`, venue),
-  deleteVenue: (id: string | number) => apiClient.delete<null>(`/venues/${id}`),
+  updateVenue: (id: string, venue: Partial<Venue>) => apiClient.put<Venue>(`/venues/${id}`, venue),
+  deleteVenue: (id: string) => apiClient.delete<null>(`/venues/${id}`),
 
   // Gallery
   getGalleryImages: () => {
