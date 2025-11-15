@@ -4,12 +4,6 @@ import { motion } from 'framer-motion';
 const SocialMediaSection: React.FC = () => {
   const socialLinks = [
     { 
-      name: 'Instagram', 
-      icon: '/icons/Instagram_icon.png', 
-      href: 'https://www.instagram.com/aldrigl8/',
-      description: ''
-    },
-    { 
       name: 'Facebook', 
       icon: '/icons/facebook_icon.png', 
       href: 'https://www.facebook.com/profile.php?id=61556066605549',
@@ -48,13 +42,13 @@ const SocialMediaSection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 flex items-center justify-center p-4">
+    <section className="py-16 flex items-center justify-center px-4 sm:px-6">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="container mx-auto max-w-4xl"
+        className="w-full max-w-screen-2xl mx-auto"
       >
         <motion.div variants={itemVariants} className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
@@ -65,8 +59,26 @@ const SocialMediaSection: React.FC = () => {
           </p>
         </motion.div>
 
+        <motion.div
+          variants={itemVariants}
+          className="mb-12 border border-white/10 rounded-3xl w-full sm:p-6 shadow-2xl"
+          style={{ minHeight: 720, backgroundColor: '#fafafa' }}
+        >
+          <iframe
+            src="https://emb.fouita.com/widget/0x34cf9e/ftbngklcwg"
+            title="Carousel Instagram Feed"
+            width="100%"
+            height="720"
+            frameBorder="0"
+            scrolling="no"
+            className="w-full h-full min-h-[720px]"
+            style={{ width: '100%' }}
+            allowFullScreen
+          />
+        </motion.div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {socialLinks.map((social, index) => (
+          {socialLinks.map((social) => (
             <motion.a
               key={social.name}
               href={social.href}
@@ -104,6 +116,7 @@ const SocialMediaSection: React.FC = () => {
             </motion.a>
           ))}
         </div>
+
       </motion.div>
     </section>
   );
