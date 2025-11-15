@@ -278,28 +278,31 @@ const EventDetails: React.FC = () => {
                   Lokation
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">{event.venue.name}</h3>
-                    <p className="text-white/70 mb-2">{event.venue.address}</p>
-                    {event.venue.city && (
-                      <p className="text-white/70 mb-4">{event.venue.city}</p>
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="text-2xl font-semibold text-white">{event.venue.name}</h3>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
+                      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1">
+                        <MapPin className="w-4 h-4 text-l8-beige" />
+                        <span>{event.venue.address}</span>
+                      </div>
+                      {event.venue.city && (
+                        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1">
+                          <span className="w-2 h-2 rounded-full bg-l8-beige inline-block" />
+                          <span>{event.venue.city}</span>
+                        </div>
+                      )}
+                    </div>
                     {event.venue.description && (
-                      <p className="text-white/80 text-sm leading-relaxed">{event.venue.description}</p>
+                      <p className="text-white/80 text-sm leading-relaxed">
+                        {event.venue.description}
+                      </p>
                     )}
                   </div>
-                  {(event.capacity || event.totalTickets) && (
-                    <div className="bg-black/20 rounded-2xl p-4">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Users className="w-5 h-5 text-l8-beige" />
-                        <span className="text-white font-semibold">Kapacitet</span>
-                      </div>
-                      <p className="text-white/70">
-                        {(event.capacity || event.totalTickets)?.toLocaleString()} personer
-                      </p>
-                    </div>
-                  )}
                 </div>
                 {event.venue.mapEmbedHtml && (
                   <div className="mt-6">
