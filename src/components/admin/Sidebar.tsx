@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -9,10 +9,18 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  LogOut
+  LogOut,
+  UserCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminSection } from '../../types/admin';
+import { AuthUser } from '../../hooks/useAuth';
+import { apiService, User as ApiUser } from '../../services/api';
+
+type SidebarUserProfile = ApiUser & {
+  firstName?: string;
+  lastName?: string;
+};
 
 interface SidebarProps {
   activeSection: AdminSection;
@@ -21,6 +29,7 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   unreadMessages: number;
   onLogout: () => void;
+  user?: AuthUser | null;
 }
 
 const menuItems = [
@@ -30,6 +39,7 @@ const menuItems = [
   { id: 'venues' as AdminSection, label: 'Venues', icon: MapPin },
   { id: 'gallery' as AdminSection, label: 'Gallery', icon: Image },
   { id: 'messages' as AdminSection, label: 'Messages', icon: MessageSquare },
+  { id: 'account' as AdminSection, label: 'Account', icon: UserCircle },
 ];
 
 export default function Sidebar({ 
@@ -38,8 +48,75 @@ export default function Sidebar({
   isCollapsed, 
   onToggleCollapse,
   unreadMessages,
-  onLogout
+  onLogout,
+  user = null
 }: SidebarProps) {
+  const [profile, setProfile] = useState<SidebarUserProfile | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUserProfile = async () => {
+      if (!user?.id) {
+        setProfile(null);
+        return;
+      }
+
+      setIsLoadingProfile(true);
+
+      try {
+        const response = await apiService.getUser(user.id);
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (response.data) {
+          setProfile(response.data);
+        } else {
+          setProfile(null);
+        }
+      } catch {
+        if (isMounted) {
+          setProfile(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingProfile(false);
+        }
+      }
+    };
+
+    loadUserProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
+  const displayName = useMemo(() => {
+    if (profile) {
+      const nameFromParts = [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim();
+      return nameFromParts || profile.name || profile.email || 'Admin User';
+    }
+    if (user?.name) return user.name;
+    if (user?.email) return user.email;
+    return 'Admin User';
+  }, [profile, user]);
+
+  const displayEmail = useMemo(() => {
+    if (profile?.email) return profile.email;
+    return user?.email || '';
+  }, [profile, user]);
+
+  const avatarLetter = useMemo(() => {
+    if (displayName && displayName.length > 0) {
+      return displayName.charAt(0).toUpperCase();
+    }
+    return 'A';
+  }, [displayName]);
+
   return (
     <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${
       isCollapsed ? 'w-16' : 'w-64'
@@ -128,12 +205,20 @@ export default function Sidebar({
         {/* Admin user info */}
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-700">A</span>
+            <span className="text-sm font-medium text-gray-700">
+              {avatarLetter}
+            </span>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">Admin User</p>
-              <p className="text-xs text-gray-500 truncate">admin@example.com</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {isLoadingProfile ? 'Loading user...' : displayName}
+              </p>
+              {displayEmail && (
+                <p className="text-xs text-gray-500 truncate">
+                  {displayEmail}
+                </p>
+              )}
             </div>
           )}
         </div>

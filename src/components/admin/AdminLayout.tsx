@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import { AdminSection } from '../../types/admin';
+import { AuthUser } from '../../hooks/useAuth';
 
 interface AdminLayoutProps {
   activeSection: AdminSection;
@@ -8,6 +9,7 @@ interface AdminLayoutProps {
   children: React.ReactNode;
   unreadMessages: number;
   onLogout: () => void;
+  user?: AuthUser | null;
 }
 
 export default function AdminLayout({ 
@@ -15,7 +17,8 @@ export default function AdminLayout({
   onSectionChange, 
   children, 
   unreadMessages,
-  onLogout
+  onLogout,
+  user = null
 }: AdminLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -28,6 +31,7 @@ export default function AdminLayout({
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         unreadMessages={unreadMessages}
         onLogout={onLogout}
+        user={user}
       />
       <main className="flex-1 overflow-auto">
         <div className="p-6">

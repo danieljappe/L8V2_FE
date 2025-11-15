@@ -6,6 +6,7 @@ import ArtistsList from '../components/admin/ArtistsList';
 import VenuesList from '../components/admin/VenuesList';
 import GalleryList from '../components/admin/GalleryList';
 import MessagesList from '../components/admin/MessagesList';
+import AccountSettings from '../components/admin/AccountSettings';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';
 import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from '../data/mockData';
@@ -145,7 +146,7 @@ function mapApiGalleryToAdminGallery(apiGallery: any): GalleryItem {
 }
 
 export default function Admin() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
   // Events: use backend
   const [events, setEvents] = useState<Event[]>([]);
@@ -488,6 +489,8 @@ export default function Admin() {
             onDeleteMessage={handleDeleteMessage}
           />
         );
+      case 'account':
+        return <AccountSettings user={user} />;
       default:
         return null;
     }
@@ -500,6 +503,7 @@ export default function Admin() {
         onSectionChange={setActiveSection}
         unreadMessages={unreadMessages}
         onLogout={logout}
+        user={user}
       >
         {renderContent()}
       </AdminLayout>

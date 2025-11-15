@@ -281,8 +281,11 @@ export interface ContactMessage {
 export interface User {
   id: string;
   email: string;
-  name: string;
-  role: 'user' | 'admin';
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  address?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -328,6 +331,16 @@ export const apiService = {
   // Contact
   getContactMessages: () => apiClient.get<ContactMessage[]>('/contact'),
   createContactMessage: (message: Partial<ContactMessage>) => apiClient.post<ContactMessage>('/contact', message),
+
+  // Users
+  getUsers: () => apiClient.get<User[]>('/users'),
+  getUser: (id: string) => apiClient.get<User>(`/users/${id}`),
+  updateUser: (id: string, user: Partial<User>) => apiClient.put<User>(`/users/${id}`, user),
+  changePassword: (id: string, payload: { currentPassword: string; newPassword: string }) =>
+    apiClient.put<{ message: string }>(`/users/${id}/password`, payload),
+  createUser: (user: { firstName: string; lastName: string; email: string; password: string }) =>
+    apiClient.post<User>('/users', user),
+  deleteUser: (id: string) => apiClient.delete<{ message: string }>(`/users/${id}`),
 
 
   // Event Artists

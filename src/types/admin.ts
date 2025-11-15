@@ -99,4 +99,4 @@ export interface Message {
   createdAt: string;
 }
 
-export type AdminSection = 'dashboard' | 'events' | 'artists' | 'venues' | 'gallery' | 'messages'; 
+export type AdminSection = 'dashboard' | 'events' | 'artists' | 'venues' | 'gallery' | 'messages' | 'account';

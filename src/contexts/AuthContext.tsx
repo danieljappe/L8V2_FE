@@ -1,10 +1,11 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth, AuthUser } from '../hooks/useAuth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   loading: boolean;
+  user: AuthUser | null;
   login: (token: string) => void;
   logout: () => void;
   checkAuth: () => boolean;

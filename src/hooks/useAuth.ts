@@ -1,17 +1,51 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+export interface AuthUser {
+  id?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+}
+
 interface AuthState {
   isAuthenticated: boolean;
   token: string | null;
   loading: boolean;
+  user: AuthUser | null;
 }
+
+const decodeUserFromToken = (token: string | null): AuthUser | null => {
+  if (!token) return null;
+  try {
+    const base64Payload = token.split('.')[1];
+    if (!base64Payload) return null;
+    const payload = JSON.parse(atob(base64Payload));
+    const firstName = payload.firstName || payload.given_name;
+    const lastName = payload.lastName || payload.family_name;
+    const derivedName = firstName || lastName
+      ? [firstName, lastName].filter(Boolean).join(' ').trim()
+      : payload.name || payload.email || undefined;
+
+    return {
+      id: payload.id,
+      email: payload.email,
+      firstName,
+      lastName,
+      name: derivedName,
+    };
+  } catch {
+    return null;
+  }
+};
 
 export function useAuth() {
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     token: null,
     loading: true,
+    user: null,
   });
   const navigate = useNavigate();
   const navigateRef = useRef(navigate);
@@ -41,6 +75,7 @@ export function useAuth() {
         isAuthenticated: true,
         token,
         loading: false,
+        user: decodeUserFromToken(token),
       });
     } else {
       // Clear invalid token
@@ -51,6 +86,7 @@ export function useAuth() {
         isAuthenticated: false,
         token: null,
         loading: false,
+        user: null,
       });
     }
   }, []); // Remove isTokenValid dependency since it's stable
@@ -62,6 +98,7 @@ export function useAuth() {
       isAuthenticated: true,
       token,
       loading: false,
+      user: decodeUserFromToken(token),
     });
   }, []);
 
@@ -72,6 +109,7 @@ export function useAuth() {
       isAuthenticated: false,
       token: null,
       loading: false,
+      user: null,
     });
     navigateRef.current('/login');
   }, []); // No dependencies needed
