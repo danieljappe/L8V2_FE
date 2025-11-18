@@ -41,11 +41,19 @@ const PreviousEventGallery: React.FC = () => {
   };
 
   // Get the most recent past event
-  const recentPastEvent = events?.find(event => {
-    const eventDate = new Date(event.date);
-    const today = new Date();
-    return eventDate < today;
-  });
+  const recentPastEvent = events
+    ?.filter(event => {
+      const eventDate = new Date(event.date);
+      const today = new Date();
+      // Set time to midnight for both dates to compare only the date part
+      eventDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      return eventDate < today;
+    })
+    .sort((a, b) => {
+      // Sort by date descending (most recent first)
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    })[0]; // Get the first (most recent) past event
 
   // Get gallery images for the recent event (or use all if no specific event)
   const eventGalleryImages = galleryImages?.filter(img => 
