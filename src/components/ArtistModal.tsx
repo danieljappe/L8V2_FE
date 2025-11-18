@@ -167,17 +167,19 @@ const ArtistModal: React.FC<ArtistModalProps> = ({ artist, onClose, isAdmin = fa
                   )}
                 </div>
 
-                {/* View Full Profile Button */}
-                <div className="mt-6">
-                  <Link
-                    to={`/booking/artists/${getArtistUrl(artist.name)}`}
-                    onClick={onClose}
-                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    <span>View Full Profile</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </Link>
-                </div>
+                {/* View Full Profile Button - Only show for bookable artists */}
+                {artist.isBookable && (
+                  <div className="mt-6">
+                    <Link
+                      to={`/booking/artists/${getArtistUrl(artist.name)}`}
+                      onClick={onClose}
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <span>View Full Profile</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Embeddings Section */}

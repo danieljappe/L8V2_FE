@@ -47,7 +47,12 @@ const ArtistPage: React.FC = () => {
           );
           
           if (foundArtist) {
-            setArtist(foundArtist);
+            // Only display artists that are bookable
+            if (foundArtist.isBookable) {
+              setArtist(foundArtist);
+            } else {
+              setError('This artist is not available for booking');
+            }
           } else {
             setError('Artist not found');
           }
