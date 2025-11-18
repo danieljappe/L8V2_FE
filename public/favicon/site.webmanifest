@@ -1,7 +1,7 @@
 {
-  "name": "L8 Events - Uforglemmelige Musikkopplevelser",
+  "name": "L8 Events - Dont be L8!",
   "short_name": "L8 Events",
-  "description": "L8 Events skaber uforglemmelige musikkopplevelser med elektronisk musik. Book kunstnere, deltag i vores begivenheder og oplev noget ekstraordinært.",
+  "description": "L8 Events skaber events med fokus på vækstlaget i dansk musik og agerer som booker for spirrende artister. Kom for koncerterne, bliv for festen. Dont be L8!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
