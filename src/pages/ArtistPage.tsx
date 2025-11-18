@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, 
   Globe, 
   Instagram, 
   Youtube, 
@@ -16,6 +15,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import EmbedRenderer from '../components/EmbedRenderer';
 import { constructFullUrl } from '../utils/imageUtils';
 import { normalizeSocialMedia } from '../utils/socialMediaUtils';
+import { useSEO } from '../hooks/useSEO';
+import { StructuredData, createArtistSchema } from '../components/StructuredData';
 
 const ArtistPage: React.FC = () => {
   const { artistName } = useParams<{ artistName: string }>();
@@ -51,7 +52,7 @@ const ArtistPage: React.FC = () => {
             setError('Artist not found');
           }
         }
-      } catch (err) {
+      } catch {
         setError('Failed to fetch artist');
       } finally {
         setLoading(false);
@@ -60,6 +61,55 @@ const ArtistPage: React.FC = () => {
 
     fetchArtist();
   }, [artistName]);
+
+  // SEO Configuration
+  const artistSlug = artistName || '';
+  const pageUrl = `/booking/artists/${artistSlug}`;
+  
+  // Generate SEO title
+  const seoTitle = artist 
+    ? `${artist.name}${artist.genre ? ` - ${artist.genre} Artist` : ' - Artist'} | Book ${artist.name} | L8 Events`
+    : 'Artist | L8 Events';
+
+  // Generate SEO description
+  const seoDescription = artist
+    ? artist.bio 
+      ? `${artist.bio} Book ${artist.name}${artist.genre ? ` - ${artist.genre} artist` : ''} til dit event gennem L8 Events. Professionel booking service.`
+      : `Book ${artist.name}${artist.genre ? ` - ${artist.genre} artist` : ''} til dit event gennem L8 Events. Professionel booking service for danske artister.`
+    : 'Book artister gennem L8 Events. Professionel booking service for events og koncerter.';
+
+  // Generate SEO keywords
+  const seoKeywords = artist
+    ? [
+        artist.name,
+        artist.genre || '',
+        'artist booking',
+        'book artist',
+        'L8 Events',
+        'dansk musik',
+        'event booking',
+        'koncert booking',
+        'musik booking',
+        artist.isBookable ? 'bookbar artist' : '',
+        'booking service',
+        'dansk artist'
+      ].filter(Boolean).join(', ')
+    : 'artist booking, L8 Events, dansk musik, event booking';
+
+  // Generate SEO image
+  const seoImage = artist && artist.imageUrl
+    ? constructFullUrl(artist.imageUrl)
+    : undefined;
+
+  // Apply SEO
+  useSEO({
+    title: seoTitle,
+    description: seoDescription,
+    keywords: seoKeywords,
+    image: seoImage,
+    url: pageUrl,
+    type: 'profile'
+  });
 
 
 
@@ -101,6 +151,11 @@ const ArtistPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
+      {/* Structured Data for SEO */}
+      {artist && (
+        <StructuredData data={createArtistSchema(artist)} />
+      )}
+
       {/* Header */}
       <div className="relative pt-24 pb-8">
         <div className="container mx-auto px-4 pt-6">

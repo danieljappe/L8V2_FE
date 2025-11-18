@@ -25,7 +25,10 @@ export const useSEO = ({
     const finalTitle = title ? `${title} | ${baseTitle}` : baseTitle;
     const finalDescription = description || baseDescription;
     const finalUrl = url ? `${baseUrl}${url}` : baseUrl;
-    const finalImage = image ? `${baseUrl}${image}` : `${baseUrl}/l8logo.png`;
+    // Handle both relative and absolute image URLs
+    const finalImage = image 
+      ? (image.startsWith('http') ? image : `${baseUrl}${image}`)
+      : `${baseUrl}/l8logo.png`;
 
     // Update document title
     document.title = finalTitle;
