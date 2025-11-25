@@ -44,21 +44,11 @@ const AppContent = () => {
   return (
     <div className="relative min-h-screen">
       {!isAdminPage && !isLoginPage && (
-        <div 
-          className={`fixed bg-gradient-to-br -z-10 ${
-            isBookingPage 
-              ? 'from-booking-dark via-booking-dark to-booking-teal-dark'
-              : 'from-l8-dark via-l8-blue-dark to-l8-blue'
-          }`}
-          style={{
-            top: 'calc(0px - env(safe-area-inset-top, 0px))',
-            left: 'calc(0px - env(safe-area-inset-left, 0px))',
-            right: 'calc(0px - env(safe-area-inset-right, 0px))',
-            bottom: 'calc(0px - env(safe-area-inset-bottom, 0px))',
-            width: 'calc(100% + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px))',
-            height: 'calc(100% + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))',
-          }}
-        />
+        <div className={`fixed inset-0 bg-gradient-to-br -z-10 ${
+          isBookingPage 
+            ? 'from-booking-dark via-booking-dark to-booking-teal-dark'
+            : 'from-l8-dark via-l8-blue-dark to-l8-blue'
+        }`} />
       )}
       <div className="relative z-10">
         {!isAdminPage && !isLoginPage && <Header />}
