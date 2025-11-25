@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Clock } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { apiService } from '../services/api';
 
 interface ContactFormData {
   name: string;
@@ -24,10 +25,22 @@ const Contact = () => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission logic
-    console.log('Form submitted:', formData);
+    try {
+      // Submit contact form via API
+      const result = await apiService.createContactMessage(formData);
+      if (result.data) {
+        // Reset form and show success message
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        alert('Tak for din besked! Vi vender tilbage hurtigst muligt.');
+      } else {
+        alert(result.error || 'Der opstod en fejl ved afsendelse af din besked. Prøv venligst igen.');
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      alert('Der opstod en fejl ved afsendelse af din besked. Prøv venligst igen.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

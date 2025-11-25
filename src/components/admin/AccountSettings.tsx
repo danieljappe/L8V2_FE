@@ -12,6 +12,8 @@ type FormState = {
   email: string;
   phoneNumber: string;
   address: string;
+  imageUrl: string;
+  role: string;
 };
 
 type PasswordFormState = {
@@ -33,6 +35,8 @@ const createFormState = (user?: Partial<ApiUser>): FormState => ({
   email: user?.email || '',
   phoneNumber: user?.phoneNumber || '',
   address: user?.address || '',
+  imageUrl: user?.imageUrl || '',
+  role: user?.role || '',
 });
 
 const emptyPasswordState: PasswordFormState = {
@@ -171,6 +175,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         email: formData.email.trim(),
         phoneNumber: formData.phoneNumber.trim(),
         address: formData.address.trim(),
+        imageUrl: formData.imageUrl.trim() || undefined,
+        role: formData.role.trim() || undefined,
       };
 
       const response = await apiService.updateUser(userId, payload);
@@ -424,6 +430,40 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                 rows={3}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
                 placeholder="Street, City, Country"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image URL</label>
+              <input
+                type="url"
+                value={formData.imageUrl}
+                onChange={(e) => handleChange('imageUrl', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                placeholder="https://example.com/image.jpg"
+              />
+              {formData.imageUrl && (
+                <div className="mt-2">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Profile preview"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <input
+                type="text"
+                value={formData.role}
+                onChange={(e) => handleChange('role', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                placeholder="e.g., CEO & Founder, Creative Director, Event Afholder"
               />
             </div>
 

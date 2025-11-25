@@ -53,6 +53,16 @@ export interface Artist {
   }>;
   genre?: string;
   isBookable: boolean;
+  bookingUserId?: string;
+  bookingUser?: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    imageUrl?: string;
+    role?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

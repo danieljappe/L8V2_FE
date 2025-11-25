@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Music } from 'lucide-react';
 import { Artist } from '../../types/admin';
-import { apiService } from '../../services/api';
+import { apiService, User } from '../../services/api';
 import EmbeddingManager from '../EmbeddingManager';
 import SimpleEmbeddingInput from './SimpleEmbeddingInput';
 import { normalizeSocialMedia } from '../../utils/socialMediaUtils';
@@ -22,10 +22,31 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
     socialMedia: [] as Array<{ platform: string; url: string }>,
     genre: '',
     isBookable: false,
+    bookingUserId: '',
     embeddings: [] as any[]
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+
+  useEffect(() => {
+    // Load users when component mounts
+    const loadUsers = async () => {
+      setUsersLoading(true);
+      try {
+        const response = await apiService.getUsers();
+        if (response.data) {
+          setUsers(response.data);
+        }
+      } catch (err) {
+        console.error('Failed to load users:', err);
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+    loadUsers();
+  }, []);
 
   useEffect(() => {
     if (artist) {
@@ -40,6 +61,7 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
         socialMedia: socialMediaArray,
         genre: artist.genre || '',
         isBookable: artist.isBookable || false,
+        bookingUserId: artist.bookingUserId || '',
         embeddings: artist.embeddings || []
       });
     } else {
@@ -51,6 +73,7 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
         socialMedia: [],
         genre: '',
         isBookable: false,
+        bookingUserId: '',
         embeddings: []
       });
     }
@@ -62,10 +85,15 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
     setError(null);
 
     try {
-      const artistData = {
+      const artistData: any = {
         ...formData,
+        bookingUserId: formData.isBookable && formData.bookingUserId ? formData.bookingUserId : null,
         updatedAt: new Date().toISOString()
       };
+      // Remove bookingUserId if not bookable
+      if (!formData.isBookable) {
+        delete artistData.bookingUserId;
+      }
 
       if (artist) {
         // Update existing artist
@@ -180,17 +208,46 @@ const ArtistFormModal: React.FC<ArtistFormModalProps> = ({ artist, onSave, onClo
               </div>
 
               {/* Bookable Status */}
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  id="isBookable"
-                  checked={formData.isBookable}
-                  onChange={(e) => setFormData({ ...formData, isBookable: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <label htmlFor="isBookable" className="text-sm font-medium text-gray-700">
-                  Available for booking
-                </label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="isBookable"
+                    checked={formData.isBookable}
+                    onChange={(e) => setFormData({ ...formData, isBookable: e.target.checked, bookingUserId: e.target.checked ? formData.bookingUserId : '' })}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <label htmlFor="isBookable" className="text-sm font-medium text-gray-700">
+                    Available for booking
+                  </label>
+                </div>
+                
+                {/* Booking User Selection - Only show if bookable */}
+                {formData.isBookable && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Booking Contact User
+                    </label>
+                    <select
+                      value={formData.bookingUserId}
+                      onChange={(e) => setFormData({ ...formData, bookingUserId: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      disabled={usersLoading}
+                    >
+                      <option value="">Select a user...</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.firstName && user.lastName 
+                            ? `${user.firstName} ${user.lastName} (${user.email})`
+                            : user.email}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Select the user who will handle bookings for this artist
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>

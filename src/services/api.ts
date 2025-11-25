@@ -88,7 +88,6 @@ class ApiClient {
       if (response.status === 400) {
         try {
           const errorData = await response.json();
-          console.log('400 Response with error details:', errorData);
           // Return the error details so the frontend can handle them properly
           return { error: errorData.message || errorData.details || 'Bad Request', errorData };
         } catch (parseError) {
@@ -200,6 +199,8 @@ export interface Artist {
   embeddings?: Embedding[];
   genre?: string;
   isBookable: boolean;
+  bookingUserId?: string;
+  bookingUser?: User;
   createdAt: string;
   updatedAt: string;
 }
@@ -287,6 +288,8 @@ export interface User {
   lastName?: string;
   phoneNumber?: string;
   address?: string;
+  imageUrl?: string;
+  role?: string;
   createdAt: string;
   updatedAt: string;
 }

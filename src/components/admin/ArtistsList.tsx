@@ -24,7 +24,6 @@ export default function ArtistsList({
     if (selectedArtist && !isCreating) {
       const updatedArtist = artists.find(artist => artist.id === selectedArtist.id);
       if (updatedArtist) {
-        console.log('ArtistsList: updating selectedArtist with new data:', updatedArtist);
         setSelectedArtist(updatedArtist);
       }
     }

@@ -105,6 +105,16 @@ function mapApiArtistToAdminArtist(apiArtist: ApiArtist): Artist {
     embeddings: apiArtist.embeddings || [],
     genre: apiArtist.genre || '',
     isBookable: apiArtist.isBookable || false,
+    bookingUserId: apiArtist.bookingUserId,
+    bookingUser: apiArtist.bookingUser ? {
+      id: apiArtist.bookingUser.id,
+      email: apiArtist.bookingUser.email,
+      firstName: apiArtist.bookingUser.firstName,
+      lastName: apiArtist.bookingUser.lastName,
+      phoneNumber: apiArtist.bookingUser.phoneNumber,
+      imageUrl: apiArtist.bookingUser.imageUrl,
+      role: apiArtist.bookingUser.role
+    } : undefined,
     createdAt: apiArtist.createdAt,
     updatedAt: apiArtist.updatedAt
   };
@@ -302,8 +312,6 @@ export default function Admin() {
   // Handle adding artist to event
   const handleAddArtistToEvent = async (eventId: string, artistId: string) => {
     try {
-      console.log('Frontend: Adding artist to event:', { eventId, artistId });
-      
       const eventArtistData = {
         event: { id: eventId } as any,
         artist: { id: artistId } as any
@@ -325,17 +333,6 @@ export default function Admin() {
     } catch (error) {
       console.error('Error adding artist to event:', error);
       // Could show a toast notification here instead of alert
-    }
-  };
-
-  // Test function to add an artist to an event
-  const testAddArtistToEvent = async () => {
-    if (events.length > 0 && artists.length > 0) {
-      const eventId = events[0].id;
-      const artistId = artists[0].id;
-      await handleAddArtistToEvent(eventId, artistId);
-    } else {
-      alert('No events or artists available for testing');
     }
   };
 
@@ -430,16 +427,6 @@ export default function Admin() {
               gallery={gallery}
               messages={messages}
             />
-            {/* Test button for debugging */}
-            <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2">Debug Tools</h3>
-              <button
-                onClick={testAddArtistToEvent}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Test Add Artist to Event
-              </button>
-            </div>
           </div>
         );
       case 'events':

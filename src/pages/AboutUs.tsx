@@ -1,9 +1,10 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Users, Heart, Rocket, Star, ArrowRight, Linkedin, Github } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Users, Heart, Rocket, Star, ArrowRight, Linkedin, Github, Mail, Phone } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useEvents } from '../hooks/useApi';
+import { useEvents, useApi } from '../hooks/useApi';
 import { useSEO } from '../hooks/useSEO';
+import { apiService, User } from '../services/api';
 
 const useCountAnimation = (end: number, duration: number = 2) => {
   const count = useMotionValue(0);
@@ -22,6 +23,7 @@ const useCountAnimation = (end: number, duration: number = 2) => {
 
 const AboutUs = () => {
   const { data: events, loading: eventsLoading } = useEvents();
+  const { data: users, loading: usersLoading } = useApi<User[]>(() => apiService.getUsers());
   const [eventCount, setEventCount] = useState(0);
 
   // SEO optimization
@@ -94,29 +96,88 @@ const AboutUs = () => {
     }
   };
 
-  const teamMembers = [
-    {
-      name: "Mikkel Danø Mourier",
-      role: "CEO & Founder",
-      image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
-      // TODO: Mail
-    },
-    {
-      name: "Joachim Engelhart Illigen",
-      role: "Creative Director",
-      image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
-    },
-    {
-      name: "Jacob Kruse",
-      role: "Event Afholder",
-      image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
-    },
-    {
-      name: "Nabil Hussein",
-      role: "Rolle",
-      image: "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"
+  // Stat Card Component to properly use hooks
+  const StatCard = ({ stat, index }: { 
+    stat: { 
+      icon: React.ComponentType<{ className?: string }>, 
+      value: number, 
+      label: string, 
+      suffix: string,
+      duration: number
+    }, 
+    index: number
+  }) => {
+    const displayValue = stat.label === "Begivenheder" && eventsLoading ? 0 : stat.value;
+    const count = useCountAnimation(displayValue, stat.duration);
+    
+    return (
+      <motion.div
+        variants={statCardVariants}
+        whileHover="hover"
+        className="text-center p-6 rounded-lg bg-black/30 backdrop-blur-sm cursor-pointer border border-white/10"
+      >
+        <motion.div
+          initial={{ rotate: -180, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          transition={{ delay: index * 0.1, duration: 0.5 }}
+        >
+          <stat.icon className="w-12 h-12 mx-auto mb-4 text-l8-blue" />
+        </motion.div>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: index * 0.1 + 0.2 }}
+          className="text-3xl font-bold text-l8-blue mb-2"
+        >
+          {stat.label === "Begivenheder" && eventsLoading ? (
+            <div className="flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-l8-blue border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <>
+              <motion.span>{count}</motion.span>
+              {stat.suffix}
+            </>
+          )}
+        </motion.div>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: index * 0.1 + 0.3 }}
+          className="text-l8-beige"
+        >
+          {stat.label}
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  // Map users to team members format
+  const teamMembers = useMemo(() => {
+    if (!users || users.length === 0) {
+      return [];
     }
-  ];
+    
+    return users.map((user) => {
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.name || user.email || 'Team Member';
+      const initials = fullName
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+      
+      return {
+        id: user.id,
+        name: fullName,
+        role: user.role || 'Team Member',
+        image: user.imageUrl,
+        initials,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      };
+    });
+  }, [users]);
 
   const stats = [
     { 
@@ -192,52 +253,9 @@ const AboutUs = () => {
         viewport={{ once: true, margin: "-100px" }}
         className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
       >
-        {stats.map((stat, index) => {
-          // For events stat, show loading state if data is still loading
-          const displayValue = stat.label === "Begivenheder" && eventsLoading ? 0 : stat.value;
-          const count = useCountAnimation(displayValue, stat.duration);
-          return (
-            <motion.div
-              key={index}
-              variants={statCardVariants}
-              whileHover="hover"
-              className="text-center p-6 rounded-lg bg-black/30 backdrop-blur-sm cursor-pointer border border-white/10"
-            >
-              <motion.div
-                initial={{ rotate: -180, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-              >
-                <stat.icon className="w-12 h-12 mx-auto mb-4 text-l8-blue" />
-              </motion.div>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 + 0.2 }}
-                className="text-3xl font-bold text-l8-blue mb-2"
-              >
-                {stat.label === "Begivenheder" && eventsLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-6 h-6 border-2 border-l8-blue border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                ) : (
-                  <>
-                    <motion.span>{count}</motion.span>
-                    {stat.suffix}
-                  </>
-                )}
-              </motion.div>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 + 0.3 }}
-                className="text-l8-beige"
-              >
-                {stat.label}
-              </motion.div>
-            </motion.div>
-          );
-        })}
+        {stats.map((stat, index) => (
+          <StatCard key={index} stat={stat} index={index} />
+        ))}
       </motion.div>
 
       {/* Team Section */}
@@ -256,46 +274,103 @@ const AboutUs = () => {
         >
           Holdet bag L8
         </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {teamMembers.map((member, index) => (
-            <motion.div
-              key={index}
-              variants={fadeIn}
-              whileHover={{ 
-                scale: 1.05,
-                transition: { type: "spring", stiffness: 400, damping: 10 }
-              }}
-              className="bg-black/30 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10"
-            >
-              <motion.img
-                initial={{ scale: 1.2, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                src={member.image}
-                alt={member.name}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-6">
-                <motion.h3
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-xl font-semibold mb-2"
-                >
-                  {member.name}
-                </motion.h3>
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-l8-beige"
-                >
-                  {member.role}
-                </motion.p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {usersLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-l8-blue border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : teamMembers.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center py-12 text-l8-beige"
+          >
+            <p>Ingen team medlemmer fundet.</p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {teamMembers.map((member) => (
+              <motion.div
+                key={member.id}
+                variants={fadeIn}
+                whileHover={{ 
+                  scale: 1.05,
+                  transition: { type: "spring", stiffness: 400, damping: 10 }
+                }}
+                className="bg-black/30 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10"
+              >
+                <div className="relative w-full h-64 bg-gradient-to-br from-l8-blue/20 to-l8-beige/20 flex items-center justify-center overflow-hidden">
+                  {member.image ? (
+                    <motion.img
+                      initial={{ scale: 1.2, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.6 }}
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.initials-fallback') as HTMLElement;
+                        if (fallback) fallback.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`initials-fallback w-full h-full flex items-center justify-center ${member.image ? 'hidden' : ''}`}>
+                    <div className="w-24 h-24 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-white text-2xl font-bold">{member.initials}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <motion.h3
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-xl font-semibold mb-2 text-white"
+                  >
+                    {member.name}
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-l8-beige text-sm font-medium mb-4"
+                  >
+                    {member.role}
+                  </motion.p>
+                  
+                  {/* Contact Information */}
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    {member.email && (
+                      <motion.a
+                        href={`mailto:${member.email}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex items-center space-x-2 text-l8-beige hover:text-l8-blue transition-colors text-xs"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span className="truncate">{member.email}</span>
+                      </motion.a>
+                    )}
+                    {member.phoneNumber && (
+                      <motion.a
+                        href={`tel:${member.phoneNumber}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="flex items-center space-x-2 text-l8-beige hover:text-l8-blue transition-colors text-xs"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>{member.phoneNumber}</span>
+                      </motion.a>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </motion.div>
 
       {/* Contact CTA Section */}

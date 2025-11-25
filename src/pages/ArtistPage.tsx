@@ -13,6 +13,7 @@ import {
 import { apiService, Artist } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmbedRenderer from '../components/EmbedRenderer';
+import BookingModal from '../components/BookingModal';
 import { constructFullUrl } from '../utils/imageUtils';
 import { normalizeSocialMedia } from '../utils/socialMediaUtils';
 import { useSEO } from '../hooks/useSEO';
@@ -24,6 +25,7 @@ const ArtistPage: React.FC = () => {
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     const fetchArtist = async () => {
@@ -119,8 +121,8 @@ const ArtistPage: React.FC = () => {
 
 
   const handleBookingClick = () => {
-    // Navigate to booking contact or open booking modal
-    navigate('/booking/contact');
+    // Show booking modal with user information
+    setShowBookingModal(true);
   };
 
   if (loading) {
@@ -391,6 +393,14 @@ const ArtistPage: React.FC = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <BookingModal
+          artist={artist}
+          onClose={() => setShowBookingModal(false)}
+        />
+      )}
     </div>
   );
 };

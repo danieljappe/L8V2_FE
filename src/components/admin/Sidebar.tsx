@@ -204,7 +204,18 @@ export default function Sidebar({
 
         {/* Admin user info */}
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+          {profile?.imageUrl ? (
+            <img
+              src={profile.imageUrl}
+              alt={displayName}
+              className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <div className={`w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ${profile?.imageUrl ? 'hidden' : ''}`}>
             <span className="text-sm font-medium text-gray-700">
               {avatarLetter}
             </span>

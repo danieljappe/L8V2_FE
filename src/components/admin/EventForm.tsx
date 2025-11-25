@@ -50,10 +50,7 @@ export default function EventForm({ event, onSubmit, onCancel, artists, venues, 
 
   // Additional effect to refresh when event.eventArtists changes
   useEffect(() => {
-    if (event && event.eventArtists) {
-      // Only log when artists count changes significantly
-      console.log('EventForm: Artists count updated:', event.eventArtists.length);
-    }
+    // Event artists are updated through props
   }, [event?.eventArtists]);
 
   const handleSubmit = (e: React.FormEvent) => {
