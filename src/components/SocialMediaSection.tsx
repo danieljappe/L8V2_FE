@@ -1,30 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 const SocialMediaSection: React.FC = () => {
-  const embedRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Load EmbedSocial script if not already loaded
-    if (document.getElementById('EmbedSocialHashtagScript')) {
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = 'EmbedSocialHashtagScript';
-    script.src = 'https://embedsocial.com/cdn/ht.js';
-    script.async = true;
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup: remove script on unmount
-      const existingScript = document.getElementById('EmbedSocialHashtagScript');
-      if (existingScript) {
-        existingScript.remove();
-      }
-    };
-  }, []);
-
   const socialLinks = [
     { 
       name: 'Facebook', 
@@ -87,16 +64,20 @@ const SocialMediaSection: React.FC = () => {
           className="mb-12 border border-white/10 rounded-3xl w-full sm:p-6 shadow-2xl"
           style={{ minHeight: 720, backgroundColor: '#fafafa' }}
         >
-          <div 
-            ref={embedRef}
-            className="embedsocial-hashtag" 
-            data-ref="fbdb46265f1faa1dffff215a2a094bf167c2709a" 
-            data-dynamicload="yes"
-          >
-          </div>
-        </motion.div>
+          <iframe
+            src="https://emb.fouita.com/widget/0x34cf9e/ftbngklcwg"
+            title="Carousel Instagram Feed"
+            width="100%"
+            height="720"
+            frameBorder="0"
+            scrolling="no"
+            className="w-full h-full min-h-[720px]"
+            style={{ width: '100%' }}
+            allowFullScreen
+          />        
+          </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {socialLinks.map((social) => (
             <motion.a
               key={social.name}

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, Home } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { useEvent } from '../hooks/useApi';
+import { useEvent, useArtists } from '../hooks/useApi';
 
 const Breadcrumbs: React.FC = () => {
   const location = useLocation();
@@ -14,6 +14,35 @@ const Breadcrumbs: React.FC = () => {
   
   // Fetch event data if we're on an event details page
   const { data: event, loading: eventLoading } = useEvent(eventId || '');
+
+  // Check if we're on an artist page
+  const isArtistPage = pathnames.length === 3 && pathnames[0] === 'booking' && pathnames[1] === 'artists' && pathnames[2];
+  
+  // Safely decode the artist slug
+  let artistSlug: string | null = null;
+  if (isArtistPage && pathnames[2]) {
+    try {
+      artistSlug = decodeURIComponent(pathnames[2]);
+    } catch (e) {
+      // If decoding fails, use the raw value
+      artistSlug = pathnames[2];
+    }
+  }
+  
+  // Fetch all artists to find the matching one
+  const { data: artists, loading: artistsLoading } = useArtists();
+  
+  // Find the artist by matching the slug
+  const artist = React.useMemo(() => {
+    if (!isArtistPage || !artists || !artistSlug) return null;
+    
+    // Helper function to convert artist name to URL-friendly format (same as getArtistUrl)
+    const getArtistUrl = (artistName: string) => {
+      return artistName.toLowerCase().replace(/\s+/g, '-');
+    };
+    
+    return artists.find(a => getArtistUrl(a.name) === artistSlug!.toLowerCase()) || null;
+  }, [isArtistPage, artists, artistSlug]);
 
   const breadcrumbNameMap: { [key: string]: string } = {
     home: 'Home',
@@ -55,6 +84,23 @@ const Breadcrumbs: React.FC = () => {
             displayName = 'Loading...';
           }
           // If event fails to load, fall back to showing the ID
+        }
+        
+        // Use artist name if we're on an artist page and this is the artist slug
+        if (isArtistPage && last && index === 2) {
+          if (artist?.name) {
+            displayName = artist.name;
+          } else if (artistsLoading) {
+            displayName = 'Loading...';
+          } else {
+            // If artist fails to load, try to decode and format the slug as fallback
+            try {
+              displayName = decodeURIComponent(value).replace(/-/g, ' ');
+            } catch (e) {
+              // If decoding fails, just use the value with hyphens replaced
+              displayName = value.replace(/-/g, ' ');
+            }
+          }
         }
 
         return (

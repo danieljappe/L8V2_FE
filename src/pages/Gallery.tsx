@@ -101,9 +101,11 @@ const Gallery: React.FC = () => {
     return (
       <div className="min-h-screen overflow-x-hidden">
         <Header />
-        <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-0">
-          <LoadingSpinner size="lg" text="Loading gallery..." />
-        </section>
+        <main className="relative z-10 pt-20">
+          <section className="min-h-screen flex items-center justify-center p-4 snap-start">
+            <LoadingSpinner size="lg" text="Loading gallery..." />
+          </section>
+        </main>
       </div>
     );
   }
@@ -112,7 +114,8 @@ const Gallery: React.FC = () => {
     return (
       <div className="min-h-screen overflow-x-hidden">
         <Header />
-        <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-0">
+        <main className="relative z-10 pt-20">
+          <section className="min-h-screen flex items-center justify-center p-4 snap-start">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -135,7 +138,8 @@ const Gallery: React.FC = () => {
               </motion.button>
             </motion.div>
           </motion.div>
-        </section>
+          </section>
+        </main>
       </div>
     );
   }
@@ -144,8 +148,8 @@ const Gallery: React.FC = () => {
     <div className="min-h-screen overflow-x-hidden">
       <Header />
       
-      <main className="relative z-10">
-        <section className="min-h-screen flex items-center justify-center p-4 snap-start pt-20 xl:pt-0">
+      <main className="relative z-10 pt-20">
+        <section className="min-h-screen flex items-center justify-center p-4 snap-start">
           <motion.div 
             variants={containerVariants}
             initial="hidden"

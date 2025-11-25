@@ -14,6 +14,7 @@ import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Header from './components/Header';
 import PlatformRouter from './components/PlatformRouter';
+import ScrollToTop from './components/ScrollToTop';
 import { useAuth } from './hooks/useAuth';
 import CookieSettingsButton from './components/CookieSettingsButton';
 import CookieConsentBanner from './components/CookieConsentBanner';
@@ -79,6 +80,7 @@ const App = () => {
     <Router>
       <AuthProvider>
         <PlatformRouter>
+          <ScrollToTop />
           <AppContent />
           <CookieSettingsButton />
           <CookieConsentBanner />
