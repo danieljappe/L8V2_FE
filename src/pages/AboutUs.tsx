@@ -158,25 +158,27 @@ const AboutUs = () => {
       return [];
     }
     
-    return users.map((user) => {
-      const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.name || user.email || 'Team Member';
-      const initials = fullName
-        .split(' ')
-        .map(n => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-      
-      return {
-        id: user.id,
-        name: fullName,
-        role: user.role || 'Team Member',
-        image: user.imageUrl,
-        initials,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-      };
-    });
+    return users
+      .filter((user) => user.email !== 'danieljappe@icloud.com')
+      .map((user) => {
+        const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.name || user.email || 'Team Member';
+        const initials = fullName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
+        
+        return {
+          id: user.id,
+          name: fullName,
+          role: user.role || 'Team Member',
+          image: user.imageUrl,
+          initials,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+        };
+      });
   }, [users]);
 
   const stats = [

@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon/web-app-manifest-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon/web-app-manifest-512x512.png" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     
     <!-- Primary Meta Tags -->
     <title>L8 Events - Dont be L8!</title>
@@ -42,12 +42,19 @@
     <meta property="twitter:image:alt" content="L8 Events Logo - Dont be L8!" />
     
     <!-- Additional SEO -->
-    <meta name="theme-color" content="#9333ea" />
-    <meta name="msapplication-TileColor" content="#9333ea" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="msapplication-TileColor" content="#050505" />
     <style>
       /* Smooth scrolling for snap-to-scroll */
       html {
         scroll-behavior: smooth;
+      }
+      
+      /* Ensure body and html background matches app background for safe area */
+      html, body {
+        background-color: #050505;
+        margin: 0;
+        padding: 0;
       }
       
       /* Custom scrollbar for webkit browsers */
@@ -61,12 +68,12 @@
       }
       
       ::-webkit-scrollbar-thumb {
-        background: rgba(147, 51, 234, 0.6);
+        background: rgba(0, 192, 255, 0.6);
         border-radius: 4px;
       }
       
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(147, 51, 234, 0.8);
+        background: rgba(0, 192, 255, 0.8);
       }
     </style>
   </head>
