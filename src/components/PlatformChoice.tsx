@@ -108,7 +108,7 @@ const PlatformChoice: React.FC = () => {
             >
               <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 transition-all duration-300">
                 <img 
-                  src="/l8logo.png" 
+                  src="/l8logo.webp" 
                   alt="L8 Logo" 
                   className="w-12 h-12 object-contain rounded-2xl"
                 />
@@ -163,7 +163,7 @@ const PlatformChoice: React.FC = () => {
             >
               <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 transition-all duration-300">
                 <img 
-                  src="/l8logo.png" 
+                  src="/l8logo.webp" 
                   alt="L8 Logo" 
                   className="w-12 h-12 object-contain rounded-2xl"
                 />

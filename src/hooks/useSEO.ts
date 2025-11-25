@@ -28,7 +28,7 @@ export const useSEO = ({
     // Handle both relative and absolute image URLs
     const finalImage = image 
       ? (image.startsWith('http') ? image : `${baseUrl}${image}`)
-      : `${baseUrl}/l8logo.png`;
+      : `${baseUrl}/l8logo.webp`;
 
     // Update document title
     document.title = finalTitle;

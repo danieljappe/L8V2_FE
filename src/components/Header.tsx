@@ -108,7 +108,7 @@ const Header: React.FC = () => {
             <Link to={getPlatformFromPath() === 'booking' ? '/booking' : '/'}>
               <div className="flex items-center space-x-2">
                 <img 
-                  src="/l8logo.png" 
+                  src="/l8logo.webp" 
                   alt="L8 Logo" 
                   className="w-10 h-10 object-contain rounded-xl"
                 />
@@ -189,7 +189,7 @@ const Header: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <img 
-                        src="/l8logo.png" 
+                        src="/l8logo.webp" 
                         alt="L8 Logo" 
                         className="w-8 h-8 object-contain rounded-lg"
                       />

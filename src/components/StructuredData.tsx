@@ -21,8 +21,8 @@ export const createOrganizationSchema = () => ({
   "@type": "Organization",
   "name": "L8 Events",
   "url": "https://l8events.dk",
-  "logo": "https://l8events.dk/l8logo.png",
-  "image": "https://l8events.dk/l8logo.png",
+  "logo": "https://l8events.dk/l8logo.webp",
+  "image": "https://l8events.dk/l8logo.webp",
   "description": "L8 Events skaber events med fokus på vækstlaget i dansk musik og agerer som booker for spirrende artister. Kom for koncerterne, bliv for festen. Dont be L8!",
   "sameAs": [
     "https://www.facebook.com/l8events",
@@ -65,7 +65,7 @@ export const createEventSchema = (event: any) => ({
     "priceCurrency": "DKK",
     "availability": "https://schema.org/InStock"
   } : undefined,
-  "image": event.image ? `https://l8events.dk/uploads/events/${event.image}` : "https://l8events.dk/l8logo.png"
+  "image": event.image ? `https://l8events.dk/uploads/events/${event.image}` : "https://l8events.dk/l8logo.webp"
 });
 
 export const createArtistSchema = (artist: any) => {
@@ -80,7 +80,7 @@ export const createArtistSchema = (artist: any) => {
   }
 
   // Construct image URL
-  let imageUrl = "https://l8events.dk/l8logo.png";
+  let imageUrl = "https://l8events.dk/l8logo.webp";
   if (artist.imageUrl) {
     if (artist.imageUrl.startsWith('http')) {
       imageUrl = artist.imageUrl;
