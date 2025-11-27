@@ -5,9 +5,10 @@ import { useFrame, useThree } from '@react-three/fiber';
 
 interface ModelProps {
   mousePosition: THREE.Vector2;
+  onReady?: () => void;
 }
 
-function Model({ mousePosition }: ModelProps) {
+function Model({ mousePosition, onReady }: ModelProps) {
   const { scene } = useGLTF('/3dlogo/l8_v2.gltf');
   const modelRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
@@ -46,8 +47,13 @@ function Model({ mousePosition }: ModelProps) {
     if (modelRef.current) {
       modelRef.current.position.set(0, 0, -20);
       modelRef.current.scale.setScalar(0.7);
+      // Notify that model is ready
+      if (onReady) {
+        // Small delay to ensure everything is rendered
+        setTimeout(() => onReady(), 100);
+      }
     }
-  }, []);
+  }, [onReady]);
 
   return <primitive ref={modelRef} object={scene} />;
 }

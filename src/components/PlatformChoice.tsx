@@ -1,12 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Scene from './3DScene';
 // No subdomain utilities needed
 
 const PlatformChoice: React.FC = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [sceneReady, setSceneReady] = useState(false);
+  const [animationsReady, setAnimationsReady] = useState(false);
+
+  // Preload images in background (non-blocking, for better UX)
+  useEffect(() => {
+    const imageUrls = ['/l8logo.webp'];
+    imageUrls.forEach((url) => {
+      const img = new Image();
+      img.src = url; // Preload in background
+    });
+  }, []);
+
+  // Prioritize 3D scene - show content when scene is ready
+  // Images can load in background
+  useEffect(() => {
+    if (sceneReady) {
+      // Small delay to ensure smooth transition, then trigger animations
+      const timer = setTimeout(() => {
+        setAnimationsReady(true);
+        // Show content after animations start
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 100);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [sceneReady]);
+
+  const handleSceneReady = () => {
+    const win = window as Window & { __sceneTimeout?: number };
+    if (win.__sceneTimeout) {
+      clearTimeout(win.__sceneTimeout);
+      delete win.__sceneTimeout;
+    }
+    setSceneReady(true);
+  };
 
   const handlePlatformChoice = (platform: string) => {
     localStorage.setItem('l8-platform-choice', platform);
@@ -19,12 +56,13 @@ const PlatformChoice: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* 3D Background */}
+      {/* 3D Background - Always visible, serves as loading screen */}
       <div className="absolute inset-0 z-0">
-        <Scene />
+        <Scene onReady={handleSceneReady} />
       </div>
       
-      {/* Split Background Overlay with Circular Cutout */}
+      {/* Split Background Overlay with Circular Cutout - Only show when ready */}
+      {animationsReady && (
       <div className="absolute inset-0 flex flex-col md:flex-row z-10">
         {/* Left Side - Events */}
         <motion.div 
@@ -82,10 +120,17 @@ const PlatformChoice: React.FC = () => {
           <div className="absolute inset-0 bg-black/10 md:hidden" />
         </motion.div>
       </div>
+      )}
 
 
       {/* Content */}
-      <div className="relative z-30 h-screen flex flex-col md:flex-row">
+      {!isLoading && (
+      <motion.div 
+        className="relative z-30 h-screen flex flex-col md:flex-row"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         {/* Left Side - Events */}
         <motion.div 
           className="flex-1 flex items-center justify-center relative group cursor-pointer min-h-[50vh] md:min-h-full"
@@ -195,7 +240,8 @@ const PlatformChoice: React.FC = () => {
 
           </div>
         </motion.div>
-      </div>
+      </motion.div>
+      )}
     </div>
   );
 };

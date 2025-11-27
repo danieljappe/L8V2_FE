@@ -64,9 +64,22 @@ const MovingLights = ({ mousePosition }: { mousePosition: THREE.Vector2 }) => {
   );
 };
 
-const Scene = () => {
+interface SceneProps {
+  onReady?: () => void;
+}
+
+const Scene = ({ onReady }: SceneProps) => {
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
+  const [canvasReady, setCanvasReady] = useState(false);
+  const [modelReady, setModelReady] = useState(false);
+  const readyCallbackRef = useRef<(() => void) | undefined>(onReady);
+  const modelReadyRef = useRef(false);
   
+  // Update ref when onReady changes
+  useEffect(() => {
+    readyCallbackRef.current = onReady;
+  }, [onReady]);
+
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
@@ -81,10 +94,39 @@ const Scene = () => {
     };
   }, []);
 
+  // Check if both are ready
+  useEffect(() => {
+    if (canvasReady && modelReady && readyCallbackRef.current) {
+      const win = window as Window & { __sceneTimeout?: number };
+      if (win.__sceneTimeout) {
+        clearTimeout(win.__sceneTimeout);
+        delete win.__sceneTimeout;
+      }
+      readyCallbackRef.current();
+    }
+  }, [canvasReady, modelReady]);
+
+  const handleModelReady = () => {
+    modelReadyRef.current = true;
+    setModelReady(true);
+  };
+
   return (
     <Canvas 
       camera={{ position: [0, 0, 0], fov: 75 }}
       style={{ background: 'linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)' }}
+      onCreated={() => {
+        setCanvasReady(true);
+        // Fallback timeout in case model takes too long to load
+        const timeout = setTimeout(() => {
+          if (readyCallbackRef.current && !modelReadyRef.current) {
+            readyCallbackRef.current();
+          }
+        }, 3000);
+        // Store timeout to clear if model loads first
+        const win = window as Window & { __sceneTimeout?: number };
+        win.__sceneTimeout = timeout;
+      }}
     >
       {/* Moving atmospheric background elements */}
       <MovingStars mousePosition={mousePosition} />
@@ -98,7 +140,7 @@ const Scene = () => {
       <MovingLights mousePosition={mousePosition} />
       
       <Suspense fallback={null}>
-        <Model mousePosition={mousePosition} />
+        <Model mousePosition={mousePosition} onReady={handleModelReady} />
       </Suspense>
     </Canvas>
   );
