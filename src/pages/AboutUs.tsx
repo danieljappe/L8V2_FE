@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Users, Heart, Rocket, Star, ArrowRight, Linkedin, Github, Mail, Phone } from 'lucide-react';
+import { Users, Heart, Rocket, Star, ArrowRight, Linkedin, Github, Mail, Phone, AlertCircle, RefreshCw } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useEvents, useApi } from '../hooks/useApi';
@@ -23,7 +23,7 @@ const useCountAnimation = (end: number, duration: number = 2) => {
 
 const AboutUs = () => {
   const { data: events, loading: eventsLoading } = useEvents();
-  const { data: users, loading: usersLoading } = useApi<User[]>(() => apiService.getUsers());
+  const { data: users, loading: usersLoading, error: usersError, refetch: refetchUsers } = useApi<User[]>(() => apiService.getUsers());
   const [eventCount, setEventCount] = useState(0);
 
   // SEO optimization
@@ -42,7 +42,14 @@ const AboutUs = () => {
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
   };
 
   const staggerContainer = {
@@ -181,6 +188,7 @@ const AboutUs = () => {
       });
   }, [users]);
 
+
   const stats = [
     { 
       icon: Users, 
@@ -276,21 +284,82 @@ const AboutUs = () => {
         >
           Holdet bag L8
         </motion.h2>
-        {usersLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-l8-blue border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : teamMembers.length === 0 ? (
+        {(() => {
+          if (usersLoading) {
+            return (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-l8-blue border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-l8-beige text-sm">Indlæser team medlemmer...</p>
+              </div>
+            );
+          }
+
+          if (usersError) {
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center py-12"
+              >
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 max-w-md mx-auto">
+                  <div className="flex items-center justify-center mb-4">
+                    <AlertCircle className="w-8 h-8 text-red-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-red-400 mb-2">
+                    Fejl ved indlæsning af team medlemmer
+                  </h3>
+                  <p className="text-l8-beige text-sm mb-4 break-words">
+                    {usersError}
+                  </p>
+                  <button
+                    onClick={() => refetchUsers()}
+                    className="inline-flex items-center space-x-2 px-4 py-2 bg-l8-blue hover:bg-l8-blue-light text-white rounded-lg transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Prøv igen</span>
+                  </button>
+                </div>
+              </motion.div>
+            );
+          }
+
+          if (!users || users.length === 0) {
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center py-12 text-l8-beige"
+              >
+                <p>Ingen brugere fundet.</p>
+              </motion.div>
+            );
+          }
+
+          if (teamMembers.length === 0) {
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center py-12 text-l8-beige"
+              >
+                <p>Ingen team medlemmer fundet (alle brugere kan være filtreret væk).</p>
+                <p className="text-xs mt-2 text-l8-beige/60">
+                  Antal brugere: {users.length}
+                </p>
+              </motion.div>
+            );
+          }
+
+          return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center py-12 text-l8-beige"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
-            <p>Ingen team medlemmer fundet.</p>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {teamMembers.map((member) => (
               <motion.div
                 key={member.id}
@@ -371,8 +440,9 @@ const AboutUs = () => {
                 </div>
               </motion.div>
             ))}
-          </div>
-        )}
+          </motion.div>
+          );
+        })()}
       </motion.div>
 
       {/* Contact CTA Section */}

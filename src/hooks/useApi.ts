@@ -36,11 +36,20 @@ export function useApi<T>(
           loading: false,
           error: result.error,
         });
-      } else if (result.data) {
+      } else if (result.data !== undefined) {
+        // Handle both null and actual data (including empty arrays)
         setState({
           data: result.data,
           loading: false,
           error: null,
+        });
+      } else {
+        // If neither error nor data is returned, treat as error
+        console.error('API returned neither data nor error');
+        setState({
+          data: null,
+          loading: false,
+          error: 'API returned an unexpected response',
         });
       }
     } catch (error) {
