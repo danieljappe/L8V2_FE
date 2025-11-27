@@ -273,8 +273,18 @@ export interface ContactMessage {
   id: string;
   name: string;
   email: string;
-  subject: string;
+  subject?: string;
   message: string;
+  isRead: boolean;
+  type: 'general' | 'booking' | 'support' | 'feedback';
+  status: 'pending' | 'read' | 'replied' | 'archived';
+  phone?: string;
+  eventDate?: string;
+  artistType?: string;
+  eventDetails?: string;
+  budget?: number;
+  adminNotes?: string;
+  repliedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -334,7 +344,10 @@ export const apiService = {
 
   // Contact
   getContactMessages: () => apiClient.get<ContactMessage[]>('/contact'),
+  getContactMessage: (id: string) => apiClient.get<ContactMessage>(`/contact/${id}`),
   createContactMessage: (message: Partial<ContactMessage>) => apiClient.post<ContactMessage>('/contact', message),
+  updateContactMessage: (id: string, message: Partial<ContactMessage>) => apiClient.put<ContactMessage>(`/contact/${id}`, message),
+  deleteContactMessage: (id: string) => apiClient.delete<null>(`/contact/${id}`),
 
   // Users
   getUsers: () => apiClient.get<User[]>('/users'),

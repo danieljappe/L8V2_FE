@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Globe } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Plus, Edit, Trash2, Globe, Music, Calendar } from 'lucide-react';
 import { Artist } from '../../types/admin';
 import ArtistFormModal from './ArtistFormModal';
 
@@ -19,6 +19,18 @@ export default function ArtistsList({
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
+  // Sort artists: bookable first, then by name
+  const sortedArtists = useMemo(() => {
+    return [...artists].sort((a, b) => {
+      // First sort by isBookable (true first)
+      if (a.isBookable !== b.isBookable) {
+        return b.isBookable ? 1 : -1;
+      }
+      // Then sort alphabetically by name
+      return a.name.localeCompare(b.name);
+    });
+  }, [artists]);
+
   // Update selectedArtist if the artist data changes
   useEffect(() => {
     if (selectedArtist && !isCreating) {
@@ -27,6 +39,7 @@ export default function ArtistsList({
         setSelectedArtist(updatedArtist);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [artists, selectedArtist?.id, isCreating]);
 
   const handleEdit = (artist: Artist) => {
@@ -66,132 +79,159 @@ export default function ArtistsList({
         </button>
       </div>
 
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {artists.map((artist) => (
-          <div key={artist.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group">
-            {/* Image Section */}
-            <div className="relative h-40 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-              {artist.imageUrl ? (
-                <img 
-                  src={artist.imageUrl} 
-                  alt={artist.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-              ) : null}
-              {/* Fallback placeholder */}
-              <div className={`w-full h-full flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}>
-                <div className="w-12 h-12 bg-gradient-to-br from-l8-blue to-l8-blue-light rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white text-xl font-bold">{artist.name.charAt(0).toUpperCase()}</span>
-                </div>
-              </div>
-              
-            </div>
-            
-            {/* Content Section */}
-            <div className="p-5">
-              {/* Artist Name */}
-              <div className="mb-3">
-                <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-                  {artist.name}
-                </h3>
-                {artist.bio && (
-                  <p className="text-gray-600 text-sm line-clamp-2">
-                    {artist.bio}
-                  </p>
-                )}
-              </div>
-              
-              {/* Stats Row */}
-              <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                <div className="flex items-center space-x-3">
-                  {/* Social Media Count */}
-                  {artist.socialMedia && Array.isArray(artist.socialMedia) && artist.socialMedia.length > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <span className="text-l8-blue">📱</span>
-                      <span>{artist.socialMedia.length} social</span>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Artist
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Genre
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Media & Links
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Updated
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {sortedArtists.map((artist) => (
+                <tr key={artist.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        {artist.imageUrl ? (
+                          <img 
+                            src={artist.imageUrl} 
+                            alt={artist.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const fallback = e.currentTarget.nextElementSibling;
+                              if (fallback) {
+                                (fallback as HTMLElement).style.display = 'flex';
+                              }
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className={`w-full h-full bg-gradient-to-br from-l8-blue to-l8-blue-light flex items-center justify-center ${artist.imageUrl ? 'hidden' : ''}`}
+                        >
+                          <span className="text-white text-sm font-bold">
+                            {artist.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                          {artist.name}
+                          {artist.isBookable && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Bookable
+                            </span>
+                          )}
+                        </div>
+                        {artist.bio && (
+                          <div className="text-sm text-gray-500 line-clamp-1 max-w-md">
+                            {artist.bio}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  
-                  {/* Embeddings Count */}
-                  {artist.embeddings && artist.embeddings.length > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <span className="text-green-500">🎵</span>
-                      <span>{artist.embeddings.length} media</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {artist.genre ? (
+                      <div className="flex items-center">
+                        <Music className="w-4 h-4 text-gray-400 mr-1" />
+                        <span className="text-sm text-gray-900">{artist.genre}</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center space-x-3 text-sm text-gray-500">
+                      {artist.socialMedia && Array.isArray(artist.socialMedia) && artist.socialMedia.length > 0 && (
+                        <div className="flex items-center space-x-1">
+                          <span>📱</span>
+                          <span>{artist.socialMedia.length}</span>
+                        </div>
+                      )}
+                      {artist.embeddings && artist.embeddings.length > 0 && (
+                        <div className="flex items-center space-x-1">
+                          <span>🎵</span>
+                          <span>{artist.embeddings.length}</span>
+                        </div>
+                      )}
+                      {artist.website && (
+                        <div className="flex items-center space-x-1">
+                          <Globe className="w-4 h-4 text-blue-500" />
+                        </div>
+                      )}
+                      {!artist.socialMedia?.length && !artist.embeddings?.length && !artist.website && (
+                        <span className="text-gray-400">—</span>
+                      )}
                     </div>
-                  )}
-                  
-                  {/* Website Indicator */}
-                  {artist.website && (
-                    <div className="flex items-center space-x-1">
-                      <Globe className="w-3 h-3 text-blue-500" />
-                      <span>website</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {artist.updatedAt ? new Date(artist.updatedAt).toLocaleDateString() : 'Unknown'}
                     </div>
-                  )}
-                  
-                  {/* Bookable Indicator */}
-                  {artist.isBookable && (
-                    <div className="flex items-center space-x-1">
-                      <span className="text-green-500">📅</span>
-                      <span>bookable</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(artist)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="Edit Artist"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(artist.id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete Artist"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  )}
-                </div>
-                
-                {/* Status Indicator */}
-                <div className="flex items-center space-x-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                  <span>Active</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                <div className="text-xs text-gray-400">
-                  Updated {artist.updatedAt ? new Date(artist.updatedAt).toLocaleDateString() : 'Unknown'}
-                </div>
-                
-                <div className="flex items-center space-x-1">
-                  <button 
-                    onClick={() => handleEdit(artist)}
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                    title="Edit Artist"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(artist.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                    title="Delete Artist"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Empty State */}
-      {artists.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-          <div className="w-20 h-20 bg-gradient-to-br from-l8-beige-light to-l8-beige rounded-full flex items-center justify-center mx-auto mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-l8-blue to-l8-blue-dark rounded-full flex items-center justify-center">
-              <span className="text-white text-2xl">👨‍🎤</span>
+      {sortedArtists.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-lg shadow">
+          <div className="w-16 h-16 bg-gradient-to-br from-l8-beige-light to-l8-beige rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-l8-blue to-l8-blue-dark rounded-full flex items-center justify-center">
+              <span className="text-white text-xl">👨‍🎤</span>
             </div>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Artists Yet</h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Get started by adding your first artist to the roster
-          </p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Artists Yet</h3>
+          <p className="text-gray-500 mb-6">Get started by adding your first artist to the roster</p>
           <button
             onClick={handleCreate}
-            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
+            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span>Add Your First Artist</span>

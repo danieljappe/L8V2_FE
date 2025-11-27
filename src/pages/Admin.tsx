@@ -9,9 +9,9 @@ import MessagesList from '../components/admin/MessagesList';
 import AccountSettings from '../components/admin/AccountSettings';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';
-import { mockEvents, mockArtists, mockVenues, mockGallery, mockMessages } from '../data/mockData';
+import { mockEvents, mockArtists, mockVenues, mockGallery } from '../data/mockData';
 import { AdminSection, Event, Artist, Venue, GalleryItem, Message } from '../types/admin';
-import { apiService, Event as ApiEvent, Artist as ApiArtist, Venue as ApiVenue } from '../services/api';
+import { apiService, Event as ApiEvent, Artist as ApiArtist, Venue as ApiVenue, ContactMessage as ApiContactMessage } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
 import ConstraintErrorModal from '../components/admin/ConstraintErrorModal';
 
@@ -156,6 +156,28 @@ function mapApiGalleryToAdminGallery(apiGallery: any): GalleryItem {
   };
 }
 
+// Map backend ContactMessage to admin Message type
+function mapApiContactMessageToAdminMessage(apiMessage: ApiContactMessage): Message {
+  // Map status to priority: pending/replied = high, read = medium, archived = low
+  let priority: 'low' | 'medium' | 'high' = 'medium';
+  if (apiMessage.status === 'pending' || apiMessage.status === 'replied') {
+    priority = 'high';
+  } else if (apiMessage.status === 'archived') {
+    priority = 'low';
+  }
+
+  return {
+    id: apiMessage.id,
+    name: apiMessage.name,
+    email: apiMessage.email,
+    subject: apiMessage.subject || 'No Subject',
+    message: apiMessage.message,
+    read: apiMessage.isRead,
+    priority,
+    createdAt: apiMessage.createdAt,
+  };
+}
+
 export default function Admin() {
   const { logout, user } = useAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
@@ -174,7 +196,9 @@ export default function Admin() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
-  const [messages, setMessages] = useLocalStorage<Message[]>('admin-messages', mockMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesError, setMessagesError] = useState<string | null>(null);
 
   // Constraint error modal state
   const [constraintError, setConstraintError] = useState<{
@@ -227,10 +251,22 @@ export default function Admin() {
       }
       setGalleryLoading(false);
     };
+    const fetchMessages = async () => {
+      setMessagesLoading(true);
+      setMessagesError(null);
+      const res = await apiService.getContactMessages();
+      if (res.data) {
+        setMessages((res.data as ApiContactMessage[]).map(mapApiContactMessageToAdminMessage));
+      } else {
+        setMessagesError(res.error || 'Failed to fetch contact messages');
+      }
+      setMessagesLoading(false);
+    };
     fetchEvents();
     fetchArtists();
     fetchVenues();
     fetchGallery();
+    fetchMessages();
   }, []);
 
   // Event handlers (backend)
@@ -405,14 +441,36 @@ export default function Admin() {
   };
 
   // Message handlers
-  const handleMarkAsRead = (id: string) => {
-    setMessages(messages.map(message => 
-      message.id === id ? { ...message, read: true } : message
-    ));
+  const handleMarkAsRead = async (id: string) => {
+    const message = messages.find(m => m.id === id);
+    if (!message) return;
+
+    const res = await apiService.updateContactMessage(id, {
+      isRead: true,
+      status: 'read'
+    });
+    
+    if (res.data) {
+      setMessages(messages.map(msg => 
+        msg.id === id ? mapApiContactMessageToAdminMessage(res.data as ApiContactMessage) : msg
+      ));
+    } else {
+      alert(res.error || 'Failed to mark message as read');
+    }
   };
 
-  const handleDeleteMessage = (id: string) => {
-    setMessages(messages.filter(message => message.id !== id));
+  const handleDeleteMessage = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
+
+    const res = await apiService.deleteContactMessage(id);
+    
+    if (!res.error) {
+      setMessages(messages.filter(message => message.id !== id));
+    } else {
+      alert(res.error || 'Failed to delete message');
+    }
   };
 
   const renderContent = () => {
@@ -473,6 +531,8 @@ export default function Admin() {
         return (
           <MessagesList
             messages={messages}
+            loading={messagesLoading}
+            error={messagesError}
             onMarkAsRead={handleMarkAsRead}
             onDeleteMessage={handleDeleteMessage}
           />
