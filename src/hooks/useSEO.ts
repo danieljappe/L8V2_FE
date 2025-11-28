@@ -74,7 +74,8 @@ export const useSEO = ({
       'twitter:title': finalTitle,
       'twitter:description': finalDescription,
       'twitter:url': finalUrl,
-      'twitter:image': finalImage
+      'twitter:image': finalImage,
+      'twitter:card': 'summary_large_image'
     };
 
     Object.entries(twitterTags).forEach(([name, content]) => {
@@ -95,6 +96,49 @@ export const useSEO = ({
       document.head.appendChild(canonicalLink);
     }
     canonicalLink.setAttribute('href', finalUrl);
+
+    // Add language meta tag
+    const langTag = document.querySelector('html');
+    if (langTag && !langTag.getAttribute('lang')) {
+      langTag.setAttribute('lang', 'da');
+    }
+
+    // Add additional Open Graph tags for better social sharing
+    const additionalOgTags = {
+      'og:image:width': '1200',
+      'og:image:height': '630',
+      'og:image:alt': finalTitle,
+      'og:locale': 'da_DK',
+      'og:site_name': 'L8 Events'
+    };
+
+    Object.entries(additionalOgTags).forEach(([property, content]) => {
+      let metaTag = document.querySelector(`meta[property="${property}"]`);
+      if (!metaTag) {
+        metaTag = document.createElement('meta');
+        metaTag.setAttribute('property', property);
+        document.head.appendChild(metaTag);
+      }
+      metaTag.setAttribute('content', content);
+    });
+
+    // Add article meta tags if type is article or profile
+    if (type === 'article' || type === 'profile') {
+      const articleTags = {
+        'article:author': 'L8 Events',
+        'article:publisher': 'https://www.facebook.com/l8events'
+      };
+
+      Object.entries(articleTags).forEach(([property, content]) => {
+        let metaTag = document.querySelector(`meta[property="${property}"]`);
+        if (!metaTag) {
+          metaTag = document.createElement('meta');
+          metaTag.setAttribute('property', property);
+          document.head.appendChild(metaTag);
+        }
+        metaTag.setAttribute('content', content);
+      });
+    }
 
   }, [title, description, keywords, image, url, type]);
 };

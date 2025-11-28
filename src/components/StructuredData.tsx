@@ -93,22 +93,43 @@ export const createArtistSchema = (artist: any) => {
   const artistSlug = artist.name.toLowerCase().replace(/\s+/g, '-');
   const pageUrl = `https://l8events.dk/booking/artists/${artistSlug}`;
 
+  // Enhanced Person schema with more comprehensive information
   return {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": artist.name,
     "description": artist.bio || `${artist.name} er en talentfuld artist booket gennem L8 Events. Book ${artist.name} til dit event.`,
-    "image": imageUrl,
+    "image": {
+      "@type": "ImageObject",
+      "url": imageUrl,
+      "caption": `${artist.name} - ${artist.genre || 'Musik'} Artist`
+    },
     "jobTitle": artist.genre ? `${artist.genre} Artist` : "Musik Artist",
     "worksFor": {
       "@type": "Organization",
       "name": "L8 Events",
-      "url": "https://l8events.dk"
+      "url": "https://l8events.dk",
+      "logo": "https://l8events.dk/l8logo.webp"
     },
     "sameAs": socialUrls.length > 0 ? socialUrls : undefined,
     "url": pageUrl,
-    "knowsAbout": artist.genre ? [artist.genre, "Musik", "Booking", "Events"] : ["Musik", "Booking", "Events"],
-    ...(artist.website ? { "mainEntityOfPage": artist.website } : {})
+    "knowsAbout": artist.genre ? [artist.genre, "Musik", "Booking", "Events", "Koncert", "Performance"] : ["Musik", "Booking", "Events", "Koncert", "Performance"],
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": pageUrl,
+      "name": `${artist.name} - Artist Booking | L8 Events`,
+      "description": artist.bio || `${artist.name} er en talentfuld artist booket gennem L8 Events. Book ${artist.name} til dit event.`
+    },
+    ...(artist.website ? { "url": artist.website } : {}),
+    // Add additional properties for better SEO
+    "alumniOf": {
+      "@type": "Organization",
+      "name": "L8 Events Artist Roster"
+    },
+    "performerIn": {
+      "@type": "Event",
+      "name": "Events booket gennem L8 Events"
+    }
   };
 };
 
@@ -124,3 +145,36 @@ export const createWebSiteSchema = () => ({
     "query-input": "required name=search_term_string"
   }
 });
+
+// Create BreadcrumbList for navigation breadcrumbs in Google search results
+export const createBreadcrumbSchema = (items: Array<{ name: string; url: string }>) => {
+  const baseUrl = "https://l8events.dk";
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items.map((item, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": item.name,
+      "item": item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}`
+    }))
+  };
+};
+
+// Create SiteNavigationElement for site navigation structure
+export const createSiteNavigationSchema = (navItems: Array<{ name: string; url: string }>) => {
+  const baseUrl = "https://l8events.dk";
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "SiteNavigationElement",
+    "name": "Main Navigation",
+    "url": baseUrl,
+    "hasPart": navItems.map(item => ({
+      "@type": "SiteNavigationElement",
+      "name": item.name,
+      "url": item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}`
+    }))
+  };
+};

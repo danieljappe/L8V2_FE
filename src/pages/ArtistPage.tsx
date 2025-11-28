@@ -17,7 +17,7 @@ import BookingModal from '../components/BookingModal';
 import { constructFullUrl } from '../utils/imageUtils';
 import { normalizeSocialMedia } from '../utils/socialMediaUtils';
 import { useSEO } from '../hooks/useSEO';
-import { StructuredData, createArtistSchema } from '../components/StructuredData';
+import { StructuredData, createArtistSchema, createBreadcrumbSchema } from '../components/StructuredData';
 
 const ArtistPage: React.FC = () => {
   const { artistName } = useParams<{ artistName: string }>();
@@ -73,10 +73,10 @@ const ArtistPage: React.FC = () => {
   const artistSlug = artistName || '';
   const pageUrl = `/booking/artists/${artistSlug}`;
   
-  // Generate SEO title
+  // Generate SEO title (without | L8 Events as useSEO adds it)
   const seoTitle = artist 
-    ? `${artist.name}${artist.genre ? ` - ${artist.genre} Artist` : ' - Artist'} | Book ${artist.name} | L8 Events`
-    : 'Artist | L8 Events';
+    ? `${artist.name}${artist.genre ? ` - ${artist.genre} Artist` : ' - Artist'} | Book ${artist.name}`
+    : 'Artist';
 
   // Generate SEO description
   const seoDescription = artist
@@ -156,11 +156,22 @@ const ArtistPage: React.FC = () => {
   // Convert social media data to consistent array format
   const socialMediaArray = normalizeSocialMedia(artist.socialMedia);
 
+  // Create breadcrumb navigation for Google
+  const breadcrumbItems = [
+    { name: 'Forside', url: '/' },
+    { name: 'Booking', url: '/booking' },
+    { name: 'Kunstnere', url: '/booking/artists' },
+    { name: artist?.name || 'Artist', url: pageUrl }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-booking-dark via-booking-dark to-booking-teal-dark">
       {/* Structured Data for SEO */}
       {artist && (
-        <StructuredData data={createArtistSchema(artist)} />
+        <>
+          <StructuredData data={createArtistSchema(artist)} />
+          <StructuredData data={createBreadcrumbSchema(breadcrumbItems)} />
+        </>
       )}
 
       {/* Header */}
