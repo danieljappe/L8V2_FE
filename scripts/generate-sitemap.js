@@ -11,15 +11,45 @@ const API_BASE_URL = process.env.VITE_API_URL || 'https://l8events.dk/api';
 // Helper function to fetch data from API
 const fetchFromAPI = async (endpoint) => {
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
+    // Add timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    clearTimeout(timeoutId);
+    
     if (!response.ok) {
       console.warn(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
       return [];
     }
-    const data = await response.json();
+    
+    const jsonData = await response.json();
+    
+    // Handle API response format: { data: [...] } or just [...]
+    let data = jsonData;
+    if (jsonData && typeof jsonData === 'object' && 'data' in jsonData) {
+      data = jsonData.data;
+    }
+    
+    // Ensure we return an array
+    if (!Array.isArray(data)) {
+      console.warn(`Unexpected data format from ${endpoint}, expected array`);
+      return [];
+    }
+    
     return data || [];
   } catch (error) {
-    console.warn(`Error fetching ${endpoint}:`, error.message);
+    if (error.name === 'AbortError') {
+      console.warn(`Timeout fetching ${endpoint} (10s limit)`);
+    } else {
+      console.warn(`Error fetching ${endpoint}:`, error.message);
+    }
     return [];
   }
 };
@@ -84,12 +114,20 @@ const generateSitemap = async () => {
 
   // Fetch dynamic content from API
   console.log('Fetching dynamic content from API...');
+  console.log(`API Base URL: ${API_BASE_URL}`);
+  
   const [events, artists] = await Promise.all([
     fetchFromAPI('/events'),
     fetchFromAPI('/artists')
   ]);
 
   console.log(`Found ${events.length} events and ${artists.length} artists`);
+  
+  if (events.length === 0 && artists.length === 0) {
+    console.warn('⚠️  Warning: No dynamic content fetched from API. Sitemap will only include static pages.');
+    console.warn('   This may be normal if the API is unavailable during build time.');
+    console.warn('   The sitemap will still be generated with static pages.');
+  }
 
   // Add dynamic event pages
   const eventPages = events.map(event => ({
@@ -135,14 +173,19 @@ const generateSitemap = async () => {
   sitemap += `
 </urlset>`;
 
-  return sitemap;
+  return {
+    sitemap,
+    staticCount: staticPages.length,
+    dynamicCount: eventPages.length + artistPages.length,
+    totalCount: allPages.length
+  };
 };
 
 // Generate and write sitemap
 const main = async () => {
   try {
     console.log('Generating sitemap...');
-    const sitemap = await generateSitemap();
+    const { sitemap, staticCount, dynamicCount, totalCount } = await generateSitemap();
     
     const publicPath = path.join(__dirname, '../public');
     const sitemapPath = path.join(publicPath, 'sitemap.xml');
@@ -153,8 +196,14 @@ const main = async () => {
     }
     
     fs.writeFileSync(sitemapPath, sitemap);
-    console.log('Sitemap generated successfully at:', sitemapPath);
-    console.log(`Total URLs: ${sitemap.split('<url>').length - 1}`);
+    
+    console.log('✅ Sitemap generated successfully at:', sitemapPath);
+    console.log(`   Total URLs: ${totalCount} (${staticCount} static, ${dynamicCount} dynamic)`);
+    
+    if (dynamicCount === 0) {
+      console.log('   ⚠️  Note: No dynamic URLs included. If this is unexpected, check API connectivity.');
+      console.log('   The sitemap will still work with static pages only.');
+    }
   } catch (error) {
     console.error('Error generating sitemap:', error);
     process.exit(1);
