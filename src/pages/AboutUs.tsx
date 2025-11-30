@@ -29,8 +29,8 @@ const AboutUs = () => {
   // SEO optimization
   useSEO({
     title: 'Om L8 Events - Vores Mission og Team',
-    description: 'Lær mere om L8 Events team og vores mission om at skabe uforglemmelige musikkopplevelser. Vi er dedikeret til at styrke den danske musikscene gennem innovative events.',
-    keywords: 'L8 Events om os, team, mission, dansk musik, event management, musikkopplevelser, elektronisk musik, event organisatorer, musik fællesskab',
+    description: 'Lær mere om L8 Events - vi kuraterer events med fokus på den nye bølge af dansk musik og fungerer som bindeled mellem nye talenter og etablerede spillesteder. Siden marts 2024 har vi vokset fra festlokale til Distortion scene.',
+    keywords: 'L8 Events om os, team, mission, dansk musik, vækstlaget musik, event management, musikkopplevelser, elektronisk musik, event organisatorer, musik fællesskab, spillesteder, kunstnere booking',
     url: '/about'
   });
 

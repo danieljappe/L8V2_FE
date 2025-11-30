@@ -14,9 +14,9 @@ const Home: React.FC = () => {
 
   // SEO optimization
   useSEO({
-    title: 'L8 Events - Uforglemmelige Musikkopplevelser',
-    description: 'L8 Events skaber uforglemmelige musikoplevelser. Book kunstnere, deltag i vores begivenheder, og se afholdte events. Event management og booking service.',
-    keywords: 'L8, l8events, L8 Events, event booking, kunstnere, events, booking, musik, DJ, producer',
+    title: 'L8 Events - Den Nye Bølge af Dansk Musik',
+    description: 'L8 Events kuraterer events med fokus på den nye bølge af dansk musik. Book spirrende artister, deltag i vores begivenheder, og oplev uforglemmelige musikkopplevelser. Vi fungerer som bindeled mellem nye talenter og etablerede spillesteder.',
+    keywords: 'L8 Events, dansk musik, elektronisk musik, event booking, kunstnere booking, musikkopplevelser, vækstlaget musik, DJ events, musik events Danmark, event management, booking service',
     url: '/'
   });
 
