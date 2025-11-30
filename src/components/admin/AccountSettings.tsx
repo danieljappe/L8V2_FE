@@ -633,9 +633,41 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   {users.map((teamMember) => {
                     const fullName = [teamMember.firstName, teamMember.lastName].filter(Boolean).join(' ') || teamMember.email;
                     const disabled = teamMember.id === userId;
+                    const initials = [teamMember.firstName?.[0], teamMember.lastName?.[0]]
+                      .filter(Boolean)
+                      .join('')
+                      .toUpperCase() || teamMember.email[0].toUpperCase();
                     return (
                       <tr key={teamMember.id}>
-                        <td className="px-4 py-3 text-sm text-gray-900">{fullName}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            {teamMember.imageUrl ? (
+                              <>
+                                <img
+                                  src={teamMember.imageUrl}
+                                  alt={fullName}
+                                  className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                                  onError={(e) => {
+                                    const target = e.currentTarget;
+                                    target.style.display = 'none';
+                                    const fallback = target.nextElementSibling as HTMLElement;
+                                    if (fallback) {
+                                      fallback.classList.remove('hidden');
+                                    }
+                                  }}
+                                />
+                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-700 hidden">
+                                  {initials}
+                                </div>
+                              </>
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-700">
+                                {initials}
+                              </div>
+                            )}
+                            <span className="text-sm text-gray-900">{fullName}</span>
+                          </div>
+                        </td>
                         <td className="px-4 py-3 text-sm text-gray-500">{teamMember.email}</td>
                         <td className="px-4 py-3">
                           <div className="flex justify-end">
