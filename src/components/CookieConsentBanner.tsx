@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Settings, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 type ConsentPreferences = {
@@ -90,6 +90,15 @@ const CookieConsentBanner: React.FC = () => {
     marketing: false
   });
 
+  const openBanner = useCallback(() => {
+    const savedConsent = localStorage.getItem('cookieConsent');
+    if (savedConsent) {
+      const consentData = JSON.parse(savedConsent);
+      setPreferences(consentData);
+    }
+    setShowBanner(true);
+  }, []);
+
   useEffect(() => {
     // Check if user has already given consent
     const savedConsent = localStorage.getItem('cookieConsent');
@@ -100,6 +109,17 @@ const CookieConsentBanner: React.FC = () => {
       setPreferences(consentData);
     }
   }, []);
+
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      openBanner();
+    };
+
+    window.addEventListener('openCookieSettings', handleOpenSettings);
+    return () => {
+      window.removeEventListener('openCookieSettings', handleOpenSettings);
+    };
+  }, [openBanner]);
 
   const savePreferences = (consentPrefs: ConsentPreferences) => {
     localStorage.setItem('cookieConsent', JSON.stringify(consentPrefs));
@@ -131,15 +151,6 @@ const CookieConsentBanner: React.FC = () => {
 
   const handleSavePreferences = () => {
     savePreferences(preferences);
-  };
-
-  const openBanner = () => {
-    const savedConsent = localStorage.getItem('cookieConsent');
-    if (savedConsent) {
-      const consentData = JSON.parse(savedConsent);
-      setPreferences(consentData);
-    }
-    setShowBanner(true);
   };
 
   if (!showBanner) return null;
