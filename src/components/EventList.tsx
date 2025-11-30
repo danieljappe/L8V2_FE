@@ -6,6 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { useEvents } from '../hooks/useApi';
 import { Event } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
+import { slugify } from '../utils/slugUtils';
 
 interface ProcessedEvent extends Event {
   status: 'upcoming' | 'past';
@@ -241,7 +242,7 @@ const EventList: React.FC = () => {
                 <motion.button 
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate(`/events/${selectedEvent.id}`)}
+                  onClick={() => navigate(`/events/${slugify(selectedEvent.title)}`)}
                   className="bg-gradient-to-r from-l8-blue to-l8-blue-light hover:from-l8-blue-dark hover:to-l8-blue text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 mx-auto"
                 >
                   <Ticket className="w-5 h-5" />
@@ -271,7 +272,7 @@ const EventList: React.FC = () => {
           {sortedEvents.map((event) => (
             <div
               key={event.id}
-              onClick={() => navigate(`/events/${event.id}`)}
+              onClick={() => navigate(`/events/${slugify(event.title)}`)}
               className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl cursor-pointer transition-all duration-300 group hover:scale-105 active:scale-95"
             >
               {/* Event Status Badge */}

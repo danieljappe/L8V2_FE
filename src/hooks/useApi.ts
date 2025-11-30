@@ -90,14 +90,14 @@ export function useEvents() {
   return useApi(() => apiService.getEvents());
 }
 
-export function useEvent(id: string) {
+export function useEvent(nameOrId: string) {
   return useApi(() => {
-    // Don't make API call if ID is invalid
-    if (!id || typeof id !== 'string' || id.trim() === '') {
-      return Promise.resolve({ error: 'Invalid event ID' });
+    // Don't make API call if name/id is invalid
+    if (!nameOrId || typeof nameOrId !== 'string' || nameOrId.trim() === '') {
+      return Promise.resolve({ error: 'Invalid event name or ID' });
     }
-    return apiService.getEvent(id);
-  }, [id]);
+    return apiService.getEvent(nameOrId);
+  }, [nameOrId]);
 }
 
 export function useArtists() {

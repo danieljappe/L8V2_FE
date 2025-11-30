@@ -8,50 +8,137 @@ const __dirname = path.dirname(__filename);
 // API Base URL - adjust this based on your backend deployment
 const API_BASE_URL = process.env.VITE_API_URL || 'https://l8events.dk/api';
 
-// Helper function to fetch data from API
-const fetchFromAPI = async (endpoint) => {
-  try {
-    // Add timeout to prevent hanging
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-    
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      console.warn(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
-      return [];
+// Slugify function to convert event titles to URL-friendly slugs
+function slugify(text) {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'oe')
+    .replace(/å/g, 'aa')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/\s+/g, '-')
+    .replace(/_/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
+// Wait for API to be available (useful during deployment)
+const waitForAPI = async (maxWaitTime = 30000, checkInterval = 2000) => {
+  const startTime = Date.now();
+  const healthCheckEndpoint = '/events'; // Simple endpoint to check if API is up
+  
+  console.log(`Waiting for API to be available at ${API_BASE_URL}...`);
+  
+  while (Date.now() - startTime < maxWaitTime) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(`${API_BASE_URL}${healthCheckEndpoint}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok || response.status === 200) {
+        console.log('✅ API is available');
+        return true;
+      }
+    } catch (error) {
+      // API not ready yet, continue waiting
     }
     
-    const jsonData = await response.json();
-    
-    // Handle API response format: { data: [...] } or just [...]
-    let data = jsonData;
-    if (jsonData && typeof jsonData === 'object' && 'data' in jsonData) {
-      data = jsonData.data;
-    }
-    
-    // Ensure we return an array
-    if (!Array.isArray(data)) {
-      console.warn(`Unexpected data format from ${endpoint}, expected array`);
-      return [];
-    }
-    
-    return data || [];
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      console.warn(`Timeout fetching ${endpoint} (10s limit)`);
-    } else {
-      console.warn(`Error fetching ${endpoint}:`, error.message);
-    }
-    return [];
+    // Wait before next check
+    await new Promise(resolve => setTimeout(resolve, checkInterval));
+    process.stdout.write('.'); // Show progress
   }
+  
+  console.log('\n⚠️  API not available after waiting, proceeding with static pages only');
+  return false;
+};
+
+// Helper function to fetch data from API with retry logic
+const fetchFromAPI = async (endpoint, retries = 2) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        // Don't retry on client errors (4xx), only on server errors (5xx)
+        if (response.status >= 400 && response.status < 500) {
+          console.warn(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
+          return [];
+        }
+        
+        // Retry on server errors
+        if (attempt < retries) {
+          const delay = (attempt + 1) * 1000; // Exponential backoff: 1s, 2s
+          console.warn(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}. Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        console.warn(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
+        return [];
+      }
+      
+      const jsonData = await response.json();
+      
+      // Handle API response format: { data: [...] } or just [...]
+      // Backend returns arrays directly, but frontend API client wraps them
+      let data = jsonData;
+      if (jsonData && typeof jsonData === 'object' && !Array.isArray(jsonData) && 'data' in jsonData) {
+        data = jsonData.data;
+      }
+      
+      // Ensure we return an array
+      if (!Array.isArray(data)) {
+        console.warn(`Unexpected data format from ${endpoint}, expected array. Got:`, typeof data);
+        return [];
+      }
+      
+      return data || [];
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        if (attempt < retries) {
+          console.warn(`Timeout fetching ${endpoint}. Retrying...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          continue;
+        }
+        console.warn(`Timeout fetching ${endpoint} (10s limit)`);
+      } else if (attempt < retries) {
+        const delay = (attempt + 1) * 1000;
+        console.warn(`Error fetching ${endpoint}: ${error.message}. Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      } else {
+        console.warn(`Error fetching ${endpoint}:`, error.message);
+      }
+      return [];
+    }
+  }
+  return [];
 };
 
 // Generate sitemap with both static and dynamic content
@@ -113,32 +200,56 @@ const generateSitemap = async () => {
   ];
 
   // Fetch dynamic content from API
-  console.log('Fetching dynamic content from API...');
-  console.log(`API Base URL: ${API_BASE_URL}`);
+  const skipApiCalls = process.env.SKIP_SITEMAP_API === 'true';
+  const waitForApi = process.env.WAIT_FOR_API !== 'false'; // Default to true
   
-  const [events, artists] = await Promise.all([
-    fetchFromAPI('/events'),
-    fetchFromAPI('/artists')
-  ]);
+  let events = [];
+  let artists = [];
+  
+  if (skipApiCalls) {
+    console.log('⚠️  Skipping API calls (SKIP_SITEMAP_API=true). Generating sitemap with static pages only.');
+  } else {
+    console.log('Fetching dynamic content from API...');
+    console.log(`API Base URL: ${API_BASE_URL}`);
+    
+    // Wait for API to be available if enabled (useful during deployment)
+    if (waitForApi) {
+      const apiReady = await waitForAPI(30000); // Wait up to 30 seconds
+      if (!apiReady) {
+        console.warn('⚠️  API not ready, generating sitemap with static pages only.');
+      }
+    }
+    
+    [events, artists] = await Promise.all([
+      fetchFromAPI('/events'),
+      fetchFromAPI('/artists')
+    ]);
 
-  console.log(`Found ${events.length} events and ${artists.length} artists`);
-  
-  if (events.length === 0 && artists.length === 0) {
-    console.warn('⚠️  Warning: No dynamic content fetched from API. Sitemap will only include static pages.');
-    console.warn('   This may be normal if the API is unavailable during build time.');
-    console.warn('   The sitemap will still be generated with static pages.');
+    const bookableCount = artists.filter(a => a.isBookable === true).length;
+    console.log(`Found ${events.length} events and ${artists.length} artists (${bookableCount} bookable)`);
+    
+    if (events.length === 0 && artists.length === 0) {
+      console.warn('⚠️  Warning: No dynamic content fetched from API. Sitemap will only include static pages.');
+      console.warn('   Possible reasons:');
+      console.warn('   - API is unavailable during build time (common in CI/CD)');
+      console.warn('   - API requires authentication or is behind a firewall');
+      console.warn('   - Network connectivity issues');
+      console.warn('   To skip API calls entirely, set SKIP_SITEMAP_API=true');
+      console.warn('   The sitemap will still be generated with static pages.');
+    }
   }
 
   // Add dynamic event pages
   const eventPages = events.map(event => ({
-    url: `/events/${event.id}`,
+    url: `/events/${slugify(event.title)}`,
     lastmod: event.updatedAt ? new Date(event.updatedAt).toISOString().split('T')[0] : undefined,
     changefreq: 'weekly',
     priority: 0.8
   }));
 
-  // Add dynamic artist pages (for booking platform)
-  const artistPages = artists.map(artist => {
+  // Add dynamic artist pages (for booking platform) - only include bookable artists
+  const bookableArtists = artists.filter(artist => artist.isBookable === true);
+  const artistPages = bookableArtists.map(artist => {
     const slug = artist.name.toLowerCase().replace(/\s+/g, '-');
     return {
       url: `/booking/artists/${slug}`,

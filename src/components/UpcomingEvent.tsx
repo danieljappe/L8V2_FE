@@ -6,6 +6,7 @@ import ArtistModal from './ArtistModal';
 import LoadingSpinner from './LoadingSpinner';
 import { useEvents, useArtists } from '../hooks/useApi';
 import { Artist, Event } from '../services/api';
+import { slugify } from '../utils/slugUtils';
 
 const UpcomingEvent: React.FC = () => {
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
@@ -53,7 +54,7 @@ const UpcomingEvent: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     if (upcomingEvent) {
-      navigate(`/events/${upcomingEvent.id}`, { replace: true });
+      navigate(`/events/${slugify(upcomingEvent.title)}`, { replace: true });
     }
   };
 

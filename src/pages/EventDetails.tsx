@@ -11,15 +11,15 @@ import { constructFullUrl } from '../utils/imageUtils';
 import VenueMapEmbed from '../components/VenueMapEmbed';
 
 const EventDetails: React.FC = () => {
-  const { eventId } = useParams();
+  const { eventName } = useParams();
   const navigate = useNavigate();
   const [selectedArtist, setSelectedArtist] = React.useState<Artist | null>(null);
 
-  // Validate eventId before making API call
-  const isValidEventId = eventId && typeof eventId === 'string' && eventId.trim() !== '';
+  // Validate eventName before making API call
+  const isValidEventName = eventName && typeof eventName === 'string' && eventName.trim() !== '';
 
-  // Fetch event data from API only if eventId is valid
-  const { data: event, loading, error } = useEvent(isValidEventId ? eventId : '');
+  // Fetch event data from API only if eventName is valid
+  const { data: event, loading, error } = useEvent(isValidEventName ? eventName : '');
 
   // Show loading state
   if (loading) {
@@ -33,16 +33,16 @@ const EventDetails: React.FC = () => {
     );
   }
 
-  // Show error state for invalid event ID
-  if (!isValidEventId) {
+  // Show error state for invalid event name
+  if (!isValidEventName) {
     return (
       <div className="min-h-screen overflow-x-hidden">
         <Header />
         <div className="flex items-center justify-center h-[60vh]">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">Invalid Event ID</h2>
-            <p className="text-white/70 mb-4">The event ID in the URL is not valid.</p>
+            <h2 className="text-2xl font-bold text-white mb-2">Invalid Event Name</h2>
+            <p className="text-white/70 mb-4">The event name in the URL is not valid.</p>
             <button 
               onClick={() => navigate('/events')}
               className="bg-l8-blue hover:bg-l8-blue-dark text-white px-6 py-3 rounded-lg transition-colors"

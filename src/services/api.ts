@@ -320,7 +320,7 @@ export const apiService = {
 
   // Events
   getEvents: () => apiClient.get<Event[]>('/events'),
-  getEvent: (id: string) => apiClient.get<Event>(`/events/${id}`),
+  getEvent: (nameOrId: string) => apiClient.get<Event>(`/events/${nameOrId}`),
   createEvent: (event: Partial<Event>) => apiClient.post<Event>('/events', event),
   updateEvent: (id: string, event: Partial<Event>) => apiClient.put<Event>(`/events/${id}`, event),
   deleteEvent: (id: string) => apiClient.delete<null>(`/events/${id}`),

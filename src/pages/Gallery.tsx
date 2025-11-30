@@ -7,6 +7,7 @@ import { useGalleryImages } from '../hooks/useApi';
 import { GalleryImage, Event, apiService } from '../services/api';
 import { constructFullUrl } from '../utils/imageUtils';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { slugify } from '../utils/slugUtils';
 
 const Gallery: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +69,13 @@ const Gallery: React.FC = () => {
     if (image.eventId && event?.target instanceof HTMLElement) {
       const eventInfoElement = event.target.closest('[data-event-info]');
       if (eventInfoElement) {
-        navigate(`/events/${image.eventId}`);
+        const linkedEvent = eventMap[image.eventId];
+        if (linkedEvent) {
+          navigate(`/events/${slugify(linkedEvent.title)}`);
+        } else {
+          // Fallback to ID if event not found in map
+          navigate(`/events/${image.eventId}`);
+        }
         return;
       }
     }
@@ -78,7 +85,13 @@ const Gallery: React.FC = () => {
   };
 
   const handleEventNavigation = (eventId: string) => {
-    navigate(`/events/${eventId}`);
+    const linkedEvent = eventMap[eventId];
+    if (linkedEvent) {
+      navigate(`/events/${slugify(linkedEvent.title)}`);
+    } else {
+      // Fallback to ID if event not found in map
+      navigate(`/events/${eventId}`);
+    }
   };
 
   const handleCloseModal = () => {

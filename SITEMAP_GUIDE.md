@@ -35,7 +35,7 @@ The sitemap includes the following URL patterns:
 - `/contact` (priority: 0.6, changefreq: monthly)
 
 #### Dynamic Pages
-- `/events/{eventId}` - Individual event pages (priority: 0.8, changefreq: weekly)
+- `/events/{event-name-slug}` - Individual event pages (priority: 0.8, changefreq: weekly)
 - `/booking/artists/{artist-slug}` - Individual artist pages for booking (priority: 0.7, changefreq: monthly)
 
 ## Usage

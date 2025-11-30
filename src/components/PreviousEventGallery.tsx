@@ -6,6 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { useGalleryImages, useEvents } from '../hooks/useApi';
 import { constructFullUrl } from '../utils/imageUtils';
 import { GalleryImage } from '../services/api';
+import { slugify } from '../utils/slugUtils';
 
 const PreviousEventGallery: React.FC = () => {
   const navigate = useNavigate();
@@ -284,7 +285,7 @@ const PreviousEventGallery: React.FC = () => {
               <motion.button 
                 whileHover={{ scale: 1.05, x: 5 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate(`/events/${recentPastEvent.id}`)}
+                onClick={() => navigate(`/events/${slugify(recentPastEvent.title)}`)}
                 className="inline-flex items-center space-x-2 bg-l8-blue hover:bg-l8-blue-dark text-white font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all duration-300 border border-l8-blue/20 text-sm sm:text-base"
               >
                 <span>Se Event</span>

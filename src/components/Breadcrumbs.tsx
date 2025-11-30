@@ -10,10 +10,10 @@ const Breadcrumbs: React.FC = () => {
 
   // Check if we're on an event details page
   const isEventDetailsPage = pathnames.length === 2 && pathnames[0] === 'events' && pathnames[1];
-  const eventId = isEventDetailsPage ? pathnames[1] : null;
+  const eventName = isEventDetailsPage ? pathnames[1] : null;
   
-  // Fetch event data if we're on an event details page
-  const { data: event, loading: eventLoading } = useEvent(eventId || '');
+  // Fetch event data if we're on an event details page (using event name/slug)
+  const { data: event, loading: eventLoading } = useEvent(eventName || '');
 
   // Check if we're on an artist page
   const isArtistPage = pathnames.length === 3 && pathnames[0] === 'booking' && pathnames[1] === 'artists' && pathnames[2];

@@ -1,4 +1,5 @@
 import React from 'react';
+import { slugify } from '../utils/slugUtils';
 
 interface StructuredDataProps {
   data: any;
@@ -60,7 +61,7 @@ export const createEventSchema = (event: any) => ({
   },
   "offers": event.isBookable ? {
     "@type": "Offer",
-    "url": `https://l8events.dk/events/${event.id}`,
+    "url": `https://l8events.dk/events/${slugify(event.title)}`,
     "price": "0",
     "priceCurrency": "DKK",
     "availability": "https://schema.org/InStock"

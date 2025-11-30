@@ -85,13 +85,32 @@ export const getStaticPages = (): SitemapEntry[] => [
   }
 ];
 
+// Simple slugify function for sitemap generation
+const slugify = (text: string): string => {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'oe')
+    .replace(/å/g, 'aa')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/_/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+};
+
 export const addDynamicPages = (events: any[], artists: any[]): SitemapEntry[] => {
   const dynamicPages: SitemapEntry[] = [];
 
   // Add event pages
   events.forEach(event => {
     dynamicPages.push({
-      url: `/events/${event.id}`,
+      url: `/events/${slugify(event.title)}`,
       lastmod: event.updatedAt ? new Date(event.updatedAt).toISOString().split('T')[0] : undefined,
       changefreq: 'weekly',
       priority: 0.8
