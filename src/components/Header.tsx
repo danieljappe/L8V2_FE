@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPlatformFromPath } from '../utils/subdomainUtils';
+import { StructuredData } from './StructuredData';
+import { createSiteNavigationSchema, createWebSiteSchema } from './StructuredData';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -78,8 +80,23 @@ const Header: React.FC = () => {
     { name: 'TikTok', icon: '/icons/tiktokicon.png', href: 'https://www.tiktok.com/@aldrigl8', size: 'w-8 h-8', padding: 'p-0.5' }
   ];
 
+  // Create structured data for SEO - helps Google show site links/mega menu in search results
+  const navigationSchema = createSiteNavigationSchema(
+    navItems.map(item => ({
+      name: item.name,
+      url: item.path
+    }))
+  );
+
+  // Also add WebSite schema with navigation for better SEO
+  const websiteSchema = createWebSiteSchema();
+
   return (
-    <header
+    <>
+      {/* SEO: Navigation structured data for Google Search */}
+      <StructuredData data={navigationSchema} />
+      <StructuredData data={websiteSchema} />
+      <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-black/80 backdrop-blur-lg' : 'bg-transparent'
       }`}
@@ -108,7 +125,7 @@ const Header: React.FC = () => {
             <Link to={getPlatformFromPath() === 'booking' ? '/booking' : '/'}>
               <div className="flex items-center space-x-2">
                 <img 
-                  src="/l8logo.webp" 
+                  src="/l8logo.png" 
                   alt="L8 Logo" 
                   className="w-10 h-10 object-contain rounded-xl"
                 />
@@ -189,7 +206,7 @@ const Header: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <img 
-                        src="/l8logo.webp" 
+                        src="/l8logo.png" 
                         alt="L8 Logo" 
                         className="w-8 h-8 object-contain rounded-lg"
                       />
@@ -284,6 +301,7 @@ const Header: React.FC = () => {
         )}
       </AnimatePresence>
     </header>
+    </>
   );
 };
 
