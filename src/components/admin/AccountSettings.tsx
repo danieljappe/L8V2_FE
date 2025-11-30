@@ -12,6 +12,8 @@ type FormState = {
   email: string;
   phoneNumber: string;
   address: string;
+  imageUrl: string;
+  role: string;
 };
 
 type PasswordFormState = {
@@ -33,6 +35,8 @@ const createFormState = (user?: Partial<ApiUser>): FormState => ({
   email: user?.email || '',
   phoneNumber: user?.phoneNumber || '',
   address: user?.address || '',
+  imageUrl: user?.imageUrl || '',
+  role: user?.role || '',
 });
 
 const emptyPasswordState: PasswordFormState = {
@@ -68,6 +72,7 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
   const [userManagementError, setUserManagementError] = useState<string | null>(null);
   const [userManagementSuccess, setUserManagementSuccess] = useState<string | null>(null);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let isMounted = true;
@@ -171,6 +176,8 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
         email: formData.email.trim(),
         phoneNumber: formData.phoneNumber.trim(),
         address: formData.address.trim(),
+        imageUrl: formData.imageUrl.trim() || undefined,
+        role: formData.role.trim() || undefined,
       };
 
       const response = await apiService.updateUser(userId, payload);
@@ -427,6 +434,40 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image URL</label>
+              <input
+                type="url"
+                value={formData.imageUrl}
+                onChange={(e) => handleChange('imageUrl', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                placeholder="https://example.com/image.jpg"
+              />
+              {formData.imageUrl && (
+                <div className="mt-2">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Profile preview"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <input
+                type="text"
+                value={formData.role}
+                onChange={(e) => handleChange('role', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                placeholder="e.g., CEO & Founder, Creative Director, Event Afholder"
+              />
+            </div>
+
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
               <button
                 type="button"
@@ -633,39 +674,28 @@ export default function AccountSettings({ user }: AccountSettingsProps) {
                   {users.map((teamMember) => {
                     const fullName = [teamMember.firstName, teamMember.lastName].filter(Boolean).join(' ') || teamMember.email;
                     const disabled = teamMember.id === userId;
-                    const initials = [teamMember.firstName?.[0], teamMember.lastName?.[0]]
-                      .filter(Boolean)
-                      .join('')
-                      .toUpperCase() || teamMember.email[0].toUpperCase();
+                    const initials = [teamMember.firstName?.[0], teamMember.lastName?.[0]].filter(Boolean).join('').toUpperCase() || teamMember.email[0].toUpperCase();
+                    const hasImageError = imageErrors.has(teamMember.id);
+                    const showImage = teamMember.imageUrl && !hasImageError;
                     return (
                       <tr key={teamMember.id}>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 text-sm text-gray-900">
                           <div className="flex items-center gap-3">
-                            {teamMember.imageUrl ? (
-                              <>
-                                <img
-                                  src={teamMember.imageUrl}
-                                  alt={fullName}
-                                  className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
-                                  onError={(e) => {
-                                    const target = e.currentTarget;
-                                    target.style.display = 'none';
-                                    const fallback = target.nextElementSibling as HTMLElement;
-                                    if (fallback) {
-                                      fallback.classList.remove('hidden');
-                                    }
-                                  }}
-                                />
-                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-700 hidden">
-                                  {initials}
-                                </div>
-                              </>
+                            {showImage ? (
+                              <img
+                                src={teamMember.imageUrl}
+                                alt={fullName}
+                                className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                                onError={() => {
+                                  setImageErrors((prev) => new Set(prev).add(teamMember.id));
+                                }}
+                              />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-700">
+                              <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-gray-200 flex items-center justify-center text-xs font-semibold text-blue-700">
                                 {initials}
                               </div>
                             )}
-                            <span className="text-sm text-gray-900">{fullName}</span>
+                            <span>{fullName}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500">{teamMember.email}</td>
